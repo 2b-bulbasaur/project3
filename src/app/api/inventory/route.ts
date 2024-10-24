@@ -48,6 +48,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const existingItem = await getInventoryById(name);
+    if (existingItem) {
+      return NextResponse.json(
+        { error: `Inventory item '${name}' already exists.` },
+        { status: 409 }
+      );
+    }
+
     const newItem = await addInventory(name, amount, unit, reorder);
     return NextResponse.json(newItem, { status: 201 });
   } catch (error) {
