@@ -2,6 +2,8 @@
 import { NextResponse } from 'next/server';
 import { getTransactions, addTransaction, getTransactionDetails } from '@/lib/db';
 
+
+// GET: fetch all transactions or a specific transaction by ID
 export async function GET(request: Request) {
     try {
         // Check if we're requesting details for a specific transaction
@@ -27,6 +29,8 @@ export async function GET(request: Request) {
         );
     }
 }
+
+//POST: add new transaction to the database
 
 export async function POST(request: Request) {
     try {
