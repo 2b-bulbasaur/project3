@@ -7,7 +7,7 @@ const pool = new Pool({
   host: process.env.POSTGRES_HOST,
   database: process.env.POSTGRES_DATABASE,
   ssl: {
-    rejectUnauthorized: false // Required for some university databases
+    rejectUnauthorized: false 
   }
 });
 
@@ -23,11 +23,11 @@ interface Transaction {
   drinks: number;
 }
 
-// Query function with logging
+// query function with logging
 export async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
   const client = await pool.connect();
   
-  // Log the query and parameters for debugging
+  // logged for debugging purpose
   console.log('Executing SQL Query:', sql);
   console.log('With Parameters:', params);
 
@@ -42,7 +42,7 @@ export async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
   }
 }
 
-// Get all transactions
+// gets all transactions (50)
 export async function getTransactions(): Promise<Transaction[]> {
   try {
     return await query<Transaction>(`
@@ -77,7 +77,7 @@ export async function getTransactions(): Promise<Transaction[]> {
   }
 }
 
-// Add a new transaction
+// adds new transaction
 export async function addTransaction({
   customerName,
   cashierName,
@@ -118,7 +118,7 @@ export async function addTransaction({
   }
 }
 
-// Get detailed transaction information
+// get detailed transaction information
 export async function getTransactionDetails(transactionId: number): Promise<Transaction> {
   try {
     const [result] = await query<Transaction>(`
