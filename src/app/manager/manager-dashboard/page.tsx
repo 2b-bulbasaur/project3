@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import '../globals.css';
-import Button from '../buttons';
+import '@/app/globals.css'; 
+
+import Button from '../../buttons';
 
 interface Transaction {
   id: number;
