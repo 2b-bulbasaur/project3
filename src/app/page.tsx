@@ -36,7 +36,7 @@ const LoginPage = () => {
       }
 
       if (data.job?.toLowerCase() === 'manager') {
-        router.push('/manager/manager-dashboard');
+        router.push('/manager');
       } else if (data.job?.toLowerCase() === 'crew') {
         router.push('/cashier-dashboard');
       } else {
