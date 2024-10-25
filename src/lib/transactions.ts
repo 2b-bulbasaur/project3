@@ -81,6 +81,27 @@ export async function addTransaction(input: CreateTransactionInput): Promise<Tra
 }
 
 export async function getTransactions(withSummary: boolean = false): Promise<Transaction[]> {
+  if (withSummary) {
+    const result = await query<Transaction>(`
+      SELECT 
+        t.*,
+        STRING_AGG(DISTINCT m.name, ', ') as meal_items,
+        STRING_AGG(DISTINCT a.name, ', ') as appetizer_items,
+        STRING_AGG(DISTINCT d.name, ', ') as drink_items
+      FROM transactionhistory t
+      LEFT JOIN mealorders mo ON t.id = mo.o_id
+      LEFT JOIN menu m ON m.id IN (mo.entree1, mo.entree2, mo.entree3, mo.side1, mo.side2)
+      LEFT JOIN appetizerorders ao ON t.id = ao.o_id
+      LEFT JOIN menu a ON a.id = ao.item
+      LEFT JOIN drinkorders do ON t.id = do.o_id
+      LEFT JOIN menu d ON d.id = do.item
+      GROUP BY t.id
+      ORDER BY t.date DESC 
+      LIMIT 50
+    `);
+    return result;
+  }
+  
   const result = await query<Transaction>(`
     SELECT * FROM transactionhistory 
     ORDER BY date DESC 
