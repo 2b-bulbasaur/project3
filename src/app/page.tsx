@@ -1,100 +1,176 @@
-import Image from "next/image";
+import Link from "next/link";
+import ImageWithFallback from "../components/ImageWithFallback";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const menuItems = [
+    {
+      name: 'The Original Orange Chicken®',
+      image: '/images/orange-chicken.jpg',
+      description: 'Our signature dish. Crispy chicken wok-tossed in a sweet and spicy orange sauce.',
+    },
+    {
+      name: 'Beijing Beef',
+      image: '/images/beijing-beef.jpg',
+      description: 'Crispy beef, bell peppers and onions in a sweet-tangy sauce.',
+    },
+    {
+      name: 'Chow Mein',
+      image: '/images/chow-mein.jpg',
+      description: 'Stir-fried wheat noodles with onions, celery and cabbage.',
+    },
+  ];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Navigation Bar */}
+      <nav className="bg-black text-white py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
+          <div className="flex items-center gap-4">
+          <ImageWithFallback
+          src="/images/panda-logo.png"
+
+          alt="Panda Express Logo"
+          width={150}
+          height={50}
+          priority
+          className="object-contain"
+        />
+          </div>
+
+          <div className="hidden md:flex items-center gap-8">
+            <Link 
+              href="/menu" 
+              className="hover:text-orange-500 transition-colors font-semibold"
+            >
+              Order Online
+            </Link>
+            <Link 
+              href="/menu" 
+              className="hover:text-orange-500 transition-colors font-semibold"
+            >
+              Menu
+            </Link>
+            <Link 
+              href="/locations" 
+              className="hover:text-orange-500 transition-colors font-semibold"
+            >
+              Locations
+            </Link>
+            <Link 
+              href="/employee-login"
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full transition-colors font-semibold"
+            >
+              Employee Portal
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="relative h-[600px]">
+      <ImageWithFallback
+      src="/images/hero-orange-chicken.jpg"
+      alt="Orange Chicken"
+      fill
+      priority
+      className="object-cover brightness-75"
+    />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-6xl font-bold mb-6">
+              AMERICAN CHINESE KITCHEN
+            </h1>
+            <p className="text-2xl mb-8 max-w-2xl mx-auto">
+              Experience the bold flavors of Panda Express
+            </p>
+            <Link 
+              href="/order-now"
+              className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full text-xl font-semibold transition-colors inline-block"
+            >
+              Order Now
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Featured Menu Items */}
+      <div className="max-w-7xl mx-auto py-20 px-4">
+        <h2 className="text-3xl font-bold text-center mb-16">Featured Dishes</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {menuItems.map((item) => (
+            <div key={item.name} className="rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105">
+              <div className="h-64 relative">
+                <ImageWithFallback
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  loading="lazy"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6 bg-white">
+                <h3 className="text-xl font-bold mb-2">{item.name}</h3>
+                <p className="text-gray-600 mb-4">{item.description}</p>
+                <Link 
+                  href="/menu"
+                  className="text-red-600 hover:text-red-700 font-semibold inline-flex items-center"
+                >
+                  Order Now <span className="ml-2">→</span>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-black text-white mt-auto">
+        <div className="max-w-7xl mx-auto py-12 px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-bold mb-4">Menu</h3>
+              <ul className="space-y-2">
+                <li><Link href="/menu" className="hover:text-orange-500">Entrées</Link></li>
+                <li><Link href="/menu" className="hover:text-orange-500">Sides</Link></li>
+                <li><Link href="/menu" className="hover:text-orange-500">Appetizers</Link></li>
+                <li><Link href="/menu" className="hover:text-orange-500">Family Meals</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="hover:text-orange-500">About Us</Link></li>
+                <li><Link href="/careers" className="hover:text-orange-500">Careers</Link></li>
+                <li><Link href="/contact" className="hover:text-orange-500">Contact Us</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Connect</h3>
+              <ul className="space-y-2">
+                <li><Link href="#" className="hover:text-orange-500">Facebook</Link></li>
+                <li><Link href="#" className="hover:text-orange-500">Instagram</Link></li>
+                <li><Link href="#" className="hover:text-orange-500">Twitter</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Get Updates</h3>
+              <p className="mb-4">Sign up for exclusive offers and updates</p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  className="px-4 py-2 rounded-full flex-grow text-black"
+                />
+                <button className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-full transition-colors">
+                  Sign Up
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+            <p>© {new Date().getFullYear()} Panda Express. All Rights Reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
