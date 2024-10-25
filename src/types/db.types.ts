@@ -1,16 +1,16 @@
-export type size = 'bowl' | 'plate' | 'bigger plate';
-export type item = 'entree' | 'side' | 'drink' | 'appetizer' | 'other';
+export type SizeEnum = 'bowl' | 'plate' | 'bigger plate';
+export type ItemTypeEnum = 'entree' | 'side' | 'appetizer' | 'drink' | 'other';
 
 export interface Employee {
     id: number;
     name: string;
-    job: string;
-    hours: number;
-    salary: number;
-    password: string;
+    hours: number | null;
+    job: string | null;
+    salary: number | null;
+    password: string | null;
 }
 
-export interface Inventory {
+export interface InventoryItem {
     id: number;
     name: string;
     amount: number;
@@ -20,7 +20,7 @@ export interface Inventory {
 
 export interface MenuItem {
     id: number;
-    item_type: item;
+    item_type: ItemTypeEnum;
     name: string;
     price: number;
     premium: boolean;
@@ -34,7 +34,7 @@ export interface Recipe {
 
 export interface Transaction {
     id: number;
-    date: Date;
+    date: string;
     customer_name: string;
     cashier_name: string;
     sale_price: number;
@@ -42,4 +42,27 @@ export interface Transaction {
     meals: number;
     appetizers: number;
     drinks: number;
+}
+
+export interface MealOrder {
+    id: number;
+    o_id: number;
+    size: SizeEnum;
+    side1: number | null;
+    side2: number | null;
+    entree1: number | null;
+    entree2: number | null;
+    entree3: number | null;
+}
+
+export interface AppetizerOrder {
+    id: number;
+    o_id: number;
+    item: number;
+}
+
+export interface DrinkOrder {
+    id: number;
+    o_id: number;
+    item: number;
 }
