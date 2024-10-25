@@ -145,7 +145,7 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black flex items-center justify-center">
           <h1 className="text-6xl font-bold text-center text-white drop-shadow-lg">
-            Delicious Entrees
+            Delicious Menu Highlights
           </h1>
         </div>
       </div>
