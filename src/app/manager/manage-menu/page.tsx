@@ -64,8 +64,8 @@ const ManageMenu: React.FC = () => {
   };
 
   const handleAddMenuItem = async () => {
-    if (!name || price === '' || selectedIngredients.length === 0) {
-      setError('Name, price, and at least one ingredient are required');
+    if (!name || price === '') {
+      setError('Name and price are required');
       return;
     }
 
@@ -81,14 +81,26 @@ const ManageMenu: React.FC = () => {
           item_type: itemType,
           price: Number(price),
           premium,
-          ingredients: selectedIngredients
+          ingredients: selectedIngredients.map(ing => ({
+            id: ing.id,
+            name: ing.name,
+            amount: ing.quantity || 1,
+            unit: ing.unit,
+            reorder: ing.reorder
+          }))
         }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to add menu item');
-
+      
+      // Always try to fetch menu items, regardless of response status
       await fetchMenuItems();
+
+      // Only throw error if response wasn't successful
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add menu item');
+      }
+
       resetForm();
     } catch (error) {
       console.error('Error adding menu item:', error);
@@ -98,9 +110,10 @@ const ManageMenu: React.FC = () => {
     }
   };
 
+
   const handleUpdateMenuItem = async () => {
-    if (!selectedItem || !name || price === '' || selectedIngredients.length === 0) {
-      setError('All fields are required');
+    if (!selectedItem || !name || price === '') {
+      setError('Name and price are required');
       return;
     }
 
@@ -117,14 +130,25 @@ const ManageMenu: React.FC = () => {
           item_type: itemType,
           price: Number(price),
           premium,
-          ingredients: selectedIngredients
+          ingredients: selectedIngredients.map(ing => ({
+            id: ing.id,
+            name: ing.name,
+            amount: ing.quantity || 1,
+            unit: ing.unit,
+            reorder: ing.reorder
+          }))
         }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to update menu item');
-
+      
+      // Always try to fetch menu items, regardless of response status
       await fetchMenuItems();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update menu item');
+      }
+
       resetForm();
     } catch (error) {
       console.error('Error updating menu item:', error);
@@ -133,7 +157,6 @@ const ManageMenu: React.FC = () => {
       setIsLoading(false);
     }
   };
-
   const handleDeleteMenuItem = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this menu item?')) return;
 
@@ -146,8 +169,8 @@ const ManageMenu: React.FC = () => {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete menu item');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete menu item');
       }
 
       await fetchMenuItems();
@@ -160,21 +183,33 @@ const ManageMenu: React.FC = () => {
   };
 
   const handleAddIngredient = async () => {
+    if (!newIngredient.name || !newIngredient.amount || !newIngredient.unit) {
+      setError('Name, amount, and unit are required for new ingredients');
+      return;
+    }
+  
     try {
       const response = await fetch('/api/inventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newIngredient),
+        body: JSON.stringify({
+          ...newIngredient,
+          amount: Number(newIngredient.amount)
+        }),
       });
-
-      if (!response.ok) throw new Error('Failed to add ingredient');
+  
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to add ingredient');
+      }
       
       await fetchIngredients();
       setShowNewIngredient(false);
       setNewIngredient({ name: '', amount: '', unit: '', reorder: false });
+      setError(null);
     } catch (error) {
       console.error('Error adding ingredient:', error);
-      setError('Failed to add ingredient');
+      setError(error instanceof Error ? error.message : 'Failed to add ingredient');
     }
   };
 
@@ -227,14 +262,14 @@ const ManageMenu: React.FC = () => {
                   placeholder="Item Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   disabled={isLoading}
                 />
 
                 <select
                   value={itemType}
                   onChange={(e) => setItemType(e.target.value as ItemTypeEnum)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   disabled={isLoading}
                 >
                   {itemTypes.map(type => (
@@ -250,7 +285,7 @@ const ManageMenu: React.FC = () => {
                   value={price}
                   onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : '')}
                   step="0.01"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   disabled={isLoading}
                 />
 
@@ -267,7 +302,7 @@ const ManageMenu: React.FC = () => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-medium">Ingredients</h3>
+                  <h3 className="text-sm font-medium">Ingredients</h3>
                     <Button
                       type="button"
                       variant="outline"
@@ -334,7 +369,7 @@ const ManageMenu: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   type="submit"
@@ -487,3 +522,4 @@ const ManageMenu: React.FC = () => {
 };
 
 export default ManageMenu;
+
