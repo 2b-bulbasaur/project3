@@ -1,22 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Button from '../../buttons';
 
 interface Employee {
   id: number;
   name: string;
-  position: string;
-  salary: number;
+  job: string;
+  hours: number;
+  salary: number | string;
+  password: string;
 }
 
 const ManageEmployees: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [name, setName] = useState('');
-  const [position, setPosition] = useState('');
+  const [job, setJob] = useState('');
+  const [hours, setHours] = useState<number | ''>('');
   const [salary, setSalary] = useState<number | ''>('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch employees from the API
   const fetchEmployees = async () => {
@@ -26,6 +31,7 @@ const ManageEmployees: React.FC = () => {
       setEmployees(data);
     } catch (error) {
       console.error('Error fetching employees:', error);
+      setError('Failed to load employees.');
     }
   };
 
@@ -35,8 +41,9 @@ const ManageEmployees: React.FC = () => {
       const response = await fetch('/api/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, position, salary }),
+        body: JSON.stringify({ name, job, hours, salary, password }),
       });
+
       if (response.ok) {
         fetchEmployees();
         resetForm();
@@ -52,11 +59,13 @@ const ManageEmployees: React.FC = () => {
   const handleEditClick = (employee: Employee) => {
     setSelectedEmployee(employee);
     setName(employee.name);
-    setPosition(employee.position);
-    setSalary(employee.salary);
+    setJob(employee.job);
+    setHours(employee.hours);
+    setSalary(Number(employee.salary) || '');
+    setPassword(employee.password);
   };
 
-  // Handle updating the selected employee
+  // Handle updating an employee
   const handleUpdateEmployee = async () => {
     if (!selectedEmployee) return;
 
@@ -67,8 +76,10 @@ const ManageEmployees: React.FC = () => {
         body: JSON.stringify({
           id: selectedEmployee.id,
           name,
-          position,
+          job,
+          hours,
           salary,
+          password,
         }),
       });
 
@@ -87,6 +98,7 @@ const ManageEmployees: React.FC = () => {
   const handleDeleteEmployee = async (id: number) => {
     try {
       const response = await fetch(`/api/employees?id=${id}`, { method: 'DELETE' });
+
       if (response.ok) {
         fetchEmployees();
       } else {
@@ -97,15 +109,17 @@ const ManageEmployees: React.FC = () => {
     }
   };
 
-  // Reset the form and clear the selected employee
+  // Reset the form after add/update
   const resetForm = () => {
     setSelectedEmployee(null);
     setName('');
-    setPosition('');
+    setJob('');
+    setHours('');
     setSalary('');
+    setPassword('');
   };
 
-  // Load employees on component mount
+  // Fetch employees on component mount
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -129,16 +143,31 @@ const ManageEmployees: React.FC = () => {
             />
             <input
               type="text"
-              placeholder="Position"
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
+              placeholder="Job"
+              value={job}
+              onChange={(e) => setJob(e.target.value)}
               className="p-2 border rounded"
             />
             <input
               type="number"
-              placeholder="Salary"
-              value={salary}
-              onChange={(e) => setSalary(Number(e.target.value) || '')}
+              placeholder="Hours"
+              value={hours}
+              onChange={(e) => setHours(Number(e.target.value) || '')}
+              className="p-2 border rounded"
+            />
+            <input
+            type="number"
+            placeholder="Salary"
+            value={salary}
+            onChange={(e) => setSalary(e.target.value === '' ? '' : Number(e.target.value))}
+            className="p-2 border rounded"
+          />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="p-2 border rounded"
             />
             <div className="flex gap-4">
@@ -164,7 +193,7 @@ const ManageEmployees: React.FC = () => {
             {employees.map((employee) => (
               <li key={employee.id} className="flex justify-between items-center mb-2">
                 <span>
-                  {employee.name} - {employee.position} (${employee.salary})
+                  {employee.name} - {employee.job} ({employee.hours} hours, ${Number(employee.salary).toFixed(2)})
                 </span>
                 <div className="flex gap-2">
                   <Button label="Edit" onClick={() => handleEditClick(employee)} />
