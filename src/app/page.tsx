@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -20,10 +21,8 @@ const LoginPage = () => {
     setError('');
 
     try {
-      // Trim the username to ensure it matches the database entry
       const trimmedUsername = username.trim();
 
-      // Authenticate user by making a POST request
       const response = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,7 +35,6 @@ const LoginPage = () => {
         throw new Error(data.error || 'Login failed');
       }
 
-      // Route based on the employee’s job role
       if (data.job?.toLowerCase() === 'manager') {
         router.push('/manager/manager-dashboard');
       } else if (data.job?.toLowerCase() === 'crew') {
@@ -79,12 +77,24 @@ const LoginPage = () => {
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
               />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="show-password"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+                className="cursor-pointer"
+              />
+              <Label htmlFor="show-password" className="cursor-pointer">
+                Show Password
+              </Label>
             </div>
             {error && <div className="text-red-600 text-sm text-center">{error}</div>}
             <div className="space-y-4">
