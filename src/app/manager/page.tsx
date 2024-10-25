@@ -64,6 +64,10 @@ const ManagerDashboard = () => {
     fetchTransactions();
   }, []);
 
+  const switchToCashierView = () => {
+    router.push('/cashier');
+  }
+
   const handleLogout = () => {
     router.push('/');
   };
@@ -89,7 +93,7 @@ const ManagerDashboard = () => {
                   <DropdownMenuItem>
                     <Package className="mr-2 h-4 w-4" /> Manage Inventory
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push('/manager/manage-employees')}>
                     <Users className="mr-2 h-4 w-4" /> Manage Employees
                   </DropdownMenuItem>
                   <DropdownMenuItem>
@@ -99,7 +103,7 @@ const ManagerDashboard = () => {
               </DropdownMenu>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline">
+              <Button variant="outline" onClick={switchToCashierView}>
                 <Settings className="mr-2 h-4 w-4" />
                 Switch to Cashier View
               </Button>
