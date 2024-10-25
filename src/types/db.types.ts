@@ -18,12 +18,19 @@ export interface InventoryItem {
     reorder: boolean;
 }
 
+export interface SelectedIngredient extends InventoryItem {
+    quantity?: number; 
+}
+
+
 export interface MenuItem {
     id: number;
     item_type: ItemTypeEnum;
     name: string;
     price: number;
     premium: boolean;
+    ingredients?: SelectedIngredient[];
+
 }
 
 export interface Recipe {

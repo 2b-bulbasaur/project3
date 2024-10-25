@@ -36,7 +36,8 @@ export async function GET(request: Request) {
 // POST: adds a new menu item with ingredients
 export async function POST(request: Request) {
   try {
-    const { item_type, name, price, premium, ingredients = [] } = await request.json();
+    const body = await request.json();
+    const { item_type, name, price, premium, ingredients = [] } = body;
 
     if (!item_type || !name || price === undefined || premium === undefined) {
       return NextResponse.json(
@@ -45,12 +46,20 @@ export async function POST(request: Request) {
       );
     }
 
+    if (typeof price !== 'number' || isNaN(price)) {
+      return NextResponse.json(
+        { error: 'Price must be a valid number.' },
+        { status: 400 }
+      );
+    }
+
     const newItem = await addMenuItem(item_type, name, price, premium, ingredients);
     return NextResponse.json(newItem, { status: 201 });
   } catch (error) {
     console.error('Error adding menu item:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to add menu item';
     return NextResponse.json(
-      { error: 'Failed to add menu item.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -59,7 +68,8 @@ export async function POST(request: Request) {
 // PUT: updates an existing menu item with ingredients
 export async function PUT(request: Request) {
   try {
-    const { id,ingredents, ...updates } = await request.json();
+    const body = await request.json();
+    const { id, ingredients, ...updates } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -68,7 +78,14 @@ export async function PUT(request: Request) {
       );
     }
 
-    const updatedItem = await updateMenuItem(id, updates, updates.ingredients || []);
+    if (updates.price !== undefined && (typeof updates.price !== 'number' || isNaN(updates.price))) {
+      return NextResponse.json(
+        { error: 'Price must be a valid number.' },
+        { status: 400 }
+      );
+    }
+
+    const updatedItem = await updateMenuItem(id, updates, ingredients || []);
     if (!updatedItem) {
       return NextResponse.json(
         { error: 'Menu item not found.' },
@@ -79,8 +96,9 @@ export async function PUT(request: Request) {
     return NextResponse.json(updatedItem);
   } catch (error) {
     console.error('Error updating menu item:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to update menu item';
     return NextResponse.json(
-      { error: 'Failed to update menu item.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -99,12 +117,21 @@ export async function DELETE(request: Request) {
   }
 
   try {
+    const menuItem = await getMenuItemById(parseInt(id));
+    if (!menuItem) {
+      return NextResponse.json(
+        { error: 'Menu item not found.' },
+        { status: 404 }
+      );
+    }
+
     await deleteMenuItem(parseInt(id));
     return NextResponse.json({ message: 'Menu item deleted successfully.' });
   } catch (error) {
     console.error('Error deleting menu item:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to delete menu item';
     return NextResponse.json(
-      { error: 'Failed to delete menu item.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

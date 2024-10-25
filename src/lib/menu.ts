@@ -1,19 +1,19 @@
 // /lib/menu.ts
 import { query } from './db';
-import { Inventory, MenuItem, Recipe } from '../types';
+import { InventoryItem, MenuItem, Recipe } from '../types';
 
 // gets all menu items with their associated ingredients
 export async function getAllMenuItems(): Promise<MenuItem[]> {
   const menuItems = await query<MenuItem>('SELECT * FROM menu');
   for (const item of menuItems) {
-    item.ingredients = await getIngredientsForMenuItem(item.id); //TODO: use junction table
+    item.ingredients = await getIngredientsForMenuItem(item.id); // gets ingredients for each menu item
   }
   return menuItems;
 }
 
 // gets ingredients for a specific menu item
-async function getIngredientsForMenuItem(menuId: number): Promise<Inventory[]> {
-  return query<Inventory>(
+async function getIngredientsForMenuItem(menuId: number): Promise<InventoryItem[]> {
+  return query<InventoryItem>(
     `SELECT i.* 
      FROM inventory i
      JOIN recipes r ON i.id = r.ingredient_id
@@ -23,6 +23,7 @@ async function getIngredientsForMenuItem(menuId: number): Promise<Inventory[]> {
 }
 
 // adds a new menu item and associates ingredients
+
 export async function addMenuItem(
   item_type: string,
   name: string,
@@ -55,31 +56,36 @@ export async function addMenuItem(
       );
     }
 
-    // link the ingredient with the menu item via the recipes table
-    await addRecipe(menuItem.id, inventoryItem.id);
+    await query(
+      `INSERT INTO recipes (menu_id, ingredient_id) 
+       VALUES ($1, $2)`,
+      [menuItem.id, inventoryItem.id]
+    );
   }
 
   return menuItem;
 }
 
-async function getInventoryByName(name: string): Promise<Inventory | null> {
-  const [item] = await query<Inventory>('SELECT * FROM inventory WHERE name = $1', [name]);
+// gets an inventory item by name
+async function getInventoryByName(name: string): Promise<InventoryItem | null> {
+  const [item] = await query<InventoryItem>('SELECT * FROM inventory WHERE name = $1', [name]);
   return item || null;
 }
 
-async function getInventoryById(id: number): Promise<Inventory | null> {
-  const [item] = await query<Inventory>('SELECT * FROM inventory WHERE id = $1', [id]);
+// gets an inventory item by ID
+export async function getInventoryById(id: number): Promise<InventoryItem | null> {
+  const [item] = await query<InventoryItem>('SELECT * FROM inventory WHERE id = $1', [id]);
   return item || null;
 }
 
-// add a new ingredient to inventory
+// adds a new ingredient to inventory
 async function addInventory(
   name: string,
   amount: number,
   unit: string,
   reorder: boolean
-): Promise<Inventory> {
-  const [item] = await query<Inventory>(
+): Promise<InventoryItem> {
+  const [item] = await query<InventoryItem>(
     `INSERT INTO inventory (name, amount, unit, reorder) 
      VALUES ($1, $2, $3, $4) RETURNING *`,
     [name, amount, unit, reorder]
@@ -87,7 +93,7 @@ async function addInventory(
   return item;
 }
 
-// link a menu item with an ingredient in the recipes table
+// links a menu item with an ingredient in the recipes table
 async function addRecipe(menuId: number, ingredientId: number): Promise<Recipe> {
   const [recipe] = await query<Recipe>(
     `INSERT INTO recipes (menu_id, ingredient_id) 
@@ -113,8 +119,10 @@ export async function updateMenuItem(
   }
 
   if (ingredients) {
-    await query('DELETE FROM recipes WHERE menu_id = $1', [id]); // Clear old recipes
+    // Clear old recipes first
+    await query('DELETE FROM recipes WHERE menu_id = $1', [id]);
 
+    // Add new recipes
     for (const ingredient of ingredients) {
       let inventoryItem = ingredient.id
         ? await getInventoryById(ingredient.id)
@@ -129,14 +137,19 @@ export async function updateMenuItem(
         );
       }
 
-      await addRecipe(id, inventoryItem.id);
+      // Modified: Remove the id from the INSERT statement
+      await query(
+        `INSERT INTO recipes (menu_id, ingredient_id) 
+         VALUES ($1, $2)`,
+        [id, inventoryItem.id]
+      );
     }
   }
 
   return getMenuItemById(id);
 }
 
-// deletes a menu item and its associated recipes
+// delets a menu item and its associated recipes
 export async function deleteMenuItem(id: number): Promise<void> {
   await query('DELETE FROM recipes WHERE menu_id = $1', [id]);
   await query('DELETE FROM menu WHERE id = $1', [id]);
@@ -146,7 +159,7 @@ export async function deleteMenuItem(id: number): Promise<void> {
 export async function getMenuItemById(id: number): Promise<MenuItem | null> {
   const [menuItem] = await query<MenuItem>('SELECT * FROM menu WHERE id = $1', [id]);
   if (menuItem) {
-    menuItem.ingredients = await getIngredientsForMenuItem(menuItem.id);  //TODO: use junction table
+    menuItem.ingredients = await getIngredientsForMenuItem(menuItem.id); // Fetch ingredients
   }
   return menuItem || null;
 }
