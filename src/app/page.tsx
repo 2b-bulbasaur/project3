@@ -1,157 +1,102 @@
-'use client';
+// src/app/page.tsx
+'use client'
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button"
 
-const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+type MenuItem = {
+  name: string
+  image: string
+  description: string
+  calories: string
+  type: 'entree' | 'side'
+}
+
+const menuItems: MenuItem[] = [
+  {
+    name: "The Original Orange Chicken®",
+    image: "/images/orange-chicken.jpg",
+    description: "Our signature dish. Crispy chicken wok-tossed in a sweet and spicy orange sauce.",
+    calories: "490",
+    type: "entree"
+  },
+  // ... rest of your menu items
+]
+
+export default function HomePage() {  // Changed name since it's the root page
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const trimmedUsername = username.trim();
-
-      const response = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: trimmedUsername, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      if (data.job?.toLowerCase() === 'manager') {
-        router.push('/manager');
-      } else if (data.job?.toLowerCase() === 'crew') {
-        router.push('/cashier-dashboard');
-      } else {
-        setError('Invalid employee role');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGuestAccess = () => {
-    router.push('/customer');
-  };
-
-  const handleMenuBoard = () => {
-    router.push('/menu-board');
+  const handleLoginClick = () => {
+    router.push('/login');  // Updated to point to the login page
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-black to-orange-950">
-      {/* Logo Section */}
-      <div className="mb-8">
-        <Image 
-          src="/images/panda-logo.png" 
-          alt="Panda Express Logo" 
-          width={200} 
-          height={67} 
-          className="cursor-pointer"
-          onClick={handleMenuBoard}
-        />
+    <main className="min-h-screen bg-black text-white">
+      {/* Header with Logo and Login */}
+      <div className="absolute top-0 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
+        <div className="container mx-auto flex justify-between items-center py-4 px-4">
+          <div className="flex-shrink-0">
+            <Image 
+              src="/images/panda-logo.png" 
+              alt="Panda Express Logo" 
+              width={180} 
+              height={60}
+              className="object-contain"
+              priority
+            />
+          </div>
+          <Button 
+            variant="outline" 
+            className="bg-white/10 hover:bg-white/20 text-white border-orange-500 hover:border-orange-600 transition-all"
+            onClick={handleLoginClick}
+          >
+            Employee Login Portal
+          </Button>
+        </div>
       </div>
 
-      <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm shadow-2xl">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center text-orange-600">Employee Login</CardTitle>
-          <CardDescription className="text-center">
-            Sign in to access the POS system
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-gray-700">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your name"
-                required
-                className="border-orange-200 focus:border-orange-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700">Password</Label>
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-                className="border-orange-200 focus:border-orange-500"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="show-password"
-                checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
-                className="cursor-pointer accent-orange-500"
-              />
-              <Label htmlFor="show-password" className="cursor-pointer text-gray-700">
-                Show Password
-              </Label>
-            </div>
-            {error && (
-              <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">
-                {error}
-              </div>
-            )}
-            <div className="space-y-4">
-              <Button 
-                type="submit" 
-                className="w-full bg-orange-600 hover:bg-orange-700" 
-                disabled={isLoading}
-              >
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
-                onClick={handleGuestAccess}
-              >
-                Continue as Guest
-              </Button>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-                onClick={handleMenuBoard}
-              >
-                View Menu Board
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+      {/* Hero Section */}
+      <div className="relative h-[40vh] mb-8">
+        <Image
+          src="/images/hero-orange-chicken.jpg"
+          alt="Panda Express Hero"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black flex items-center justify-center">
+          <h1 className="text-6xl font-bold text-center text-white drop-shadow-lg">
+            Delicious Entrees
+          </h1>
+        </div>
+      </div>
 
-export default LoginPage;
+      {/* Menu Grid */}
+      <div className="container mx-auto px-4 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {menuItems.map((item) => (
+            <div 
+              key={item.name} 
+              className="bg-zinc-900 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
+            >
+              <div className="relative h-48">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold mb-2">{item.name}</h3>
+                <p className="text-gray-400 text-sm mb-2">{item.description}</p>
+                <p className="text-amber-500">{item.calories} calories</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  )
+}
