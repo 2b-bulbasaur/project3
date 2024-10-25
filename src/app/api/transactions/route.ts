@@ -1,35 +1,22 @@
 // src/app/api/transactions/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getTransactions,
-  getTransactionDetails,
-  addTransaction,
-} from '@/lib/transactions';
+import { getTransactions, addTransaction } from '@/lib/transactions';
 
-// GET: gets all transactions or a specific one by ID
+// GET: gets all transactions with or without summaries
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const withSummary = searchParams.get('summary') === 'true'; // checks if summary flag is present
 
-    if (id) {
-      const transaction = await getTransactionDetails(parseInt(id));
-
-      if (!transaction) {
-        return NextResponse.json(
-          { error: 'Transaction not found' },
-          { status: 404 }
-        );
-      }
-      return NextResponse.json(transaction);
-    }
-
-    const transactions = await getTransactions();
+    const transactions = await getTransactions(withSummary);
     return NextResponse.json(transactions);
   } catch (error) {
     console.error('Error in transactions GET route:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
     return NextResponse.json(
-      { error: 'Failed to fetch transactions', details: error },
+      { error: 'Failed to fetch transactions', details: errorMessage },
       { status: 500 }
     );
   }
@@ -69,8 +56,11 @@ export async function POST(request: Request) {
     return NextResponse.json(newTransaction);
   } catch (error) {
     console.error('Error in transactions POST route:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
     return NextResponse.json(
-      { error: 'Failed to create transaction', details: error },
+      { error: 'Failed to create transaction', details: errorMessage },
       { status: 500 }
     );
   }
