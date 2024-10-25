@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { XCircle } from 'lucide-react';
 import type { MealInProgress, MenuItem, SizeEnum } from '@/types';
 
 interface MealBuilderProps {
@@ -12,22 +13,66 @@ interface MealBuilderProps {
   menuItems: MenuItem[];
   onUpdateMeal: (item: MenuItem) => void;
   onComplete: () => void;
+  onCancel: () => void;
 }
 
-export const MealBuilder = ({ size, meal, menuItems, onUpdateMeal, onComplete }: MealBuilderProps) => {
+export const MealBuilder = ({ 
+  size, 
+  meal, 
+  menuItems, 
+  onUpdateMeal, 
+  onComplete,
+  onCancel 
+}: MealBuilderProps) => {
+  const getMealRequirements = () => {
+    switch (size) {
+      case 'bowl':
+        return { sides: 1, entrees: 1 };
+      case 'plate':
+        return { sides: 1, entrees: 2 };
+      case 'bigger plate':
+        return { sides: 2, entrees: 3 };
+      default:
+        return { sides: 1, entrees: 1 };
+    }
+  };
+
   const getProgress = () => {
-    const total = size === 'bowl' ? 3 : 4; // bowl needs 3 items, others need 4
-    const filled = [meal.side1, meal.side2, meal.entree1, meal.entree2]
-      .filter(Boolean).length;
+    const requirements = getMealRequirements();
+    let filled = 0;
+    const total = requirements.sides + requirements.entrees;
+
+    // Count sides
+    if (requirements.sides === 1) {
+      if (meal.side1) filled++;
+    } else {
+      if (meal.side1) filled++;
+      if (meal.side2) filled++;
+    }
+
+    // Count entrees
+    if (meal.entree1) filled++;
+    if (requirements.entrees >= 2 && meal.entree2) filled++;
+    if (requirements.entrees >= 3 && meal.entree3) filled++;
+
     return (filled / total) * 100;
   };
 
   const getRequiredItems = () => {
+    const requirements = getMealRequirements();
     const remaining = [];
-    if (!meal.side1) remaining.push('first side');
-    if (!meal.side2) remaining.push('second side');
+
+    if (requirements.sides === 1) {
+      if (!meal.side1) remaining.push('side');
+    } else {
+      if (!meal.side1) remaining.push('first side');
+      if (!meal.side2) remaining.push('second side');
+    }
+
     if (!meal.entree1) remaining.push('first entrée');
-    if (size !== 'bowl' && !meal.entree2) remaining.push('second entrée');
+    if (requirements.entrees >= 2 && !meal.entree2) remaining.push('second entrée');
+    if (requirements.entrees >= 3 && !meal.entree3) remaining.push('third entrée');
+
     return remaining;
   };
 
@@ -35,8 +80,48 @@ export const MealBuilder = ({ size, meal, menuItems, onUpdateMeal, onComplete }:
     return Number(price).toFixed(2);
   };
 
+  const getMealDescription = () => {
+    const requirements = getMealRequirements();
+    return `${size} (${requirements.sides} side${requirements.sides > 1 ? 's' : ''}, ${requirements.entrees} entrée${requirements.entrees > 1 ? 's' : ''})`;
+  };
+
+  const isSideDisabled = (item: MenuItem) => {
+    const requirements = getMealRequirements();
+    if (requirements.sides === 1) {
+      return meal.side1 !== null && meal.side1.id !== item.id;
+    }
+    return meal.side1 !== null && meal.side2 !== null && 
+           meal.side1.id !== item.id && meal.side2.id !== item.id;
+  };
+
+  const isEntreeDisabled = (item: MenuItem) => {
+    if (size === 'bowl') {
+      return meal.entree1 !== null && meal.entree1.id !== item.id;
+    }
+    if (size === 'plate') {
+      return meal.entree1 !== null && meal.entree2 !== null && 
+             meal.entree1.id !== item.id && meal.entree2.id !== item.id;
+    }
+    return meal.entree1 !== null && meal.entree2 !== null && meal.entree3 !== null &&
+           meal.entree1.id !== item.id && meal.entree2.id !== item.id && 
+           meal.entree3.id !== item.id;
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">{getMealDescription()}</h2>
+        <Button 
+          variant="destructive" 
+          size="sm"
+          onClick={onCancel}
+          className="gap-2"
+        >
+          <XCircle className="h-4 w-4" />
+          Cancel Meal
+        </Button>
+      </div>
+
       <div className="space-y-2">
         <Progress value={getProgress()} className="w-full" />
         {getRequiredItems().length > 0 && (
@@ -64,6 +149,7 @@ export const MealBuilder = ({ size, meal, menuItems, onUpdateMeal, onComplete }:
                         : "outline"}
                       className="w-full justify-start h-auto py-2"
                       onClick={() => onUpdateMeal(item)}
+                      disabled={isSideDisabled(item)}
                     >
                       <div className="flex justify-between w-full">
                         <span>{item.name}</span>
@@ -86,11 +172,16 @@ export const MealBuilder = ({ size, meal, menuItems, onUpdateMeal, onComplete }:
                   .map(item => (
                     <Button
                       key={item.id}
-                      variant={meal.entree1?.id === item.id || meal.entree2?.id === item.id 
-                        ? "default" 
-                        : "outline"}
+                      variant={
+                        meal.entree1?.id === item.id || 
+                        meal.entree2?.id === item.id ||
+                        meal.entree3?.id === item.id
+                          ? "default" 
+                          : "outline"
+                      }
                       className="w-full justify-start h-auto py-2"
                       onClick={() => onUpdateMeal(item)}
+                      disabled={isEntreeDisabled(item)}
                     >
                       <div className="flex justify-between w-full">
                         <span>{item.name}</span>
@@ -110,6 +201,7 @@ export const MealBuilder = ({ size, meal, menuItems, onUpdateMeal, onComplete }:
           {meal.side2 && <div>Side 2: {meal.side2.name}</div>}
           {meal.entree1 && <div>Entrée 1: {meal.entree1.name}</div>}
           {meal.entree2 && <div>Entrée 2: {meal.entree2.name}</div>}
+          {meal.entree3 && <div>Entrée 3: {meal.entree3.name}</div>}
         </div>
         <Button 
           onClick={onComplete}

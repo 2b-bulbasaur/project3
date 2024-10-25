@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, XCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import MealBuilder from '@/components/MealBuilder';
 import OrderSummary from '@/components/OrderSummary';
@@ -48,6 +49,7 @@ const CategorySection = ({
 );
 
 const CustomerPage = () => {
+  const router = useRouter();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [currentMeal, setCurrentMeal] = useState<MealInProgress | null>(null);
@@ -66,6 +68,7 @@ const CustomerPage = () => {
         const premiumItems = [
           item.meal.entree1,
           item.meal.entree2,
+          item.meal.entree3,
           item.meal.side1,
           item.meal.side2
         ].filter(i => i?.premium).length;
@@ -121,15 +124,27 @@ const CustomerPage = () => {
       if (!prev) return prev;
       
       if (item.item_type === 'side') {
-        if (!prev.side1) return { ...prev, side1: item };
-        if (!prev.side2) return { ...prev, side2: item };
+        // bowl and plate: 1 side, bigger plate: 2 sides
+        if (prev.size === 'bowl' || prev.size === 'plate') {
+          return { ...prev, side1: item, side2: null };
+        } else {
+          if (!prev.side1) return { ...prev, side1: item };
+          if (!prev.side2) return { ...prev, side2: item };
+        }
         return prev;
       }
       
       if (item.item_type === 'entree') {
-        if (!prev.entree1) return { ...prev, entree1: item };
-        if (prev.size !== 'bowl') {
+        // bowl: 1 entree, plate 2, bigger plate 3
+        if (prev.size === 'bowl') {
+          return { ...prev, entree1: item, entree2: null, entree3: null };
+        } else if (prev.size === 'plate') {
+          if (!prev.entree1) return { ...prev, entree1: item };
           if (!prev.entree2) return { ...prev, entree2: item };
+        } else {
+          if (!prev.entree1) return { ...prev, entree1: item };
+          if (!prev.entree2) return { ...prev, entree2: item };
+          if (!prev.entree3) return { ...prev, entree3: item };
         }
         return prev;
       }
@@ -176,6 +191,18 @@ const CustomerPage = () => {
     } else {
       addSimpleItem(item);
     }
+  };
+
+  const cancelMeal = () => {
+    setCurrentMeal(null);
+    setShowMealBuilder(false);
+  };
+
+  const cancelOrder = () => {
+    setCurrentOrder([]);
+    setCurrentMeal(null);
+    setShowMealBuilder(false);
+    router.push('/');
   };
 
   const completeMeal = () => {
@@ -229,12 +256,10 @@ const CustomerPage = () => {
 
       if (!response.ok) throw new Error('Failed to submit order');
       
-      // Clear the order and show success message
       setCurrentOrder([]);
       setCurrentMeal(null);
       setShowMealBuilder(false);
       
-      // You might want to redirect to a payment page or show a confirmation dialog here
     } catch (err) {
       setError('Failed to submit order');
       console.error(err);
@@ -248,8 +273,16 @@ const CustomerPage = () => {
     <div className="h-screen flex">
       <div className="w-2/3 flex flex-col">
         <Card className="m-4 flex-grow">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Place Your Order</CardTitle>
+            <Button 
+              variant="destructive"
+              onClick={cancelOrder}
+              className="gap-2"
+            >
+              <XCircle className="h-4 w-4" />
+              Cancel Order
+            </Button>
           </CardHeader>
           <CardContent>
             {!showMealBuilder ? (
@@ -263,13 +296,13 @@ const CustomerPage = () => {
                 <TabsContent value="meals" className="h-full">
                   <div className="grid grid-cols-3 gap-4 mb-4">
                     <Button onClick={() => startNewMeal('bowl')}>
-                      Start Bowl
+                      Create bowl
                     </Button>
                     <Button onClick={() => startNewMeal('plate')}>
-                      Start Plate
+                      Create plate
                     </Button>
                     <Button onClick={() => startNewMeal('bigger plate')}>
-                      Start Bigger Plate
+                      Create bigger plate
                     </Button>
                   </div>
                 </TabsContent>
@@ -297,6 +330,7 @@ const CustomerPage = () => {
                 menuItems={menuItems}
                 onUpdateMeal={handleMealUpdate}
                 onComplete={completeMeal}
+                onCancel={cancelMeal}
               />
             ) : null}
           </CardContent>
