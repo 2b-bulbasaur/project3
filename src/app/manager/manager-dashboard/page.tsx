@@ -42,13 +42,19 @@ const ManagerDashboard = () => {
     router.push('/'); 
   };
 
+
+  const handleManageEmployees = () => {
+    router.push('/manager/manage-employees'); 
+  };
+
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground p-4">
       {/* top Navigation Buttons */}
       <div className="flex justify-between items-center mb-4 space-x-2">
         <Button label="Manage Menu" onClick={() => {}} />
         <Button label="Manage Inventory" onClick={() => {}} />
-        <Button label="Manage Employees" onClick={() => {}} />
+        <Button label="Manage Employees" onClick={handleManageEmployees} /> 
         <Button label="Generate Reports" onClick={() => {}} />
         <Button label="Switch to Cashier View" onClick={() => {}} />
         <Button label="Logout" onClick={handleLogout} variant="danger" />
