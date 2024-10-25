@@ -1,12 +1,6 @@
 // /lib/employees.ts
 import { query } from './db';
-
-interface Employee {
-  id: number;
-  name: string;
-  position: string;
-  salary: number;
-}
+import { Employee } from '@/types';
 
 // fetches all employees
 export async function getAllEmployees(): Promise<Employee[]> {

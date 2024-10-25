@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/card';
-import Button from '../app/buttons';
+import { Card, CardHeader, CardTitle, CardContent } from '../card';
+import Button from '../../buttons';
 
 interface Employee {
   id: number;
