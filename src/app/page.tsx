@@ -1,4 +1,3 @@
-// src/app/page.tsx
 'use client'
 
 import Image from 'next/image'
@@ -21,14 +20,97 @@ const menuItems: MenuItem[] = [
     calories: "490",
     type: "entree"
   },
-  // ... rest of your menu items
+  {
+    name: "Beijing Beef",
+    image: "/images/beijing-beef.jpg",
+    description: "Crispy beef, bell peppers and onions in a sweet-tangy sauce.",
+    calories: "470",
+    type: "entree"
+  },
+  {
+    name: "Black Pepper Chicken",
+    image: "/images/black-pepper-chicken.jpg",
+    description: "Marinated chicken, celery and onions in a bold black pepper sauce.",
+    calories: "280",
+    type: "entree"
+  },
+  {
+    name: "Black Pepper Angus Steak",
+    image: "/images/black-pepper-steak.jpg",
+    description: "Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
+    calories: "450",
+    type: "entree"
+  },
+  {
+    name: "Bourbon Chicken",
+    image: "/images/bourbon-chicken.jpg",
+    description: "Chicken breast pieces wok-fired in a signature bourbon sauce.",
+    calories: "460",
+    type: "entree"
+  },
+  {
+    name: "Broccoli Beef",
+    image: "/images/brocolli-beef.jpg",
+    description: "Tender beef and fresh broccoli in a ginger soy sauce.",
+    calories: "150",
+    type: "entree"
+  },
+  {
+    name: "Mushroom Chicken",
+    image: "/images/mushroom-chicken.jpg",
+    description: "Light and savory chicken with mushrooms, zucchini and carrots in a ginger soy sauce.",
+    calories: "220",
+    type: "entree"
+  },
+  {
+    name: "String Bean Chicken Breast",
+    image: "/images/string-bean-chicken-breast.jpg",
+    description: "Chicken breast, string beans and onions wok-tossed in a mild ginger soy sauce.",
+    calories: "190",
+    type: "entree"
+  },
+  {
+    name: "SweetFire Chicken Breast®",
+    image: "/images/sweetfire-chicken-breast.jpg",
+    description: "Crispy white meat chicken, red bell peppers, onions and pineapples in a sweet and spicy sauce.",
+    calories: "380",
+    type: "entree"
+  },
+  {
+    name: "Honey Sesame Chicken Breast",
+    image: "/images/honey-sesame-chicken-breast.jpg",
+    description: "Crispy chicken breast strips tossed with fresh string beans and yellow bell peppers in a sweet honey sesame sauce.",
+    calories: "420",
+    type: "entree"
+  },
+  {
+    name: "Kung Pao Chicken",
+    image: "/images/kung-pao-chicken.jpg",
+    description: "A Szechwan-inspired dish with chicken, peanuts, vegetables and chili peppers.",
+    calories: "290",
+    type: "entree"
+  },
+  {
+    name: "Teriyaki Chicken",
+    image: "/images/teriyaki-chicken.jpg",
+    description: "Grilled chicken thigh hand-sliced to order and served with teriyaki sauce.",
+    calories: "300",
+    type: "entree"
+  },
+  {
+    name: "Walnut Shrimp",
+    image: "/images/walnut-shrimp.jpg",
+    description: "Large tempura-battered shrimp, wok-tossed in a honey sauce and topped with glazed walnuts.",
+    calories: "510",
+    type: "entree"
+  }
 ]
 
-export default function HomePage() {  // Changed name since it's the root page
+export default function HomePage() {
   const router = useRouter();
 
   const handleLoginClick = () => {
-    router.push('/login');  // Updated to point to the login page
+    router.push('/login');
   };
 
   return (
