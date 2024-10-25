@@ -8,10 +8,9 @@ import {
   deleteInventory,
 } from '@/lib/inventory';
 
-// GET: gets all inventory items
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id'); // optional parameter to get a single item via id
+  const id = searchParams.get('id');
 
   try {
     if (id) {
@@ -36,10 +35,10 @@ export async function GET(request: Request) {
   }
 }
 
-// POST: adds a new inventory item
 export async function POST(request: Request) {
   try {
-    const { name, amount, unit, reorder } = await request.json();
+    const body = await request.json();
+    const { name, amount, unit, reorder } = body;
 
     if (!name || amount === undefined || !unit || reorder === undefined) {
       return NextResponse.json(
@@ -48,8 +47,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const existingItem = await getInventoryById(name);
-    if (existingItem) {
+    // Check for existing items by name instead of ID
+    const existingItems = await getAllInventory();
+    const nameExists = existingItems.some(item => 
+      item.name.toLowerCase() === name.toLowerCase()
+    );
+    
+    if (nameExists) {
       return NextResponse.json(
         { error: `Inventory item '${name}' already exists.` },
         { status: 409 }
@@ -67,39 +71,26 @@ export async function POST(request: Request) {
   }
 }
 
-// PUT: updates an existing inventory item
 export async function PUT(request: Request) {
   try {
     const { id, name, amount, unit, reorder } = await request.json();
 
-    if (
-      !id ||
-      !name ||
-      amount === undefined ||
-      !unit ||
-      reorder === undefined
-    ) {
+    if (!id || !name || amount === undefined || !unit || reorder === undefined) {
       return NextResponse.json(
         { error: 'Invalid input. All fields are required.' },
         { status: 400 }
       );
     }
 
-    const updatedItem = await updateInventory(
-      id,
-      name,
-      amount,
-      unit,
-      reorder
-    );
-
-    if (!updatedItem) {
+    const existingItem = await getInventoryById(id);
+    if (!existingItem) {
       return NextResponse.json(
         { error: 'Inventory item not found' },
         { status: 404 }
       );
     }
 
+    const updatedItem = await updateInventory(id, name, amount, unit, reorder);
     return NextResponse.json(updatedItem);
   } catch (error) {
     console.error('Error updating inventory item:', error);
@@ -110,7 +101,6 @@ export async function PUT(request: Request) {
   }
 }
 
-// DELETE: removes an inventory item by ID
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
@@ -123,6 +113,14 @@ export async function DELETE(request: Request) {
   }
 
   try {
+    const item = await getInventoryById(parseInt(id));
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Inventory item not found' },
+        { status: 404 }
+      );
+    }
+
     await deleteInventory(parseInt(id));
     return NextResponse.json({ message: 'Inventory item deleted successfully' });
   } catch (error) {
