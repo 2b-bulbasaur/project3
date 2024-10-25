@@ -1,34 +1,12 @@
 // /lib/menu.ts
 import { query } from './db';
-
-interface MenuItem {
-  id: number;
-  item_type: string;
-  name: string;
-  price: number;
-  premium: boolean;
-  ingredients?: Inventory[];
-}
-
-interface Inventory {
-  id: number;
-  name: string;
-  amount: number;
-  unit: string;
-  reorder: boolean;
-}
-
-interface Recipe {
-  id: number;
-  menu_id: number;
-  ingredient_id: number;
-}
+import { Inventory, MenuItem, Recipe } from '../types';
 
 // gets all menu items with their associated ingredients
 export async function getAllMenuItems(): Promise<MenuItem[]> {
   const menuItems = await query<MenuItem>('SELECT * FROM menu');
   for (const item of menuItems) {
-    item.ingredients = await getIngredientsForMenuItem(item.id);
+    item.ingredients = await getIngredientsForMenuItem(item.id); //TODO: use junction table
   }
   return menuItems;
 }
@@ -168,7 +146,7 @@ export async function deleteMenuItem(id: number): Promise<void> {
 export async function getMenuItemById(id: number): Promise<MenuItem | null> {
   const [menuItem] = await query<MenuItem>('SELECT * FROM menu WHERE id = $1', [id]);
   if (menuItem) {
-    menuItem.ingredients = await getIngredientsForMenuItem(menuItem.id);
+    menuItem.ingredients = await getIngredientsForMenuItem(menuItem.id);  //TODO: use junction table
   }
   return menuItem || null;
 }

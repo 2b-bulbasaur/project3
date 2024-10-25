@@ -13,7 +13,7 @@ const pool = new Pool({
 });
 
 // query function with logging
-export async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
+export async function query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
   const client = await pool.connect();
   
   // logs for debugging

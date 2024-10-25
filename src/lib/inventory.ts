@@ -1,13 +1,6 @@
 // /lib/inventory.ts
 import { query } from './db';
-
-interface Inventory {
-  id: number;
-  name: string;
-  amount: number;
-  unit: string;
-  reorder: boolean;
-}
+import { Inventory } from '../types';
 
 // fetch all inventory items
 export async function getAllInventory(): Promise<Inventory[]> {

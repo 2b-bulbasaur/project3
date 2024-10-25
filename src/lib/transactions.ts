@@ -1,17 +1,6 @@
 // /lib/transactions.ts
 import { query } from './db';
-
-interface Transaction {
-  id: number;
-  date: Date;
-  customer_name: string;
-  cashier_name: string;
-  sale_price: number;
-  items: number;
-  meals: number;
-  appetizers: number;
-  drinks: number;
-}
+import { Transaction } from '../types';
 
 // fetch all transactions (limit 50)
 export async function getTransactions(): Promise<Transaction[]> {

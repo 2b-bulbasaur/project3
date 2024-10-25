@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-
-interface Employee {
-  id: number;
-  name: string;
-  job: string;
-  hours: number;
-  salary: number;
-  password: string;
-}
+import type { Employee } from '@/types';
 
 export async function POST(request: Request) {
   try {
