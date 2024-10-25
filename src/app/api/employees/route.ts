@@ -50,3 +50,30 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Failed to update employee' }, { status: 500 });
   }
 }
+
+
+// DELETE: delets an employee
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const idString = searchParams.get('id'); 
+
+  if (!idString) {
+      return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 });
+  }
+
+  const id = Number(idString); 
+
+  if (isNaN(id)) {
+      return NextResponse.json({ error: 'Invalid Employee ID' }, { status: 400 });
+  }
+
+  try {
+      await deleteEmployee(id); 
+      return NextResponse.json({ message: 'Employee deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting employee:', error);
+      return NextResponse.json({ error: 'Failed to delete employee' }, { status: 500 });
+  }
+}
+
+
