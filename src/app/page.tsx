@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,17 +54,35 @@ const LoginPage = () => {
     router.push('/customer');
   };
 
+  const handleMenuBoard = () => {
+    router.push('/menu-board');
+  };
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader>
-          <CardTitle>Welcome</CardTitle>
-          <CardDescription>Sign in to access the POS system</CardDescription>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-black to-orange-950">
+      {/* Logo Section */}
+      <div className="mb-8">
+        <Image 
+          src="/images/panda-logo.png" 
+          alt="Panda Express Logo" 
+          width={200} 
+          height={67} 
+          className="cursor-pointer"
+          onClick={handleMenuBoard}
+        />
+      </div>
+
+      <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm shadow-2xl">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center text-orange-600">Employee Login</CardTitle>
+          <CardDescription className="text-center">
+            Sign in to access the POS system
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username" className="text-gray-700">Username</Label>
               <Input
                 id="username"
                 type="text"
@@ -71,10 +90,11 @@ const LoginPage = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your name"
                 required
+                className="border-orange-200 focus:border-orange-500"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700">Password</Label>
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -82,6 +102,7 @@ const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                className="border-orange-200 focus:border-orange-500"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -90,19 +111,40 @@ const LoginPage = () => {
                 id="show-password"
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
-                className="cursor-pointer"
+                className="cursor-pointer accent-orange-500"
               />
-              <Label htmlFor="show-password" className="cursor-pointer">
+              <Label htmlFor="show-password" className="cursor-pointer text-gray-700">
                 Show Password
               </Label>
             </div>
-            {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+            {error && (
+              <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">
+                {error}
+              </div>
+            )}
             <div className="space-y-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-orange-600 hover:bg-orange-700" 
+                disabled={isLoading}
+              >
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={handleGuestAccess}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
+                onClick={handleGuestAccess}
+              >
                 Continue as Guest
+              </Button>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                onClick={handleMenuBoard}
+              >
+                View Menu Board
               </Button>
             </div>
           </form>
