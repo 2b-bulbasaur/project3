@@ -110,7 +110,7 @@ const menuItems: MenuItem[] = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* Header with Logo and Login */}
+      {/* header with logo and logout/sudtomer button*/}
       <div className="absolute top-0 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
         <div className="container mx-auto flex justify-between items-center py-4 px-4">
           <div className="flex-shrink-0">
@@ -123,6 +123,18 @@ export default function HomePage() {
               priority
             />
           </div>
+          <div className="flex gap-4">
+
+            <Link href="/customer" prefetch>
+              <Button 
+                variant="outline" 
+                className="bg-white/10 hover:bg-white/20 text-white border-orange-500 hover:border-orange-600 transition-all"
+              >
+                For Customers
+              </Button>
+            </Link>
+
+
           <Link href="/login" prefetch>
             <Button 
               variant="outline" 
@@ -133,8 +145,9 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+    </div>
 
-      {/* Hero Section */}
+      {/* Large Panda Express Image Section */}
       <div className="relative h-[40vh] mb-8">
         <Image
           src="/images/hero-orange-chicken.jpg"
@@ -150,7 +163,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Menu Grid */}
+      {/* menu grid */}
       <div className="container mx-auto px-4 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {menuItems.map((item) => (
