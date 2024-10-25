@@ -1,19 +1,17 @@
-import type { MenuItem, SizeEnum } from './db.types';
+import type { Transaction, MenuItem, SizeEnum } from './db.types';
 
-export interface TransactionRequest {
-  customer_name: string;
-  cashier_name: string;
-  sale_price: number;
-  items: number;
-  meals: number;
-  appetizers: number;
-  drinks: number;
-  date: string;
-  orderItems: OrderItem[];
+export interface TransactionWithItems extends Transaction {
+  meal_items: string[] | null;
+  appetizer_items: string[] | null;
+  drink_items: string[] | null;
+}
+
+export interface TransactionWithSummary extends Transaction {
+  order_summary?: string;
 }
 
 export interface MealInProgress {
-  id: string;
+  id?: string;
   size: SizeEnum | null;
   side1: MenuItem | null;
   side2: MenuItem | null;

@@ -104,9 +104,21 @@ const CustomerPage = () => {
     calculateTotal();
   }, [calculateTotal]);
 
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('currentOrder');
+    if (savedOrder) {
+      try {
+        const parsedOrder = JSON.parse(savedOrder);
+        setCurrentOrder(parsedOrder);
+      } catch (err) {
+        console.error('Failed to parse saved order:', err);
+        localStorage.removeItem('currentOrder');
+      }
+    }
+  }, []);
+
   const startNewMeal = (size: SizeEnum) => {
     setCurrentMeal({
-      id: Math.random().toString(36).substr(2, 9),
       size,
       side1: null,
       side2: null,
@@ -124,7 +136,6 @@ const CustomerPage = () => {
       if (!prev) return prev;
       
       if (item.item_type === 'side') {
-        // bowl and plate: 1 side, bigger plate: 2 sides
         if (prev.size === 'bowl' || prev.size === 'plate') {
           return { ...prev, side1: item, side2: null };
         } else {
@@ -135,7 +146,6 @@ const CustomerPage = () => {
       }
       
       if (item.item_type === 'entree') {
-        // bowl: 1 entree, plate 2, bigger plate 3
         if (prev.size === 'bowl') {
           return { ...prev, entree1: item, entree2: null, entree3: null };
         } else if (prev.size === 'plate') {
@@ -202,23 +212,32 @@ const CustomerPage = () => {
     setCurrentOrder([]);
     setCurrentMeal(null);
     setShowMealBuilder(false);
+    localStorage.removeItem('currentOrder');
+    localStorage.removeItem('orderTotal');
     router.push('/');
   };
 
   const completeMeal = () => {
     if (!currentMeal) return;
-    setCurrentOrder(prev => [...prev, { type: 'meal', meal: currentMeal }]);
+    const newMealItem: OrderItem = { type: 'meal', meal: currentMeal };
+    const updatedOrder = [...currentOrder, newMealItem];
+    setCurrentOrder(updatedOrder);
+    localStorage.setItem('currentOrder', JSON.stringify(updatedOrder));
     setCurrentMeal(null);
     setShowMealBuilder(false);
   };
 
   const removeOrderItem = (index: number) => {
-    setCurrentOrder(prev => prev.filter((_, i) => i !== index));
+    setCurrentOrder(prev => {
+      const updatedOrder = prev.filter((_, i) => i !== index);
+      localStorage.setItem('currentOrder', JSON.stringify(updatedOrder));
+      return updatedOrder;
+    });
   };
 
   const updateItemQuantity = (index: number, change: number) => {
     setCurrentOrder(prev => {
-      return prev.map((item, i) => {
+      const updatedOrder = prev.map((item, i) => {
         if (i !== index || item.type === 'meal' || !item.item) return item;
         
         const newQuantity = (item.item.quantity || 1) + change;
@@ -229,41 +248,22 @@ const CustomerPage = () => {
           item: { ...item.item, quantity: newQuantity }
         };
       }).filter(Boolean) as OrderItem[];
+      
+      localStorage.setItem('currentOrder', JSON.stringify(updatedOrder));
+      return updatedOrder;
     });
   };
 
-  const handleCheckout = async () => {
-    try {
-      const orderData = {
-        customer_name: "Self Service",
-        cashier_name: "Self Service Kiosk",
-        sale_price: orderTotal,
-        items: currentOrder.length,
-        meals: currentOrder.filter(item => item.type === 'meal').length,
-        appetizers: currentOrder.reduce((sum, item) => 
-          item.type === 'appetizer' && item.item ? sum + item.item.quantity : sum, 0),
-        drinks: currentOrder.reduce((sum, item) => 
-          item.type === 'drink' && item.item ? sum + item.item.quantity : sum, 0),
-        date: new Date().toISOString(),
-        orderItems: currentOrder
-      };
-
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
-
-      if (!response.ok) throw new Error('Failed to submit order');
-      
-      setCurrentOrder([]);
-      setCurrentMeal(null);
-      setShowMealBuilder(false);
-      
-    } catch (err) {
-      setError('Failed to submit order');
-      console.error(err);
+  const handleCheckout = () => {
+    if (currentOrder.length === 0) {
+      setError('Please add items to your order before checking out');
+      return;
     }
+    
+    localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+    localStorage.setItem('orderTotal', orderTotal.toString());
+    
+    router.push('/customer/checkout');
   };
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
