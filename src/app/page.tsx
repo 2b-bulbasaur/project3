@@ -1,26 +1,59 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useRouter } from 'next/navigation'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const router = useRouter()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: add actual authentication logic here
-    router.push('/manager')
-  }
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Trim the username to ensure it matches the database entry
+      const trimmedUsername = username.trim();
+
+      // Authenticate user by making a POST request
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmedUsername, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      // Route based on the employee’s job role
+      if (data.job?.toLowerCase() === 'manager') {
+        router.push('/manager/manager-dashboard');
+      } else if (data.job?.toLowerCase() === 'crew') {
+        router.push('/cashier-dashboard');
+      } else {
+        setError('Invalid employee role');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGuestAccess = () => {
-    router.push('/customer')
-  }
+    router.push('/customer');
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
@@ -33,18 +66,18 @@ const LoginPage = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-              <Input 
+              <Input
                 id="username"
-                type="text" 
+                type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder="Enter your name"
                 required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input 
+              <Input
                 id="password"
                 type="password"
                 value={password}
@@ -53,16 +86,12 @@ const LoginPage = () => {
                 required
               />
             </div>
+            {error && <div className="text-red-600 text-sm text-center">{error}</div>}
             <div className="space-y-4">
-              <Button type="submit" className="w-full">
-                Sign In
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full"
-                onClick={handleGuestAccess}
-              >
+              <Button type="button" variant="outline" className="w-full" onClick={handleGuestAccess}>
                 Continue as Guest
               </Button>
             </div>
@@ -70,7 +99,7 @@ const LoginPage = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
