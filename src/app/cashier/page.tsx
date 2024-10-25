@@ -3,16 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table"
 import {
   Select,
   SelectContent,
@@ -21,28 +12,22 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import type { MenuItem } from '@/types/db.types'
-
-type OrderItem = MenuItem & {
-  quantity: number
-}
+import type { MealInProgress, MenuItem, OrderItem, SizeEnum } from '@/types/';
 
 const CashierPage = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedCategory, setSelectedCategory] = useState<string>("side")
   const [customerName, setCustomerName] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [currentMeal, setCurrentMeal] = useState<MealInProgress | null>(null)
 
-  // Fetch menu items on component mount
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
         const response = await fetch('/api/menu')
-        if (!response.ok) {
-          throw new Error('Failed to fetch menu items')
-        }
+        if (!response.ok) throw new Error('Failed to fetch menu items')
         const data = await response.json()
         setMenuItems(data)
       } catch (err) {
@@ -52,46 +37,117 @@ const CashierPage = () => {
         setLoading(false)
       }
     }
-
     fetchMenuItems()
   }, [])
 
-  // Filter menu items based on selected category
-  const filteredMenuItems = selectedCategory === "all" 
-    ? menuItems 
-    : menuItems.filter(item => item.item_type === selectedCategory)
-
-  const addToOrder = (item: MenuItem) => {
-    setCurrentOrder(prev => {
-      const existingItem = prev.find(orderItem => orderItem.id === item.id)
-      if (existingItem) {
-        return prev.map(orderItem =>
-          orderItem.id === item.id
-            ? { ...orderItem, quantity: orderItem.quantity + 1 }
-            : orderItem
-        )
-      }
-      return [...prev, { ...item, quantity: 1 }]
+  const startNewMeal = (size: SizeEnum) => {
+    setCurrentMeal({
+      id: Math.random().toString(36).substr(2, 9),
+      size,
+      side1: null,
+      side2: null,
+      entree1: null,
+      entree2: null,
+      entree3: null
     })
   }
 
-  const removeFromOrder = (itemId: number) => {
-    setCurrentOrder(prev => 
-      prev.map(item => 
-        item.id === itemId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      ).filter(item => item.quantity > 0)
-    )
+  const addToMeal = (item: MenuItem) => {
+    if (!currentMeal) return
+
+    setCurrentMeal(prev => {
+      if (!prev) return prev
+      
+      if (item.item_type === 'side') {
+        if (!prev.side1) return { ...prev, side1: item }
+        if (!prev.side2) return { ...prev, side2: item }
+        return prev
+      }
+      
+      if (item.item_type === 'entree') {
+        if (!prev.entree1) return { ...prev, entree1: item }
+        if (!prev.entree2) return { ...prev, entree2: item }
+        if (!prev.entree3) return { ...prev, entree3: item }
+        return prev
+      }
+      
+      return prev
+    })
+  }
+
+  const completeMeal = () => {
+    if (!currentMeal) return
+    setCurrentOrder(prev => [...prev, { type: 'meal', meal: currentMeal }])
+    setCurrentMeal(null)
+  }
+
+  const addSimpleItem = (item: MenuItem) => {
+    if (item.item_type !== 'appetizer' && item.item_type !== 'drink') return
+    
+    setCurrentOrder(prev => {
+      const existingItemIndex = prev.findIndex(
+        orderItem => orderItem.type !== 'meal' && 
+        orderItem.item?.id === item.id
+      )
+
+      if (existingItemIndex >= 0) {
+        return prev.map((orderItem, index) => 
+          index === existingItemIndex && orderItem.item
+            ? {
+                ...orderItem,
+                item: {
+                  ...orderItem.item,
+                  quantity: orderItem.item.quantity + 1
+                }
+              }
+            : orderItem
+        )
+      }
+
+      return [...prev, {
+        type: item.item_type === 'appetizer' ? 'appetizer' : 'drink',
+        item: { ...item, quantity: 1 }
+      }]
+    })
+  }
+
+  const getMealPrice = (meal: MealInProgress) => {
+    let basePrice = 0
+    if (meal.size === 'bowl') basePrice = 8.99
+    else if (meal.size === 'plate') basePrice = 10.99
+    else if (meal.size === 'bigger plate') basePrice = 12.99
+
+    const premiumAddons = [
+      meal.entree1,
+      meal.entree2,
+      meal.entree3,
+      meal.side1,
+      meal.side2
+    ].filter(item => item?.premium).length
+
+    return basePrice + (premiumAddons * 1.50)
+  }
+
+  const getOrderTotal = () => {
+    return currentOrder.reduce((total, orderItem) => {
+      if (orderItem.type === 'meal' && orderItem.meal) {
+        return total + getMealPrice(orderItem.meal)
+      }
+      if (orderItem.item) {
+        return total + (Number(orderItem.item.price) * orderItem.item.quantity)
+      }
+      return total
+    }, 0)
+  }
+
+  const removeOrderItem = (index: number) => {
+    setCurrentOrder(prev => prev.filter((_, i) => i !== index))
   }
 
   const clearOrder = () => {
     setCurrentOrder([])
+    setCurrentMeal(null)
     setCustomerName("")
-  }
-
-  const getOrderTotal = () => {
-    return currentOrder.reduce((total, item) => total + (Number(item.price) * item.quantity), 0)
   }
 
   const submitOrder = async () => {
@@ -100,25 +156,25 @@ const CashierPage = () => {
         customer_name: customerName || "Guest",
         cashier_name: "Current Cashier",
         sale_price: getOrderTotal(),
-        items: currentOrder.reduce((sum, item) => sum + item.quantity, 0),
-        meals: currentOrder.filter(item => item.item_type === 'entree').reduce((sum, item) => sum + item.quantity, 0),
-        appetizers: currentOrder.filter(item => item.item_type === 'appetizer').reduce((sum, item) => sum + item.quantity, 0),
-        drinks: currentOrder.filter(item => item.item_type === 'drink').reduce((sum, item) => sum + item.quantity, 0),
+        items: currentOrder.reduce((sum, item) => {
+          if (item.type === 'meal') return sum + 1
+          return sum + (item.item?.quantity || 0)
+        }, 0),
+        meals: currentOrder.filter(item => item.type === 'meal').length,
+        appetizers: currentOrder.reduce((sum, item) => 
+          item.type === 'appetizer' ? sum + (item.item?.quantity || 0) : sum, 0),
+        drinks: currentOrder.reduce((sum, item) => 
+          item.type === 'drink' ? sum + (item.item?.quantity || 0) : sum, 0),
         date: new Date(),
       }
 
       const response = await fetch('/api/transactions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to submit order')
-      }
-
+      if (!response.ok) throw new Error('Failed to submit order')
       clearOrder()
     } catch (err) {
       setError('Failed to submit order')
@@ -126,19 +182,38 @@ const CashierPage = () => {
     }
   }
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>
+  const renderCurrentMealBuilder = () => {
+    if (!currentMeal) return null
+
+    return (
+      <div className="mb-4 p-4 border rounded-lg bg-gray-50">
+        <h3 className="font-medium mb-2">Building {currentMeal.size}</h3>
+        <div className="space-y-2">
+          <div>Sides: {currentMeal.side1?.name} {currentMeal.side2?.name}</div>
+          <div>Entrees: {currentMeal.entree1?.name} {currentMeal.entree2?.name} {currentMeal.entree3?.name}</div>
+          <div className="text-sm text-gray-600">
+            Price: ${getMealPrice(currentMeal).toFixed(2)}
+          </div>
+          <Button
+            onClick={completeMeal}
+            disabled={!currentMeal.side1 || !currentMeal.entree1}
+            className="w-full"
+          >
+            Complete Meal
+          </Button>
+        </div>
+      </div>
+    )
   }
 
-  if (error) {
-    return <div className="flex items-center justify-center h-screen text-red-500">{error}</div>
-  }
+  if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>
+  if (error) return <div className="flex items-center justify-center h-screen text-red-500">{error}</div>
 
   return (
     <div className="h-screen flex overflow-hidden">
       <div className="w-2/3 p-4 bg-gray-50">
         <Card className="h-full flex flex-col">
-          <CardHeader className="flex-shrink-0">
+          <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>Add Items</CardTitle>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -151,65 +226,49 @@ const CashierPage = () => {
                   <SelectItem value="side">Sides</SelectItem>
                   <SelectItem value="appetizer">Appetizers</SelectItem>
                   <SelectItem value="drink">Drinks</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="grid" className="h-full">
-              <TabsList>
-                <TabsTrigger value="grid">Grid View</TabsTrigger>
-                <TabsTrigger value="list">List View</TabsTrigger>
-              </TabsList>
-              <TabsContent value="grid" className="mt-4 h-[calc(100vh-220px)] overflow-y-auto">
-                <div className="grid grid-cols-3 gap-4 pb-4">
-                  {filteredMenuItems.map((item) => (
+          <CardContent className="flex flex-col h-full">
+            {!currentMeal && (
+              <div className="mb-4 grid grid-cols-3 gap-2">
+                <Button onClick={() => startNewMeal('bowl')}>New Bowl</Button>
+                <Button onClick={() => startNewMeal('plate')}>New Plate</Button>
+                <Button onClick={() => startNewMeal('bigger plate')}>New Bigger Plate</Button>
+              </div>
+            )}
+            
+            {renderCurrentMealBuilder()}
+
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid grid-cols-3 gap-4">
+                {menuItems
+                  .filter(item => selectedCategory === "all" || item.item_type === selectedCategory)
+                  .map((item) => (
                     <Button
                       key={item.id}
                       variant="outline"
                       className="h-24 flex flex-col items-center justify-center"
-                      onClick={() => addToOrder(item)}
+                      onClick={() => {
+                        if (currentMeal && (item.item_type === 'entree' || item.item_type === 'side')) {
+                          addToMeal(item)
+                        } else if (item.item_type === 'appetizer' || item.item_type === 'drink') {
+                          addSimpleItem(item)
+                        }
+                      }}
                     >
                       <span className="font-medium">{item.name}</span>
-                      <span className="text-sm text-gray-500">${Number(item.price).toFixed(2)}</span>
+                      <span className="text-sm text-gray-500">
+                        ${Number(item.price).toFixed(2)}
+                      </span>
                       {item.premium && (
                         <span className="text-xs text-yellow-600">Premium</span>
                       )}
                     </Button>
                   ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="list" className="h-[calc(100vh-220px)] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredMenuItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.item_type}</TableCell>
-                        <TableCell>${Number(item.price).toFixed(2)}</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            onClick={() => addToOrder(item)}
-                          >
-                            Add
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -227,34 +286,40 @@ const CashierPage = () => {
           </CardHeader>
           <CardContent className="flex-grow flex flex-col">
             <ScrollArea className="flex-grow">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead>Qty</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentOrder.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>${(Number(item.price) * item.quantity).toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeFromOrder(item.id)}
-                        >
-                          -
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="space-y-4">
+                {currentOrder.map((orderItem, index) => (
+                  <div key={index} className="p-2 border rounded">
+                    {orderItem.type === 'meal' && orderItem.meal && (
+                      <div>
+                        <div className="font-medium">{orderItem.meal.size}</div>
+                        <div className="text-sm">
+                          Sides: {orderItem.meal.side1?.name} {orderItem.meal.side2?.name}
+                        </div>
+                        <div className="text-sm">
+                          Entrees: {orderItem.meal.entree1?.name} {orderItem.meal.entree2?.name} {orderItem.meal.entree3?.name}
+                        </div>
+                        <div className="text-right">
+                          ${getMealPrice(orderItem.meal).toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+                    {orderItem.type !== 'meal' && orderItem.item && (
+                      <div className="flex justify-between">
+                        <span>{orderItem.item.name} x{orderItem.item.quantity}</span>
+                        <span>${(orderItem.item.price * orderItem.item.quantity).toFixed(2)}</span>
+                      </div>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => removeOrderItem(index)}
+                      className="w-full mt-2"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </ScrollArea>
             
             <div className="mt-4 space-y-4">
