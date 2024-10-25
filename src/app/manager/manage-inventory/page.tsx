@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit, Plus, Save, X } from 'lucide-react';
+import { Trash2, Edit, Plus, Save, X, ArrowLeft } from 'lucide-react';
 
+import { useRouter } from 'next/navigation';
 interface InventoryItem {
   id: number;
   name: string;
@@ -14,6 +15,8 @@ interface InventoryItem {
 }
 
 const ManageInventory: React.FC = () => {
+  const router = useRouter();
+
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [name, setName] = useState('');
@@ -22,6 +25,10 @@ const ManageInventory: React.FC = () => {
   const [reorder, setReorder] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigateToManager = () => {
+    router.push('/manager');
+  };
 
   const fetchInventory = async () => {
     try {
@@ -163,11 +170,23 @@ const ManageInventory: React.FC = () => {
 
   return (
     <div className="container mx-auto py-10">
-      <div className="rounded-lg">
-        {error && (
-          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mb-4">
-            {error}
-          </div>
+    <div className="flex items-center gap-4 mb-6">
+      <Button
+        variant="outline"
+        onClick={() => router.push('/manager')}
+        className="flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+      <h2 className="text-2xl font-bold">Manage Inventory</h2>
+    </div>
+
+    <div className="rounded-lg">
+      {error && (
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mb-4">
+          {error}
+        </div>
         )}
 
         <Card className="mb-6">

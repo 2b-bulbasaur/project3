@@ -3,8 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit, Plus, Save, X } from 'lucide-react';
 import { ItemTypeEnum, MenuItem, InventoryItem } from '@/types/db.types';
+
+import { Trash2, Edit, Plus, Save, X, ArrowLeft } from 'lucide-react';
+
+import { useRouter } from 'next/navigation';
 
 interface SelectedIngredient extends InventoryItem {
   quantity?: number;
@@ -17,6 +20,8 @@ interface MenuItemWithIngredients extends MenuItem {
 const itemTypes: ItemTypeEnum[] = ['entree', 'side', 'appetizer', 'drink', 'other'];
 
 const ManageMenu: React.FC = () => {
+  const router = useRouter();
+
   const [menuItems, setMenuItems] = useState<MenuItemWithIngredients[]>([]);
   const [selectedItem, setSelectedItem] = useState<MenuItemWithIngredients | null>(null);
   const [ingredients, setIngredients] = useState<InventoryItem[]>([]);
@@ -38,6 +43,10 @@ const ManageMenu: React.FC = () => {
     unit: '',
     reorder: false
   });
+
+  const navigateToManager = () => {
+    router.push('/manager');
+  };
 
   const fetchMenuItems = async () => {
     try {
@@ -240,11 +249,23 @@ const ManageMenu: React.FC = () => {
 
   return (
     <div className="container mx-auto py-10">
-      <div className="rounded-lg">
-        {error && (
-          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mb-4">
-            {error}
-          </div>
+    <div className="flex items-center gap-4 mb-6">
+      <Button
+        variant="outline"
+        onClick={() => router.push('/manager')}
+        className="flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+      <h2 className="text-2xl font-bold">Manage Menu</h2>
+    </div>
+
+    <div className="rounded-lg">
+      {error && (
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mb-4">
+          {error}
+        </div>
         )}
 
         <Card className="mb-6">
