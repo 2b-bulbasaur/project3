@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import '@/app/globals.css'; 
+import { useRouter } from 'next/navigation';
+
 
 import Button from '../../buttons';
 
@@ -17,6 +19,7 @@ interface Transaction {
 const ManagerDashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState<string | null>(null); 
+  const router = useRouter(); 
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -35,6 +38,10 @@ const ManagerDashboard = () => {
     fetchTransactions();
   }, []);
 
+  const handleLogout = () => {
+    router.push('/'); 
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground p-4">
       {/* top Navigation Buttons */}
@@ -43,8 +50,9 @@ const ManagerDashboard = () => {
         <Button label="Manage Inventory" onClick={() => {}} />
         <Button label="Manage Employees" onClick={() => {}} />
         <Button label="Generate Reports" onClick={() => {}} />
-        <Button label="Logout" onClick={() => {}} variant="danger" />
         <Button label="Switch to Cashier View" onClick={() => {}} />
+        <Button label="Logout" onClick={handleLogout} variant="danger" />
+
       </div>
 
       {/* error handling */}
