@@ -1,8 +1,9 @@
-// app/login/page.tsx
+// src/app/login/page.tsx
 'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,8 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError('');
 
@@ -55,23 +58,19 @@ const LoginPage = () => {
     router.push('/customer');
   };
 
-  const handleMenuBoard = () => {
-    router.push('/');  // Updated to go to root path where mood board is
-  };
-
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-black to-orange-950">
       {/* Logo Section */}
-      <div className="mb-8">
+      <Link href="/" className="mb-8">
         <Image 
           src="/images/panda-logo.png" 
           alt="Panda Express Logo" 
           width={200} 
           height={67} 
           className="cursor-pointer"
-          onClick={handleMenuBoard}
+          priority
         />
-      </div>
+      </Link>
 
       <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm shadow-2xl">
         <CardHeader className="space-y-1">
@@ -92,6 +91,7 @@ const LoginPage = () => {
                 placeholder="Enter your name"
                 required
                 className="border-orange-200 focus:border-orange-500"
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -104,6 +104,7 @@ const LoginPage = () => {
                 placeholder="Enter your password"
                 required
                 className="border-orange-200 focus:border-orange-500"
+                disabled={isLoading}
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -113,6 +114,7 @@ const LoginPage = () => {
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
                 className="cursor-pointer accent-orange-500"
+                disabled={isLoading}
               />
               <Label htmlFor="show-password" className="cursor-pointer text-gray-700">
                 Show Password
@@ -129,24 +131,34 @@ const LoginPage = () => {
                 className="w-full bg-orange-600 hover:bg-orange-700" 
                 disabled={isLoading}
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <span className="animate-spin mr-2">⚪</span>
+                    Signing in...
+                  </span>
+                ) : (
+                  'Sign In'
+                )}
               </Button>
               <Button 
                 type="button" 
                 variant="outline" 
                 className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
                 onClick={handleGuestAccess}
+                disabled={isLoading}
               >
                 Continue as Guest
               </Button>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-                onClick={handleMenuBoard}
-              >
-                View Menu Board
-              </Button>
+              <Link href="/">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                  disabled={isLoading}
+                >
+                  View Menu Board
+                </Button>
+              </Link>
             </div>
           </form>
         </CardContent>

@@ -1,7 +1,8 @@
+// src/app/page.tsx
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 
 type MenuItem = {
@@ -107,12 +108,6 @@ const menuItems: MenuItem[] = [
 ]
 
 export default function HomePage() {
-  const router = useRouter();
-
-  const handleLoginClick = () => {
-    router.push('/login');
-  };
-
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Header with Logo and Login */}
@@ -128,13 +123,14 @@ export default function HomePage() {
               priority
             />
           </div>
-          <Button 
-            variant="outline" 
-            className="bg-white/10 hover:bg-white/20 text-white border-orange-500 hover:border-orange-600 transition-all"
-            onClick={handleLoginClick}
-          >
-            Employee Login Portal
-          </Button>
+          <Link href="/login" prefetch>
+            <Button 
+              variant="outline" 
+              className="bg-white/10 hover:bg-white/20 text-white border-orange-500 hover:border-orange-600 transition-all"
+            >
+              Employee Login Portal
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -182,3 +178,4 @@ export default function HomePage() {
     </main>
   )
 }
+
