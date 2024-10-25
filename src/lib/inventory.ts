@@ -1,15 +1,15 @@
 // /lib/inventory.ts
 import { query } from './db';
-import { Inventory } from '../types';
+import { InventoryItem } from '../types';
 
 // fetch all inventory items
-export async function getAllInventory(): Promise<Inventory[]> {
-  return query<Inventory>('SELECT * FROM inventory');
+export async function getAllInventory(): Promise<InventoryItem[]> {
+  return query<InventoryItem>('SELECT * FROM inventory');
 }
 
 // fetch a single inventory item by ID
-export async function getInventoryById(id: number): Promise<Inventory | null> {
-  const [item] = await query<Inventory>(
+export async function getInventoryById(id: number): Promise<InventoryItem | null> {
+  const [item] = await query<InventoryItem>(
     'SELECT * FROM inventory WHERE id = $1',
     [id]
   );
@@ -22,8 +22,8 @@ export async function addInventory(
   amount: number,
   unit: string,
   reorder: boolean
-): Promise<Inventory> {
-  const [item] = await query<Inventory>(
+): Promise<InventoryItem> {
+  const [item] = await query<InventoryItem>(
     'INSERT INTO inventory (name, amount, unit, reorder) VALUES ($1, $2, $3, $4) RETURNING *',
     [name, amount, unit, reorder]
   );
@@ -37,8 +37,8 @@ export async function updateInventory(
   amount: number,
   unit: string,
   reorder: boolean
-): Promise<Inventory> {
-  const [item] = await query<Inventory>(
+): Promise<InventoryItem> {
+  const [item] = await query<InventoryItem>(
     'UPDATE inventory SET name = $1, amount = $2, unit = $3, reorder = $4 WHERE id = $5 RETURNING *',
     [name, amount, unit, reorder, id]
   );
