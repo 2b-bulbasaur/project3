@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -87,10 +87,10 @@ const ManagerDashboard = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push('/manager/manage-menu')}>
                     <MenuIcon className="mr-2 h-4 w-4" /> Manage Menu
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push('/manager/manage-inventory')}>
                     <Package className="mr-2 h-4 w-4" /> Manage Inventory
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => router.push('/manager/manage-employees')}>
