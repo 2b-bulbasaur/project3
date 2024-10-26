@@ -46,7 +46,7 @@ const GenerateReport: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch('/api/reports/z', {
+      const response = await fetch('/api/reports/z-report', {
         method: 'POST',
       });
 
@@ -103,7 +103,7 @@ const GenerateReport: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                //onClick={generateZReport}
+                onClick={generateZReport}
                 disabled={isLoading}
                 className="bg-primary"
               >
