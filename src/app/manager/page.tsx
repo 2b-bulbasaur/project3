@@ -96,8 +96,8 @@ const ManagerDashboard = () => {
                   <DropdownMenuItem onSelect={() => router.push('/manager/manage-employees')}>
                     <Users className="mr-2 h-4 w-4" /> Manage Employees
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <FileText className="mr-2 h-4 w-4" /> Generate Reports
+                  <DropdownMenuItem onSelect={() => router.push('/manager/generate-reports')}>
+                    <FileText className="mr-2 h-4 w-4" /> Generate Reports 
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
