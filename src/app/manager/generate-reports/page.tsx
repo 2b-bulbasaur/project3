@@ -79,58 +79,59 @@ const GenerateReport: React.FC = () => {
         )}
 
         <Card className="mb-6">
-            <CardContent>
-                <form
-                    onSubmit={(e) => {
-                    e.preventDefault();
-                    }}
-                    style={{
-                    display: 'flex',
-                    justifyContent: 'center', 
-                    alignItems: 'center',     
-                    gap: '16px',              
-                    padding: '20px',         
-                    }}
-                >
-                    <Button
-                    type="button"
-                    //onClick={() => generateXReport()}
-                    disabled={isLoading}
-                    className="bg-primary"
+            <CardTitle style={{ textAlign: 'center', margin: '0 auto', paddingTop: 10}}>Report to Generate</CardTitle>
+                <CardContent>
+                    <form
+                        onSubmit={(e) => {
+                        e.preventDefault();
+                        }}
+                        style={{
+                        display: 'flex',
+                        justifyContent: 'center', 
+                        alignItems: 'center',     
+                        gap: '16px',              
+                        padding: '20px',         
+                        }}
                     >
-                    X-Report
-                    </Button>
-                    <Button
-                    type="button"
-                    //onClick={() => generateYReport()}
-                    disabled={isLoading}
-                    className="bg-primary"
-                    >
-                    Y-Report
-                    </Button>
-                    <Button
-                    type="button"
-                    //onClick={() => generateProductUsageChart()}
-                    disabled={isLoading}
-                    className="bg-primary"
-                    >
-                    Product Usage Chart
-                    </Button>
-                    <Button
-                    type="button"
-                    //onClick={() => generateItemizedSalesReport()}
-                    disabled={isLoading}
-                    className="bg-primary"
-                    >
-                    Itemized Sales Report
-                    </Button>
-                </form>
-            </CardContent>
+                        <Button
+                        type="button"
+                        //onClick={() => generateXReport()}
+                        disabled={isLoading}
+                        className="bg-primary"
+                        >
+                        X-Report
+                        </Button>
+                        <Button
+                        type="button"
+                        //onClick={() => generateYReport()}
+                        disabled={isLoading}
+                        className="bg-primary"
+                        >
+                        Y-Report
+                        </Button>
+                        <Button
+                        type="button"
+                        //onClick={() => generateProductUsageChart()}
+                        disabled={isLoading}
+                        className="bg-primary"
+                        >
+                        Product Usage Chart
+                        </Button>
+                        <Button
+                        type="button"
+                        //onClick={() => generateItemizedSalesReport()}
+                        disabled={isLoading}
+                        className="bg-primary"
+                        >
+                        Itemized Sales Report
+                        </Button>
+                    </form>
+                </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Generated Report</CardTitle>
+            <CardTitle style={{ textAlign: 'center', margin: '0 auto' }}>Generated Report</CardTitle>
           </CardHeader>
           
 
