@@ -65,6 +65,30 @@ const GenerateReport: React.FC = () => {
     }
   };
 
+  const generateProductUsage = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/reports/product-usage', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate Product Usage Report');
+      }
+
+      const data = await response.json();
+      setReportData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate report');
+      console.error('Error generating report:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center gap-4 mb-6">

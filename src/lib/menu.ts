@@ -12,7 +12,7 @@ export async function getAllMenuItems(): Promise<MenuItem[]> {
 }
 
 // gets ingredients for a specific menu item
-async function getIngredientsForMenuItem(menuId: number): Promise<InventoryItem[]> {
+export async function getIngredientsForMenuItem(menuId: number): Promise<InventoryItem[]> {
   return query<InventoryItem>(
     `SELECT i.* 
      FROM inventory i
