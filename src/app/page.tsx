@@ -15,7 +15,7 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   {
-    name: "The Original Orange Chicken®",
+    name: "The Original Orange Chicken",
     image: "/images/orange-chicken.jpg",
     description: "Our signature dish. Crispy chicken wok-tossed in a sweet and spicy orange sauce.",
     calories: "490",
@@ -36,14 +36,14 @@ const menuItems: MenuItem[] = [
     type: "entree"
   },
   {
-    name: "Black Pepper Angus Steak",
+    name: "Black Pepper Sirloin Steak",
     image: "/images/black-pepper-steak.jpg",
     description: "Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
     calories: "450",
     type: "entree"
   },
   {
-    name: "Bourbon Chicken",
+    name: "Hot Ones Blazing Bourbon Chicken",
     image: "/images/bourbon-chicken.jpg",
     description: "Chicken breast pieces wok-fired in a signature bourbon sauce.",
     calories: "460",
@@ -71,7 +71,7 @@ const menuItems: MenuItem[] = [
     type: "entree"
   },
   {
-    name: "SweetFire Chicken Breast®",
+    name: "SweetFire Chicken Breast",
     image: "/images/sweetfire-chicken-breast.jpg",
     description: "Crispy white meat chicken, red bell peppers, onions and pineapples in a sweet and spicy sauce.",
     calories: "380",
@@ -99,7 +99,7 @@ const menuItems: MenuItem[] = [
     type: "entree"
   },
   {
-    name: "Walnut Shrimp",
+    name: "Honey Walnut Shrimp",
     image: "/images/walnut-shrimp.jpg",
     description: "Large tempura-battered shrimp, wok-tossed in a honey sauce and topped with glazed walnuts.",
     calories: "510",

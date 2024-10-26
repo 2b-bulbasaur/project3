@@ -147,7 +147,7 @@ const LoginPage = () => {
                 onClick={handleGuestAccess}
                 disabled={isLoading}
               >
-                Continue as Guest
+                Place an Order as a Customer
               </Button>
               <Link href="/">
                 <Button 
