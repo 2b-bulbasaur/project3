@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     // Check if it's before 9 PM
     if (currentHour < 21) {
       return NextResponse.json(
-        { error: 'Z Report can only be generated after 9 PM' },
+        { error: 'Z Report can only be generated after store closed - 9 PM' },
         { status: 403 }
       );
     }

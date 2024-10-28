@@ -17,6 +17,10 @@ const GenerateReport: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<ReportData[] | null>(null);
 
+  const resetReport = () => {
+    setReportData(null);
+  };
+
   const generateXReport = async () => {
     try {
       setIsLoading(true);
@@ -119,7 +123,7 @@ const GenerateReport: React.FC = () => {
             >
               <Button
                 type="button"
-                onClick={generateXReport}
+                onClick={() => { resetReport();generateXReport();}}
                 disabled={isLoading}
                 className="bg-primary"
               >
@@ -127,7 +131,7 @@ const GenerateReport: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                onClick={generateZReport}
+                onClick={() => { resetReport();generateZReport();}}
                 disabled={isLoading}
                 className="bg-primary"
               >
@@ -152,7 +156,7 @@ const GenerateReport: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader>  
             <CardTitle className="text-center">Generated Report</CardTitle>
           </CardHeader>
           <CardContent>
