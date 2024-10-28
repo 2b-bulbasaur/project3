@@ -16,9 +16,19 @@ const GenerateReport: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<ReportData[] | null>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  const [input1, setInput1] = useState('');
+  const [input2, setInput2] = useState('');
 
   const resetReport = () => {
     setReportData(null);
+    setShowForm(false);
+  };
+
+  const handleProductUsageClick = () => {
+    resetReport();
+    setShowForm(true);
   };
 
   const generateXReport = async () => {
@@ -139,6 +149,7 @@ const GenerateReport: React.FC = () => {
               </Button>
               <Button
                 type="button"
+                onClick={() => { resetReport();handleProductUsageClick();}}
                 disabled={isLoading}
                 className="bg-primary"
               >
@@ -154,6 +165,38 @@ const GenerateReport: React.FC = () => {
             </form>
           </CardContent>
         </Card>
+
+
+        {showForm && (
+          <Card className="mb-6 w-1/2 mx-auto">
+            <CardHeader>
+              <CardTitle className="text-center">Enter Time Range</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={generateProductUsage} className="flex flex-col space-y-4">
+                <input
+                  type="text"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="Start Date (MM/DD/YYYY)"
+                  className="border p-2 rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  value={input2}
+                  onChange={(e) => setInput2(e.target.value)}
+                  placeholder="End Date (MM/DD/YYYY)"
+                  className="border p-2 rounded"
+                  required
+                />
+                <Button type="submit" className="bg-primary">
+                  Generate Report
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>  
