@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getTransactions } from '@/lib/transactions';
 import { getIngredientsForMenuItem } from '@/lib/menu';
 import { getItemsInAppOrder, getItemsInMealOrder } from '@/lib/orders';
-import { getInventoryById, getInventoryNameById } from '@/lib/inventory';
+import { getInventoryById } from '@/lib/inventory';
 
 type IngredientCount = {
     [key: string]: number;
