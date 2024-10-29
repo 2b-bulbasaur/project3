@@ -30,6 +30,9 @@ const GenerateReport: React.FC = () => {
   const resetReport = () => {
     setReportData(null);
     setShowForm(false);
+    setProductUsageData(null);
+    setInput1('');
+    setInput2('');
   };
 
   const handleProductUsageClick = () => {
