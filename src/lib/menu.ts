@@ -11,6 +11,10 @@ export async function getAllMenuItems(): Promise<MenuItem[]> {
   return menuItems;
 }
 
+export async function getMenuNameById(id: number) : Promise<MenuItem[]> {
+  return query('SELECT * FROM menu WHERE id = $1', [id]);
+}
+
 // gets ingredients for a specific menu item
 export async function getIngredientsForMenuItem(menuId: number): Promise<InventoryItem[]> {
   return query<InventoryItem>(

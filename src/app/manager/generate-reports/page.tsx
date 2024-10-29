@@ -127,6 +127,28 @@ const GenerateReport: React.FC = () => {
   };
 
   const generateSalesReport = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/reports/sales-report', {
+        method: 'POST',
+        body: JSON.stringify({ input1, input2 }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate Product Usage Report');
+      }
+
+      const data = await response.json();
+      setSalesData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate report');
+      console.error('Error generating report:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

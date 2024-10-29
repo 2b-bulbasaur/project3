@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getTransactions } from '@/lib/transactions';
 import { getItemsInAppOrder, getItemsInMealOrder } from '@/lib/orders';
+import { getMenuNameById } from '@/lib/menu';
 
 type SalesCount = {
     [key: string]: number;
@@ -24,8 +25,22 @@ export async function POST(request: Request) {
             if (transactionDate >= startDate && transactionDate <= endDate) {
                 const orderId = transaction.id;
                 const mealItems = await getItemsInMealOrder(orderId);
+
+                for (const item of mealItems) {
+                    const itemNames = await getMenuNameById(item);
+                    for (const itemName of itemNames) {
+                        salesCount[itemName.name] = (salesCount[itemName.name] || 0) + 1;
+                    }
+                }
+
+                const appItems = await getItemsInAppOrder(orderId);
+                for (const item of appItems) {
+                    const itemNames = await getMenuNameById(item);
+                    for (const itemName of itemNames) {
+                        salesCount[itemName.name] = (salesCount[itemName.name] || 0) + 1;
+                    }
+                }
             }
-                
         }
         
         const reportData = Object.keys(salesCount).map(item => ({
