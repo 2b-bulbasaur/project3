@@ -70,3 +70,24 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* erm i think frutiger is what panda uses yippee */
+@font-face {
+  font-family: 'Frutiger';
+  src: url('/fonts/FrutigerLTStd-Roman.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Frutiger';
+  src: url('/fonts/FrutigerLTStd-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Frutiger', Arial, Helvetica, sans-serif;
+}

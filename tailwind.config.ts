@@ -9,6 +9,10 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		/* adding panda's font to the font family hehe */
+		fontFamily: {
+			frutiger: ['Frutiger', 'Arial', 'Helvetica', 'sans-serif'],
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
