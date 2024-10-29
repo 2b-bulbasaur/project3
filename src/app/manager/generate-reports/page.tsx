@@ -12,7 +12,12 @@ interface ReportData {
 }
 
 interface ProductUsageData {
-  ingredient: number;
+  ingredient: string;
+  count: number;
+}
+
+interface SalesData {
+  item: string;
   count: number;
 }
 
@@ -22,23 +27,31 @@ const GenerateReport: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<ReportData[] | null>(null);
   const [productUsageData, setProductUsageData] = useState<ProductUsageData[] | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [salesData, setSalesData] = useState<SalesData[] | null>(null);
+  const [showForm1, setShowForm1] = useState(false);
+  const [showForm2, setShowForm2] = useState(false);
 
   const [input1, setInput1] = useState('');
   const [input2, setInput2] = useState('');
 
   const resetReport = () => {
     setReportData(null);
-    setShowForm(false);
+    setShowForm1(false);
+    setShowForm2(false);
     setProductUsageData(null);
     setInput1('');
     setInput2('');
   };
 
-  const handleProductUsageClick = () => {
+  const handleProductUsageClick1 = () => {
     resetReport();
-    setShowForm(true);
+    setShowForm1(true);
   };
+
+  const handleProductUsageClick2 = () => {
+    resetReport();
+    setShowForm2(true);
+  }
 
   const generateXReport = async () => {
     try {
@@ -113,6 +126,9 @@ const GenerateReport: React.FC = () => {
     }
   };
 
+  const generateSalesReport = async () => {
+  };
+
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center gap-4 mb-6">
@@ -159,7 +175,7 @@ const GenerateReport: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                onClick={() => { resetReport();handleProductUsageClick();}}
+                onClick={() => { resetReport();handleProductUsageClick1();}}
                 disabled={isLoading}
                 className="bg-primary"
               >
@@ -167,6 +183,7 @@ const GenerateReport: React.FC = () => {
               </Button>
               <Button
                 type="button"
+                onClick={() => { resetReport();handleProductUsageClick2();}}
                 disabled={isLoading}
                 className="bg-primary"
               >
@@ -177,13 +194,44 @@ const GenerateReport: React.FC = () => {
         </Card>
 
 
-        {showForm && (
+        {showForm1 && (
           <Card className="mb-6 w-1/2 mx-auto">
             <CardHeader>
               <CardTitle className="text-center">Enter Time Range</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={() => {resetReport(); generateProductUsage();}} className="flex flex-col space-y-4">
+                <input
+                  type="text"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="Start Date (MM/DD/YYYY)"
+                  className="border p-2 rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  value={input2}
+                  onChange={(e) => setInput2(e.target.value)}
+                  placeholder="End Date (MM/DD/YYYY)"
+                  className="border p-2 rounded"
+                  required
+                />
+                <Button type="submit" className="bg-primary">
+                  Generate Report
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {showForm2 && (
+          <Card className="mb-6 w-1/2 mx-auto">
+            <CardHeader>
+              <CardTitle className="text-center">Enter Time Range</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={() => {resetReport(); generateSalesReport();}} className="flex flex-col space-y-4">
                 <input
                   type="text"
                   value={input1}
@@ -247,6 +295,27 @@ const GenerateReport: React.FC = () => {
                     {productUsageData.map((item, index) => (
                       <tr key={index}>
                         <td className="border p-2">{item.ingredient}</td>
+                        <td className="border p-2">{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {salesData && (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="border p-2 text-left">Item</th>
+                      <th className="border p-2 text-left">Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {salesData.map((item, index) => (
+                      <tr key={index}>
+                        <td className="border p-2">{item.item}</td>
                         <td className="border p-2">{item.count}</td>
                       </tr>
                     ))}
