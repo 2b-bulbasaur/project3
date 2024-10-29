@@ -24,7 +24,10 @@ interface SalesData {
 const GenerateReport: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingX, setIsLoadingX] = useState(false);
+  const [isLoadingZ, setIsLoadingZ] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const [isLoadingSales, setIsLoadingSales] = useState(false);
   const [reportData, setReportData] = useState<ReportData[] | null>(null);
   const [productUsageData, setProductUsageData] = useState<ProductUsageData[] | null>(null);
   const [salesData, setSalesData] = useState<SalesData[] | null>(null);
@@ -55,7 +58,7 @@ const GenerateReport: React.FC = () => {
 
   const generateXReport = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingX(true);
       setError(null);
       
       const response = await fetch('/api/reports/x-report', {
@@ -73,13 +76,13 @@ const GenerateReport: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to generate report');
       console.error('Error generating report:', err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingX(false);
     }
   };
 
   const generateZReport = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingZ(true);
       setError(null);
       
       const response = await fetch('/api/reports/z-report', {
@@ -97,13 +100,13 @@ const GenerateReport: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to generate report');
       console.error('Error generating report:', err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingZ(false);
     }
   };
 
   const generateProductUsage = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingProduct(true);
       setError(null);
 
       const response = await fetch('/api/reports/product-usage', {
@@ -122,13 +125,13 @@ const GenerateReport: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to generate report');
       console.error('Error generating report:', err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingProduct(false);
     }
   };
 
   const generateSalesReport = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingSales(true);
       setError(null);
 
       const response = await fetch('/api/reports/sales-report', {
@@ -147,7 +150,7 @@ const GenerateReport: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to generate report');
       console.error('Error generating report:', err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingSales(false);
     }
   };
 
@@ -182,34 +185,34 @@ const GenerateReport: React.FC = () => {
               <Button
                 type="button"
                 onClick={() => { resetReport();generateXReport();}}
-                disabled={isLoading}
+                disabled={isLoadingX}
                 className="bg-primary"
               >
-                {isLoading ? 'Generating...' : 'X-Report'}
+                {isLoadingX ? 'Generating...' : 'X-Report'}
               </Button>
               <Button
                 type="button"
                 onClick={() => { resetReport();generateZReport();}}
-                disabled={isLoading}
+                disabled={isLoadingZ}
                 className="bg-primary"
               >
-                Z-Report
+                {isLoadingZ ? 'Generating...' : 'Z-Report'}
               </Button>
               <Button
                 type="button"
                 onClick={() => { resetReport();handleProductUsageClick1();}}
-                disabled={isLoading}
+                disabled={isLoadingProduct}
                 className="bg-primary"
               >
-                Product Usage Chart
+                {isLoadingProduct ? 'Generating...' : 'Product Usage Report'}
               </Button>
               <Button
                 type="button"
                 onClick={() => { resetReport();handleProductUsageClick2();}}
-                disabled={isLoading}
+                disabled={isLoadingSales}
                 className="bg-primary"
               >
-                Itemized Sales Report
+                {isLoadingSales ? 'Generating...' : 'Itemized Sales Report'}
               </Button>
             </form>
           </CardContent>
