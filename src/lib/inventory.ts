@@ -16,6 +16,14 @@ export async function getInventoryById(id: number): Promise<InventoryItem | null
   return item || null;
 }
 
+export async function getInventoryNameById(id: number): Promise<InventoryItem | null> {
+  const [item] = await query<InventoryItem>(
+    'SELECT name FROM inventory WHERE id = $1',
+    [id]
+  );
+  return item || null;
+}
+
 // add a new inventory item
 export async function addInventory(
   name: string,

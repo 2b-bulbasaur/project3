@@ -11,11 +11,17 @@ interface ReportData {
   count: number;
 }
 
+interface ProductUsageData {
+  ingredient: number;
+  count: number;
+}
+
 const GenerateReport: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<ReportData[] | null>(null);
+  const [productUsageData, setProductUsageData] = useState<ProductUsageData[] | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   const [input1, setInput1] = useState('');
@@ -86,6 +92,7 @@ const GenerateReport: React.FC = () => {
 
       const response = await fetch('/api/reports/product-usage', {
         method: 'POST',
+        body: JSON.stringify({ input1, input2 }),
       });
 
       if (!response.ok) {
@@ -94,7 +101,7 @@ const GenerateReport: React.FC = () => {
       }
 
       const data = await response.json();
-      setReportData(data);
+      setProductUsageData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate report');
       console.error('Error generating report:', err);
@@ -173,7 +180,7 @@ const GenerateReport: React.FC = () => {
               <CardTitle className="text-center">Enter Time Range</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={generateProductUsage} className="flex flex-col space-y-4">
+              <form onSubmit={() => {resetReport(); generateProductUsage();}} className="flex flex-col space-y-4">
                 <input
                   type="text"
                   value={input1}
@@ -216,6 +223,27 @@ const GenerateReport: React.FC = () => {
                     {reportData.map((item, index) => (
                       <tr key={index}>
                         <td className="border p-2">{item.hour}</td>
+                        <td className="border p-2">{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {productUsageData && (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="border p-2 text-left">Ingredient</th>
+                      <th className="border p-2 text-left">Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productUsageData.map((item, index) => (
+                      <tr key={index}>
+                        <td className="border p-2">{item.ingredient}</td>
                         <td className="border p-2">{item.count}</td>
                       </tr>
                     ))}

@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getTransactions } from '@/lib/transactions';
 import { getIngredientsForMenuItem } from '@/lib/menu';
-import { getMealOrderById } from '@/lib/orders';
+import { getItemsInAppOrder, getItemsInMealOrder } from '@/lib/orders';
+import { getInventoryById, getInventoryNameById } from '@/lib/inventory';
+
+type IngredientCount = {
+    [key: string]: number;
+}
 
 export async function POST(request: Request) {
     try {
@@ -13,34 +18,51 @@ export async function POST(request: Request) {
         const endDate = new Date(year2, month2-1, day2, 23, 59, 59);
 
         const transactions = await getTransactions();
-        const ingredientMap = new Map<number, number>();
+        const ingredientCount: IngredientCount = {};
 
-        transactions.forEach(async transaction => {
+        for (const transaction of transactions) {
             const transactionDate = new Date(transaction.date);
-
+           
             if (transactionDate >= startDate && transactionDate <= endDate) {
                 const orderId = transaction.id;
-                const mealsOrdered = await getMealOrderById(orderId);
+                const mealItems = await getItemsInMealOrder(orderId);
 
-                mealsOrdered.forEach(async order => {
-                    if (order.entree1 != null) {
-                        const ingredients = await getIngredientsForMenuItem(order.entree1);
-                        ingredients.forEach(ingredient => {
-                            ingredientMap.set(ingredient.id, (ingredientMap.get(ingredient.id) || 0) + 1);
-                        });
+                for (const item of mealItems) {
+                    const ingredients = await getIngredientsForMenuItem(item);
+                    for (const ingredient of ingredients) {
+                        const ingredientQuery = await getInventoryById(ingredient.id);
+                        if (ingredientQuery) {
+                            const ingredientName = ingredientQuery.name;
+                            ingredientCount[ingredientName] = (ingredientCount[ingredientName] || 0) + 1;
+                        }
                     }
-                    
-                });
-            }
-        })
+                }
 
+                const appItems = await getItemsInAppOrder(orderId);
+                for (const item of appItems) {
+                    const ingredients = await getIngredientsForMenuItem(item);
+                    for (const ingredient of ingredients) {
+                        const ingredientQuery = await getInventoryById(ingredient.id);
+                        if (ingredientQuery) {
+                            const ingredientName = ingredientQuery.name;
+                            ingredientCount[ingredientName] = (ingredientCount[ingredientName] || 0) + 1;
+                        }
+                    }
+                }
+            }
+        }
+        
+        const reportData = Object.keys(ingredientCount).map(ingredient => ({
+            ingredient,
+            count: ingredientCount[ingredient]
+        }));
     
-        return NextResponse.json(ingredientMap);    
+        return NextResponse.json(reportData);    
     }
     catch (error) {
-        console.error('Error in generateXReport:', error);
+        console.error('Error in generateProductUsage:', error);
         return NextResponse.json(
-            { error: 'Failed to generate X Report', details: error instanceof Error ? error.message : 'Unknown error' },
+            { error: 'Failed to generate Product Usage', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
