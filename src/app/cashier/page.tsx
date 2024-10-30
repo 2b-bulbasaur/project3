@@ -27,7 +27,7 @@ const CashierPage = () => {
   const [currentMeal, setCurrentMeal] = useState<MealInProgress | null>(null);
 
   const handleLogout = () => {
-    router.push("/");
+    router.push("/login");
   };
 
   useEffect(() => {
