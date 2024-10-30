@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   MenuIcon,
   Package,
@@ -37,9 +38,8 @@ interface TransactionWithSummary extends Transaction {
 }
 
 const ManagerDashboard = () => {
-  const [transactions, setTransactions] = useState<TransactionWithSummary[]>(
-    []
-  );
+  const [transactions, setTransactions] = useState<TransactionWithSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -55,6 +55,8 @@ const ManagerDashboard = () => {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error occurred";
         setError(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchTransactions();
@@ -71,6 +73,18 @@ const ManagerDashboard = () => {
   const goToHome = () => {
     router.push("/");
   };
+
+  // Loading skeleton row component
+  const SkeletonRow = () => (
+    <TableRow>
+      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+      <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+      <TableCell className="text-right"><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
+    </TableRow>
+  );
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -154,22 +168,28 @@ const ManagerDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell className="font-medium">
-                      #{transaction.id}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(transaction.date).toLocaleString()}
-                    </TableCell>
-                    <TableCell>{transaction.customer_name}</TableCell>
-                    <TableCell>{transaction.cashier_name}</TableCell>
-                    <TableCell>{transaction.order_summary}</TableCell>
-                    <TableCell className="text-right">
-                      ${Number(transaction.sale_price).toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {isLoading ? (
+                  Array.from({ length: 6 }).map((_, index) => (
+                    <SkeletonRow key={index} />
+                  ))
+                ) : (
+                  transactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell className="font-medium">
+                        #{transaction.id}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(transaction.date).toLocaleString()}
+                      </TableCell>
+                      <TableCell>{transaction.customer_name}</TableCell>
+                      <TableCell>{transaction.cashier_name}</TableCell>
+                      <TableCell>{transaction.order_summary}</TableCell>
+                      <TableCell className="text-right">
+                        ${Number(transaction.sale_price).toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
             <ScrollBar orientation="horizontal" />
