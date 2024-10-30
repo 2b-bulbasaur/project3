@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -10,12 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,40 +19,41 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  ScrollArea,
-  ScrollBar 
-} from "@/components/ui/scroll-area";
-import { 
-  MenuIcon, 
-  Package, 
-  Users, 
-  FileText, 
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  MenuIcon,
+  Package,
+  Users,
+  FileText,
   LogOut,
   Settings,
-  ChevronDown
-} from 'lucide-react';
-import { Transaction } from '@/types/db.types';
+  ChevronDown,
+  Home,
+} from "lucide-react";
+import { Transaction } from "@/types/db.types";
 
 interface TransactionWithSummary extends Transaction {
   order_summary: string;
 }
 
 const ManagerDashboard = () => {
-  const [transactions, setTransactions] = useState<TransactionWithSummary[]>([]);
+  const [transactions, setTransactions] = useState<TransactionWithSummary[]>(
+    []
+  );
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch('/api/transactions?summary=true');
-        if (!response.ok) throw new Error('Failed to fetch transactions');
+        const response = await fetch("/api/transactions?summary=true");
+        if (!response.ok) throw new Error("Failed to fetch transactions");
         const data: TransactionWithSummary[] = await response.json();
         setTransactions(data);
       } catch (error) {
-        console.error('Error fetching transactions:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error("Error fetching transactions:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
         setError(errorMessage);
       }
     };
@@ -65,11 +61,15 @@ const ManagerDashboard = () => {
   }, []);
 
   const switchToCashierView = () => {
-    router.push('/cashier');
-  }
+    router.push("/cashier");
+  };
 
   const handleLogout = () => {
-    router.push('/');
+    router.push("/");
+  };
+
+  const goToHome = () => {
+    router.push("/");
   };
 
   return (
@@ -87,22 +87,34 @@ const ManagerDashboard = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => router.push('/manager/manage-menu')}>
+                  <DropdownMenuItem
+                    onSelect={() => router.push("/manager/manage-menu")}
+                  >
                     <MenuIcon className="mr-2 h-4 w-4" /> Manage Menu
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => router.push('/manager/manage-inventory')}>
+                  <DropdownMenuItem
+                    onSelect={() => router.push("/manager/manage-inventory")}
+                  >
                     <Package className="mr-2 h-4 w-4" /> Manage Inventory
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => router.push('/manager/manage-employees')}>
+                  <DropdownMenuItem
+                    onSelect={() => router.push("/manager/manage-employees")}
+                  >
                     <Users className="mr-2 h-4 w-4" /> Manage Employees
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => router.push('/manager/generate-reports')}>
-                    <FileText className="mr-2 h-4 w-4" /> Generate Reports 
+                  <DropdownMenuItem
+                    onSelect={() => router.push("/manager/generate-reports")}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> Generate Reports
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
             <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={goToHome}>
+                <Home className="mr-2 h-4 w-4" />
+                Back to Home
+              </Button>
               <Button variant="outline" onClick={switchToCashierView}>
                 <Settings className="mr-2 h-4 w-4" />
                 Switch to Cashier View
