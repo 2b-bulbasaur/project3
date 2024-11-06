@@ -49,7 +49,7 @@ const CashierPage = () => {
 
   const startNewMeal = (size: SizeEnum) => {
     setCurrentMeal({
-      id: Math.random().toString(36).substr(2, 9),
+      id: Math.random().toString(36).slice(2, 11),
       size,
       side1: null,
       side2: null,
@@ -182,6 +182,7 @@ const CashierPage = () => {
           0
         ),
         date: new Date(),
+        orderItems: currentOrder
       };
 
       const response = await fetch("/api/transactions", {
