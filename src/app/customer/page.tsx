@@ -141,40 +141,31 @@ const CustomerPage = () => {
     setCurrentMeal((prev) => {
       if (!prev) return prev;
 
-      // Handle sides
       if (item.item_type === "side") {
         if (prev.size === "bowl" || prev.size === "plate") {
-          // Remove the side if already selected
           if (prev.side1?.id === item.id) return { ...prev, side1: null };
           if (prev.side2?.id === item.id) return { ...prev, side2: null };
 
-          // Otherwise, set the side
           return { ...prev, side1: item, side2: null };
         } else {
-          // For other sizes, remove if exists or add in available slot
           if (prev.side1?.id === item.id) return { ...prev, side1: null };
           if (prev.side2?.id === item.id) return { ...prev, side2: null };
 
-          // If no match found, add the item
           if (!prev.side1) return { ...prev, side1: item };
           if (!prev.side2) return { ...prev, side2: item };
         }
         return prev;
       }
 
-      // Handle entrees
       if (item.item_type === "entree") {
         if (prev.size === "bowl") {
-          // Remove the entree if already selected
           if (prev.entree1?.id === item.id) return { ...prev, entree1: null };
           
-          // Otherwise, set entree1
           return { ...prev, entree1: item, entree2: null, entree3: null };
         } else if (prev.size === "plate") {
           if (prev.entree1?.id === item.id) return { ...prev, entree1: null };
           if (prev.entree2?.id === item.id) return { ...prev, entree2: null };
 
-          // Set entree slots if empty
           if (!prev.entree1) return { ...prev, entree1: item };
           if (!prev.entree2) return { ...prev, entree2: item };
         } else {
@@ -182,7 +173,6 @@ const CustomerPage = () => {
           if (prev.entree2?.id === item.id) return { ...prev, entree2: null };
           if (prev.entree3?.id === item.id) return { ...prev, entree3: null };
 
-          // Set entree slots if empty
           if (!prev.entree1) return { ...prev, entree1: item };
           if (!prev.entree2) return { ...prev, entree2: item };
           if (!prev.entree3) return { ...prev, entree3: item };
@@ -193,7 +183,6 @@ const CustomerPage = () => {
       return prev;
     });
   };
-
 
   const addSimpleItem = (item: MenuItem) => {
     if (item.item_type !== "appetizer" && item.item_type !== "drink") return;
