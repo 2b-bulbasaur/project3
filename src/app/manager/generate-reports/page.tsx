@@ -383,14 +383,6 @@
                           />
                         </PopoverContent>
                       </Popover>
-                      {/* <input
-                        type="text"
-                        value={input2}
-                        onChange={(e) => setInput2(e.target.value)}
-                        placeholder="End Date (MM/DD/YYYY)"
-                        className="border p-2 rounded"
-                        required
-                      /> */}
                       <DialogClose asChild>
                         <Button type="submit" className="bg-primary">
                           Generate Report
