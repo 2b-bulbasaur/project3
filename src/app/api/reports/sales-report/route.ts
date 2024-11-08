@@ -10,10 +10,16 @@ type SalesCount = {
 export async function POST(request: Request) {
     try {
         const { input1, input2 } = await request.json();
-        const [month1, day1, year1] = input1.split('/').map(Number);
+        const year1 = input1.substring(0, 4);
+        const month1 = input1.substring(5, 7);
+        const day1 = input1.substring(8, 10);
+        //const [month1, day1, year1] = input1.split('/').map(Number);
         const startDate = new Date(year1, month1-1, day1, 0, 0, 0);
 
-        const [month2, day2, year2] = input2.split('/').map(Number);
+        const year2= input2.substring(0, 4);
+        const month2 = input2.substring(5, 7);
+        const day2 = input2.substring(8, 10);
+        //const [month2, day2, year2] = input2.split('/').map(Number);
         const endDate = new Date(year2, month2-1, day2, 23, 59, 59);
 
         const transactions = await getTransactions();

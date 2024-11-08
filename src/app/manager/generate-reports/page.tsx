@@ -407,22 +407,40 @@
                       <DialogTitle>Enter Time Range</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={() => {resetReport(); generateSalesReport();}} className="flex flex-col space-y-4">
-                      <input
-                        type="text"
-                        value={input1}
-                        onChange={(e) => setInput1(e.target.value)}
-                        placeholder="Start Date (MM/DD/YYYY)"
-                        className="border p-2 rounded"
-                        required
-                      />
-                      <input
-                        type="text"
-                        value={input2}
-                        onChange={(e) => setInput2(e.target.value)}
-                        placeholder="End Date (MM/DD/YYYY)"
-                        className="border p-2 rounded"
-                        required
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                          variant={"outline"}
+                          >
+                            {input1 ? format(input1, "PPP") : <span>Click to Select a Start Date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={input1 ? new Date(input1) : undefined}
+                            onSelect={(day) => setInput1(day ? day.toISOString() : '')}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                          variant={"outline"}
+                          >
+                            {input2 ? format(input2, "PPP") : <span>Click to Select End Date</span>} 
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={input2 ? new Date(input2) : undefined}
+                            onSelect={(day) => setInput2(day ? day.toISOString() : '')}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <DialogClose asChild>
                         <Button type="submit" className="bg-primary">
                           Generate Report
