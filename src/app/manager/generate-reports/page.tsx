@@ -7,6 +7,29 @@
   import { useRouter } from 'next/navigation';
   import { Line } from 'react-chartjs-2';
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+  import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose
+  } from "@/components/ui/dialog"
+  import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+  } from "@/components/ui/form"
+  import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover"
 
   ChartJS.register(
     CategoryScale,
@@ -314,14 +337,55 @@
                 >
                   {isLoadingZ ? 'Generating...' : 'Z-Report'}
                 </Button>
-                <Button
+                {/* <Button
                   type="button"
                   onClick={() => { resetReport();handleProductUsageClick1();}}
                   disabled={isLoadingProduct}
                   className="bg-primary"
                 >
                   {isLoadingProduct ? 'Generating...' : 'Product Usage Report'}
-                </Button>
+                </Button> */}
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      onClick={() => { resetReport(); handleProductUsageClick1(); }}
+                      >
+                        {isLoadingProduct ? 'Generating...' : 'Product Usage Report'}
+                      </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Enter Time Range</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={() => {resetReport(); generateProductUsage();}} className="flex flex-col space-y-4">
+                      <input
+                        type="text"
+                        value={input1}
+                        onChange={(e) => setInput1(e.target.value)}
+                        placeholder="Start Date (MM/DD/YYYY)"
+                        className="border p-2 rounded"
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={input2}
+                        onChange={(e) => setInput2(e.target.value)}
+                        placeholder="End Date (MM/DD/YYYY)"
+                        className="border p-2 rounded"
+                        required
+                      />
+                      <DialogClose asChild>
+                        <Button type="submit" className="bg-primary">
+                          Generate Report
+                        </Button>
+                      </DialogClose>
+                    </form>
+                  </DialogContent>
+                  
+                </Dialog>
+
                 <Button
                   type="button"
                   onClick={() => { resetReport();handleProductUsageClick2();}}
@@ -347,37 +411,6 @@
                 </CardContent>
               </Card>
             </div>
-          )}
-
-          {showForm1 && (
-            <Card className="mb-6 w-1/2 mx-auto">
-              <CardHeader>
-                <CardTitle className="text-center">Enter Time Range</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={() => {resetReport(); generateProductUsage();}} className="flex flex-col space-y-4">
-                  <input
-                    type="text"
-                    value={input1}
-                    onChange={(e) => setInput1(e.target.value)}
-                    placeholder="Start Date (MM/DD/YYYY)"
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <input
-                    type="text"
-                    value={input2}
-                    onChange={(e) => setInput2(e.target.value)}
-                    placeholder="End Date (MM/DD/YYYY)"
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <Button type="submit" className="bg-primary">
-                    Generate Report
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
           )}
 
           {showForm2 && (
