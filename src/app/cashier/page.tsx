@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Minus} from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LogOut } from "lucide-react";
@@ -159,8 +160,24 @@ const CashierPage = () => {
   };
 
   const removeOrderItem = (index: number) => {
-    setCurrentOrder((prev) => prev.filter((_, i) => i !== index));
-  };
+      setCurrentOrder((prev) => prev.filter((_, i) => i !== index));
+    };
+  
+  const onUpdateQuantity = (index: number, delta: number) => {
+      setCurrentOrder((prev) =>
+        prev.map((orderItem, i) =>
+          i === index && orderItem.item
+            ? {
+                ...orderItem,
+                item: {
+                  ...orderItem.item,
+                  quantity: Math.max(1, orderItem.item.quantity + delta),
+                },
+              }
+            : orderItem
+        )
+      );
+    };
 
   const clearOrder = () => {
     setCurrentOrder([]);
@@ -381,6 +398,21 @@ const CashierPage = () => {
                         </span>
                       </div>
                     )}
+                    
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdateQuantity(index, -1)}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdateQuantity(index, 1)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -389,6 +421,7 @@ const CashierPage = () => {
                     >
                       Remove
                     </Button>
+                    
                   </div>
                 ))}
               </div>

@@ -180,17 +180,20 @@
     };
 
     const handleProductUsageClick1 = () => {
+      resetGraphData();
       resetReport();
       setShowForm1(true);
     };
 
     const handleProductUsageClick2 = () => {
+      resetGraphData();
       resetReport();
       setShowForm2(true);
     }
 
     const generateXReport = async () => {
       try {
+        resetGraphData();
         setIsLoadingX(true);
         setError(null);
 
@@ -218,6 +221,7 @@
 
     const generateZReport = async () => {
       try {
+        resetGraphData();
         setIsLoadingZ(true);
         setError(null);
         
