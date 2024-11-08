@@ -13,6 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import type { MealInProgress, MenuItem, OrderItem, SizeEnum } from "@/types/";
 
@@ -401,13 +411,32 @@ const CashierPage = () => {
                 >
                   Clear Order
                 </Button>
-                <Button
+                {/* <Button
                   className="w-full"
                   onClick={submitOrder}
                   disabled={currentOrder.length === 0}
                 >
                   Complete Order
-                </Button>
+                </Button> */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="w-full"
+                      onClick={submitOrder}
+                      disabled={currentOrder.length === 0}
+                      >
+                        Complete Order
+                      </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Order Submitted</DialogTitle>
+                      <DialogDescription>
+                        Order has been placed successfully.
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </CardContent>
