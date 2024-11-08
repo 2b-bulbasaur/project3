@@ -341,14 +341,6 @@
                 >
                   {isLoadingZ ? 'Generating...' : 'Z-Report'}
                 </Button>
-                {/* <Button
-                  type="button"
-                  onClick={() => { resetReport();handleProductUsageClick1();}}
-                  disabled={isLoadingProduct}
-                  className="bg-primary"
-                >
-                  {isLoadingProduct ? 'Generating...' : 'Product Usage Report'}
-                </Button> */}
 
                 <Dialog>
                   <DialogTrigger asChild>
@@ -390,14 +382,45 @@
                   
                 </Dialog>
 
-                <Button
-                  type="button"
-                  onClick={() => { resetReport();handleProductUsageClick2();}}
-                  disabled={isLoadingSales}
-                  className="bg-primary"
-                >
-                  {isLoadingSales ? 'Generating...' : 'Itemized Sales Report'}
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      onClick={() => { resetReport(); handleProductUsageClick2(); }}
+                      >
+                        {isLoadingSales ? 'Generating...' : 'Itemized Sales Report'}
+                      </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Enter Time Range</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={() => {resetReport(); generateSalesReport();}} className="flex flex-col space-y-4">
+                      <input
+                        type="text"
+                        value={input1}
+                        onChange={(e) => setInput1(e.target.value)}
+                        placeholder="Start Date (MM/DD/YYYY)"
+                        className="border p-2 rounded"
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={input2}
+                        onChange={(e) => setInput2(e.target.value)}
+                        placeholder="End Date (MM/DD/YYYY)"
+                        className="border p-2 rounded"
+                        required
+                      />
+                      <DialogClose asChild>
+                        <Button type="submit" className="bg-primary">
+                          Generate Report
+                        </Button>
+                      </DialogClose>
+                    </form>
+                  </DialogContent>
+                  
+                </Dialog>
               </form>
             </CardContent>
           </Card>
@@ -415,37 +438,6 @@
                 </CardContent>
               </Card>
             </div>
-          )}
-
-          {showForm2 && (
-            <Card className="mb-6 w-1/2 mx-auto">
-              <CardHeader>
-                <CardTitle className="text-center">Enter Time Range</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={() => {resetReport(); generateSalesReport();}} className="flex flex-col space-y-4">
-                  <input
-                    type="text"
-                    value={input1}
-                    onChange={(e) => setInput1(e.target.value)}
-                    placeholder="Start Date (MM/DD/YYYY)"
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <input
-                    type="text"
-                    value={input2}
-                    onChange={(e) => setInput2(e.target.value)}
-                    placeholder="End Date (MM/DD/YYYY)"
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <Button type="submit" className="bg-primary">
-                    Generate Report
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
           )}
 
           <Card>
