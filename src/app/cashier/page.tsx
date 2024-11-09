@@ -163,21 +163,24 @@ const CashierPage = () => {
       setCurrentOrder((prev) => prev.filter((_, i) => i !== index));
     };
   
-  const onUpdateQuantity = (index: number, delta: number) => {
+    const onUpdateQuantity = (index: number, delta: number) => {
       setCurrentOrder((prev) =>
-        prev.map((orderItem, i) =>
-          i === index && orderItem.item
-            ? {
-                ...orderItem,
-                item: {
-                  ...orderItem.item,
-                  quantity: Math.max(1, orderItem.item.quantity + delta),
-                },
-              }
-            : orderItem
-        )
+        prev
+          .map((orderItem, i) =>
+            i === index && orderItem.item
+              ? {
+                  ...orderItem,
+                  item: {
+                    ...orderItem.item,
+                    quantity: orderItem.item.quantity + delta,
+                  },
+                }
+              : orderItem
+          )
+          .filter((orderItem) => (orderItem.item?.quantity ?? 0) > 0) // Remove items with quantity <= 0
       );
     };
+    
 
   const clearOrder = () => {
     setCurrentOrder([]);
