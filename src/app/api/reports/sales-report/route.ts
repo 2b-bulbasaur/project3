@@ -57,9 +57,9 @@ export async function POST(request: Request) {
         return NextResponse.json(reportData);    
     }
     catch (error) {
-        console.error('Error in generateProductUsage:', error);
+        console.error('Error in generateSalesReport:', error);
         return NextResponse.json(
-            { error: 'Failed to generate Product Usage', details: error instanceof Error ? error.message : 'Unknown error' },
+            { error: 'Failed to generate Sales Report', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

@@ -7,22 +7,6 @@
   import { useRouter } from 'next/navigation';
   import { Line } from 'react-chartjs-2';
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-  import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose
-  } from "@/components/ui/dialog"
-  import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from "@/components/ui/popover"
-  import { Calendar } from "@/components/ui/calendar"
-  import { format } from 'date-fns';
 
   ChartJS.register(
     CategoryScale,
@@ -173,20 +157,17 @@
     };
 
     const handleProductUsageClick1 = () => {
-      resetGraphData();
       resetReport();
       setShowForm1(true);
     };
 
     const handleProductUsageClick2 = () => {
-      resetGraphData();
       resetReport();
       setShowForm2(true);
     }
 
     const generateXReport = async () => {
       try {
-        resetGraphData();
         setIsLoadingX(true);
         setError(null);
 
@@ -214,7 +195,6 @@
 
     const generateZReport = async () => {
       try {
-        resetGraphData();
         setIsLoadingZ(true);
         setError(null);
         
@@ -334,122 +314,22 @@
                 >
                   {isLoadingZ ? 'Generating...' : 'Z-Report'}
                 </Button>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      onClick={() => { resetReport(); handleProductUsageClick1(); }}
-                      >
-                        {isLoadingProduct ? 'Generating...' : 'Product Usage Report'}
-                      </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Enter Time Range</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={() => {resetReport(); generateProductUsage();}} className="flex flex-col space-y-4">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                          variant={"outline"}
-                          >
-                            {input1 ? format(input1, "PPP") : <span>Click to Select a Start Date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={input1 ? new Date(input1) : undefined}
-                            onSelect={(day) => setInput1(day ? day.toISOString() : '')}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                          variant={"outline"}
-                          >
-                            {input2 ? format(input2, "PPP") : <span>Click to Select End Date</span>} 
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={input2 ? new Date(input2) : undefined}
-                            onSelect={(day) => setInput2(day ? day.toISOString() : '')}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <DialogClose asChild>
-                        <Button type="submit" className="bg-primary">
-                          Generate Report
-                        </Button>
-                      </DialogClose>
-                    </form>
-                  </DialogContent>
-                  
-                </Dialog>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      onClick={() => { resetReport(); handleProductUsageClick2(); }}
-                      >
-                        {isLoadingSales ? 'Generating...' : 'Itemized Sales Report'}
-                      </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Enter Time Range</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={() => {resetReport(); generateSalesReport();}} className="flex flex-col space-y-4">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                          variant={"outline"}
-                          >
-                            {input1 ? format(input1, "PPP") : <span>Click to Select a Start Date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={input1 ? new Date(input1) : undefined}
-                            onSelect={(day) => setInput1(day ? day.toISOString() : '')}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                          variant={"outline"}
-                          >
-                            {input2 ? format(input2, "PPP") : <span>Click to Select End Date</span>} 
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={input2 ? new Date(input2) : undefined}
-                            onSelect={(day) => setInput2(day ? day.toISOString() : '')}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <DialogClose asChild>
-                        <Button type="submit" className="bg-primary">
-                          Generate Report
-                        </Button>
-                      </DialogClose>
-                    </form>
-                  </DialogContent>
-                  
-                </Dialog>
+                <Button
+                  type="button"
+                  onClick={() => { resetReport();handleProductUsageClick1();}}
+                  disabled={isLoadingProduct}
+                  className="bg-primary"
+                >
+                  {isLoadingProduct ? 'Generating...' : 'Product Usage Report'}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => { resetReport();handleProductUsageClick2();}}
+                  disabled={isLoadingSales}
+                  className="bg-primary"
+                >
+                  {isLoadingSales ? 'Generating...' : 'Itemized Sales Report'}
+                </Button>
               </form>
             </CardContent>
           </Card>
@@ -467,6 +347,68 @@
                 </CardContent>
               </Card>
             </div>
+          )}
+
+          {showForm1 && (
+            <Card className="mb-6 w-1/2 mx-auto">
+              <CardHeader>
+                <CardTitle className="text-center">Enter Time Range</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={() => {resetReport(); generateProductUsage();}} className="flex flex-col space-y-4">
+                  <input
+                    type="text"
+                    value={input1}
+                    onChange={(e) => setInput1(e.target.value)}
+                    placeholder="Start Date (MM/DD/YYYY)"
+                    className="border p-2 rounded"
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={input2}
+                    onChange={(e) => setInput2(e.target.value)}
+                    placeholder="End Date (MM/DD/YYYY)"
+                    className="border p-2 rounded"
+                    required
+                  />
+                  <Button type="submit" className="bg-primary">
+                    Generate Report
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {showForm2 && (
+            <Card className="mb-6 w-1/2 mx-auto">
+              <CardHeader>
+                <CardTitle className="text-center">Enter Time Range</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={() => {resetReport(); generateSalesReport();}} className="flex flex-col space-y-4">
+                  <input
+                    type="text"
+                    value={input1}
+                    onChange={(e) => setInput1(e.target.value)}
+                    placeholder="Start Date (MM/DD/YYYY)"
+                    className="border p-2 rounded"
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={input2}
+                    onChange={(e) => setInput2(e.target.value)}
+                    placeholder="End Date (MM/DD/YYYY)"
+                    className="border p-2 rounded"
+                    required
+                  />
+                  <Button type="submit" className="bg-primary">
+                    Generate Report
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           )}
 
           <Card>
