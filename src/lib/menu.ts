@@ -1,18 +1,103 @@
-// /lib/menu.ts
 import { query } from './db';
 import { InventoryItem, MenuItem, Recipe } from '../types';
 
-// gets all menu items with their associated ingredients
-export async function getAllMenuItems(): Promise<MenuItem[]> {
-  const menuItems = await query<MenuItem>('SELECT * FROM menu');
-  for (const item of menuItems) {
-    item.ingredients = await getIngredientsForMenuItem(item.id); // gets ingredients for each menu item
-  }
-  return menuItems;
+// type for the joined query result
+interface MenuItemJoinResult extends MenuItem {
+  ingredient_id: number | null;
+  ingredient_name: string | null;
+  ingredient_amount: number | null;
+  ingredient_unit: string | null;
+  ingredient_reorder: boolean | null;
 }
 
-export async function getMenuNameById(id: number) : Promise<MenuItem[]> {
-  return query('SELECT * FROM menu WHERE id = $1', [id]);
+export async function getAllMenuItems(): Promise<MenuItem[]> {
+  const result = await query<MenuItemJoinResult>(
+    `SELECT 
+      m.*,
+      i.id as ingredient_id,
+      i.name as ingredient_name,
+      i.amount as ingredient_amount,
+      i.unit as ingredient_unit,
+      i.reorder as ingredient_reorder
+     FROM menu m
+     LEFT JOIN recipes r ON m.id = r.menu_id
+     LEFT JOIN inventory i ON r.ingredient_id = i.id
+     ORDER BY m.id`
+  );
+
+  const menuItemsMap = new Map<number, MenuItem>();
+
+  for (const row of result) {
+    if (!menuItemsMap.has(row.id)) {
+      menuItemsMap.set(row.id, {
+        id: row.id,
+        item_type: row.item_type,
+        name: row.name,
+        price: row.price,
+        premium: row.premium,
+        ingredients: []
+      });
+    }
+
+    if (row.ingredient_id) {
+      const menuItem = menuItemsMap.get(row.id)!;
+      if (!menuItem.ingredients!.some(ing => ing.id === row.ingredient_id)) {
+        menuItem.ingredients!.push({
+          id: row.ingredient_id,
+          name: row.ingredient_name!,
+          amount: row.ingredient_amount!,
+          unit: row.ingredient_unit!,
+          reorder: row.ingredient_reorder!
+        });
+      }
+    }
+  }
+
+  return Array.from(menuItemsMap.values());
+}
+
+export async function getMenuItemById(id: number): Promise<MenuItem | null> {
+  const result = await query<MenuItemJoinResult>(
+    `SELECT 
+      m.*,
+      i.id as ingredient_id,
+      i.name as ingredient_name,
+      i.amount as ingredient_amount,
+      i.unit as ingredient_unit,
+      i.reorder as ingredient_reorder
+     FROM menu m
+     LEFT JOIN recipes r ON m.id = r.menu_id
+     LEFT JOIN inventory i ON r.ingredient_id = i.id
+     WHERE m.id = $1`,
+    [id]
+  );
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  const menuItem: MenuItem = {
+    id: result[0].id,
+    item_type: result[0].item_type,
+    name: result[0].name,
+    price: result[0].price,
+    premium: result[0].premium,
+    ingredients: []
+  };
+
+  for (const row of result) {
+    if (row.ingredient_id && !menuItem.ingredients!.some(ing => ing.id === row.ingredient_id)) {
+      menuItem.ingredients!.push({
+        id: row.ingredient_id,
+        name: row.ingredient_name!,
+        amount: row.ingredient_amount!,
+        unit: row.ingredient_unit!,
+        reorder: row.ingredient_reorder!
+      });
+    }
+  }
+
+  return menuItem;
 }
 
 // gets ingredients for a specific menu item
@@ -98,7 +183,7 @@ async function addInventory(
 }
 
 // links a menu item with an ingredient in the recipes table
-async function addRecipe(menuId: number, ingredientId: number): Promise<Recipe> {
+export async function addRecipe(menuId: number, ingredientId: number): Promise<Recipe> {
   const [recipe] = await query<Recipe>(
     `INSERT INTO recipes (menu_id, ingredient_id) 
      VALUES ($1, $2) RETURNING *`,
@@ -157,13 +242,4 @@ export async function updateMenuItem(
 export async function deleteMenuItem(id: number): Promise<void> {
   await query('DELETE FROM recipes WHERE menu_id = $1', [id]);
   await query('DELETE FROM menu WHERE id = $1', [id]);
-}
-
-// gets a single menu item by ID, including its ingredients
-export async function getMenuItemById(id: number): Promise<MenuItem | null> {
-  const [menuItem] = await query<MenuItem>('SELECT * FROM menu WHERE id = $1', [id]);
-  if (menuItem) {
-    menuItem.ingredients = await getIngredientsForMenuItem(menuItem.id); // Fetch ingredients
-  }
-  return menuItem || null;
 }
