@@ -130,10 +130,6 @@ const ManagerDashboard = () => {
               </DropdownMenu>
             </div>
             <div className="flex items-center space-x-2">
-              {/* <Button variant="outline" onClick={goToHome}>
-                <Home className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button> */}
               <p> Welcome {employeeName}!</p>
               <Button variant="outline" onClick={switchToCashierView}>
                 <Settings className="mr-2 h-4 w-4" />
