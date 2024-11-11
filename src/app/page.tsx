@@ -128,6 +128,7 @@ const menuItemsData: MenuItem[] = [
 
 const Weather = () => {
   const [weather, setWeather] = useState<string | null>(null);
+  const [icon, setIcon] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWeather = async (lat: number, lon: number) => {
@@ -144,10 +145,18 @@ const Weather = () => {
             },
           }
         );
-        const data = response.data as { main: { temp: number }; weather: { description: string }[] };
+        const data = response.data as {
+          main: { temp: number };
+          weather: { description: string; icon: string }[];
+        };
+        
         const temp = (data.main.temp) * (9/5) + 32;
         const condition = data.weather[0].description;
-        setWeather(`${temp}°F, ${condition}`);
+        const iconCode = data.weather[0].icon;
+
+        // Set the weather text and icon
+        setWeather(`${temp.toFixed(1)}°F, ${condition}`);
+        setIcon(`http://openweathermap.org/img/wn/${iconCode}@2x.png`);
       } catch (error) {
         console.error("Error fetching weather:", error);
       }
@@ -165,7 +174,8 @@ const Weather = () => {
   }, []);
 
   return (
-    <div className="text-white ml-4">
+    <div className="flex items-center text-white ml-4">
+      {icon && <img src={icon} alt="Weather icon" className="w-8 h-8 mr-2" />}
       {weather ? weather : "Loading weather..."}
     </div>
   );
@@ -200,7 +210,7 @@ export default function HomePage() {
             />
           </div>
           <div className="flex gap-4">
-          <Weather /> {/* Display weather next to the button */}
+          <Weather />
             <Link href="/customer/login" prefetch>
               <Button
                 variant="outline"
