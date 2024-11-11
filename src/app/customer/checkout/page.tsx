@@ -26,11 +26,12 @@ const CheckoutPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
-  const [orderTotal, setOrderTotal] = useState(0);
-  const [promoCode, setPromoCode] = useState(""); // Promo code input
-  const [isPromoValid, setIsPromoValid] = useState(false); // Promo validation
-  const [discountedTotal, setDiscountedTotal] = useState(0);
+  const [appliedPromo, setAppliedPromo] = useState("");
+  const [originalTotal, setOriginalTotal] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
 
+
+ 
   const [customerDetails, setCustomerDetails] = useState({
     name: '',
     email: '',
@@ -41,6 +42,7 @@ const CheckoutPage = () => {
   useEffect(() => {
     const order = localStorage.getItem('currentOrder');
     const total = localStorage.getItem('orderTotal');
+    const savedOriginalTotal = localStorage.getItem('originalTotal');
     const savedPromoCode = localStorage.getItem("promoCode");
 
     
@@ -48,14 +50,16 @@ const CheckoutPage = () => {
       setCurrentOrder(JSON.parse(order));
     }
     if (total) {
-      const parsedTotal = parseFloat(total);
-      setOrderTotal(parsedTotal);
-      setDiscountedTotal(parsedTotal);
+      setFinalTotal(parseFloat(total));
     }
 
+    if (savedOriginalTotal) {
+      setOriginalTotal(parseFloat(savedOriginalTotal));
+    }
+
+
     if (savedPromoCode?.trim().toUpperCase() === "PANDA20") {
-      setIsPromoValid(true);
-      setDiscountedTotal((prevTotal) => prevTotal * 0.8); // Apply 20% discount
+      setAppliedPromo(savedPromoCode);
     }
   }, []);
 
@@ -84,7 +88,10 @@ const CheckoutPage = () => {
       const orderData = {
         customer_name: customerDetails.name,
         cashier_name: "Self Service Kiosk",
-        sale_price: discountedTotal,
+        original_price: originalTotal,
+        sale_price: finalTotal,
+        promo_code: appliedPromo || null,
+        discount_amount: appliedPromo ? (originalTotal - finalTotal) : 0,
         items: currentOrder.length,
         meals: currentOrder.filter(item => item.type === 'meal').length,
         appetizers: currentOrder.reduce((sum, item) => 
@@ -104,9 +111,35 @@ const CheckoutPage = () => {
       });
 
       if (!response.ok) throw new Error('Failed to submit order');
+
+     try {
+
+      console.log("Checking promo eligibility...");
+      const promoResponse = await fetch(`/api/customer_promo?email=${encodeURIComponent(customerDetails.email)}`);
+      if (promoResponse.ok) {
+        const promoData = await promoResponse.json();
+        console.log("Promo check response", promoData);
+
+        if (promoData.isEligibleForPromo) {
+          console.log("User is eligible for promo on their next order! Email should be sent shortly.")
+        }
+        else if (promoData.ordersUntilNextPromo)
+        {
+          console.log("User is not eligible for promo at this time. They need", 5 - promoData.ordersUntilNextPromo, "more orders to qualify.")
+        }
+        else {
+          console.log("User is not eligible for promo at this time.")
+        }
+      }
+    }
+    catch (promoError) {
+      console.error("Error checking promo eligibility:", promoError);
+    }
+     
       
       localStorage.removeItem('currentOrder');
       localStorage.removeItem('orderTotal');
+      localStorage.removeItem('originalTotal');
       localStorage.removeItem('promoCode');
       
       setSuccess(true);
@@ -162,10 +195,38 @@ const CheckoutPage = () => {
             </TableCell>
           </TableRow>
         ))}
+        
         <TableRow>
           <TableCell colSpan={2} className="text-right font-medium">Total:</TableCell>
-          <TableCell className="text-right font-bold">{formatPrice(discountedTotal)}</TableCell>
+          <TableCell className="text-right font-bold">{formatPrice(originalTotal)}</TableCell>
         </TableRow>
+        {appliedPromo && (
+          <>
+          <TableRow>
+          <TableCell colSpan={2} className="text-right text-green-600">
+                Promo Code ({appliedPromo}):
+              </TableCell>
+              <TableCell className="text-right text-green-600">
+              -${(originalTotal - finalTotal).toFixed(2)}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell colSpan={2} className="text-right font-bold">
+                Final Total:
+              </TableCell>
+              <TableCell className="text-right font-bold">
+                {formatPrice(finalTotal)}
+              </TableCell>
+            </TableRow>
+          </>
+        )}
+
+{!appliedPromo && (
+          <TableRow>
+            <TableCell colSpan={2} className="text-right font-bold">Total:</TableCell>
+            <TableCell className="text-right font-bold">{formatPrice(finalTotal)}</TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );
@@ -269,7 +330,7 @@ const CheckoutPage = () => {
               onClick={handleSubmitOrder}
               disabled={loading}
             >
-              {loading ? "Processing..." : `Pay ${formatPrice(discountedTotal)}`}
+              {loading ? "Processing..." : `Pay ${formatPrice(finalTotal)}`}
             </Button>
           </CardFooter>
         </Card>

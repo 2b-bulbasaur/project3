@@ -106,7 +106,7 @@ export async function getTransactions(withSummary: boolean = false): Promise<Tra
       meals,
       appetizers,
       drinks,
-      customer_email,
+      customer_email
     FROM transactionhistory 
     ORDER BY date DESC 
     LIMIT 50;

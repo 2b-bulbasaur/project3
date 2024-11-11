@@ -1,5 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/react";
+import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth"; 
 import { getTransactions } from "@/lib/transactions";
 import { google } from "googleapis";
 
@@ -13,13 +14,12 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GMAIL_GOOGLE_REFRESH_TOKEN,
 });
 
-// to send promo email
 async function sendPromoEmail(to: string) {
   try {
-    console.log("Preparing to send email...");
+    console.log("DEBUG: Initializing Gmail service...");
     const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-    const email = [
+    const emailContent = [
       `To: ${to}`,
       "Content-Type: text/plain; charset=utf-8",
       "Subject: Your Panda Express Promo Code",
@@ -27,14 +27,13 @@ async function sendPromoEmail(to: string) {
       `Congratulations! Use the promo code "PANDA20" for 20% off your next order.`,
     ].join("\n");
 
-    const encodedEmail = Buffer.from(email)
+    const encodedEmail = Buffer.from(emailContent)
       .toString("base64")
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/, "");
 
-    console.log("Encoded email:", encodedEmail);
-
+    console.log("DEBUG: Sending email...");
     const response = await gmail.users.messages.send({
       userId: "me",
       requestBody: {
@@ -49,47 +48,60 @@ async function sendPromoEmail(to: string) {
   }
 }
 
-
-// promo handler
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
-
+// Export GET handler for App Router
+export async function GET() {
   try {
-    // gets session to verify logged-in user
-    const session = await getSession({ req });
+    console.log("DEBUG: Starting promo check...");
+    const session = await getServerSession(authOptions);
 
-    if (!session || !session.user?.email) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!session?.user?.email) {
+      console.error("DEBUG: No session or email found");
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const email = session.user.email;
+    console.log("DEBUG: Checking promos for email:", email);
 
-    // query the database to count transactions for the logged-in user's email
-    const transactions = await getTransactions(false); 
-    const userTransactions = transactions.filter(txn => txn.customer_email === email);
+    const transactions = await getTransactions(false);
+    const userTransactions = transactions.filter(
+      (txn) => txn.customer_email === email
+    );
 
     const transactionCount = userTransactions.length;
+    console.log("DEBUG: Transaction count:", transactionCount);
 
-    //  promo eligibility: every 5th transaction
-    const isEligibleForPromo = transactionCount > 0 && transactionCount % 5 === 0;
-    const promoCode = isEligibleForPromo ? "PANDA20" : null;
+    const promoThreshold = 5; // Number of transactions needed for a promo
+    const isEligibleForPromo = transactionCount > 0 && transactionCount % promoThreshold === 0;
+    const ordersUntilNextPromo = isEligibleForPromo ? 0 : promoThreshold - (transactionCount % promoThreshold);
 
-    //  promo email if eligible
+    console.log("DEBUG: Is eligible for promo?", isEligibleForPromo);
+    console.log("DEBUG: Orders until next promo:", ordersUntilNextPromo);
+
     if (isEligibleForPromo) {
-      await sendPromoEmail(email);
+      try {
+        await sendPromoEmail(email);
+        console.log("DEBUG: Promo email sent successfully");
+      } catch (emailError) {
+        console.error("DEBUG: Failed to send promo email:", emailError);
+      }
     }
 
-    // return the promo eligibility and details
-    res.status(200).json({
+    return NextResponse.json({
       email,
       transactionCount,
       isEligibleForPromo,
-      promoCode,
+      promoCode: isEligibleForPromo ? "PANDA20" : null,
+      ordersUntilNextPromo,
     });
+
   } catch (error) {
-    console.error("Error fetching promo eligibility:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error("DEBUG: Error in promo handler:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

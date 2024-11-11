@@ -14,6 +14,7 @@ import MealBuilder from "@/components/MealBuilder";
 import OrderSummary from "@/components/OrderSummary";
 import type { MenuItem, SizeEnum, ItemTypeEnum } from "@/types/db.types";
 import type { OrderItem, MealInProgress } from "@/types/api.types";
+import { set } from "date-fns";
 
 const CategorySection = ({
   items,
@@ -261,8 +262,14 @@ const CustomerPage = () => {
     setCurrentOrder([]);
     setCurrentMeal(null);
     setShowMealBuilder(false);
+    setPromoCode("");
+    setIsPromoValid(false);
+    setOrderTotal(0);
+    setDiscountedTotal(0);
     localStorage.removeItem("currentOrder");
     localStorage.removeItem("orderTotal");
+    localStorage.removeItem("originalTotal");
+    localStorage.removeItem("promoCode");
     router.push("/");
   };
 
@@ -313,7 +320,8 @@ const CustomerPage = () => {
 
     localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
     localStorage.setItem("orderTotal", discountedTotal.toString());
-    localStorage.setItem("promoCode", promoCode); // Save promo code
+    localStorage.setItem("originalTotal", orderTotal.toString());
+    localStorage.setItem("promoCode", isPromoValid ? promoCode : "");
 
     
 
