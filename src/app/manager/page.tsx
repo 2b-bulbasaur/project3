@@ -37,10 +37,12 @@ interface TransactionWithSummary extends Transaction {
   order_summary: string;
 }
 
+
 const ManagerDashboard = () => {
   const [transactions, setTransactions] = useState<TransactionWithSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [employeeName, setEmployeeName] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -60,6 +62,9 @@ const ManagerDashboard = () => {
       }
     };
     fetchTransactions();
+
+    const name = localStorage.getItem("employeeName");
+    if (name) setEmployeeName(name);
   }, []);
 
   const switchToCashierView = () => {
@@ -125,10 +130,11 @@ const ManagerDashboard = () => {
               </DropdownMenu>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={goToHome}>
+              {/* <Button variant="outline" onClick={goToHome}>
                 <Home className="mr-2 h-4 w-4" />
                 Back to Home
-              </Button>
+              </Button> */}
+              <p> Welcome {employeeName}!</p>
               <Button variant="outline" onClick={switchToCashierView}>
                 <Settings className="mr-2 h-4 w-4" />
                 Switch to Cashier View
