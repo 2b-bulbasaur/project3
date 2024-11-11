@@ -155,7 +155,7 @@ const Weather = () => {
         const iconCode = data.weather[0].icon;
 
         // Set the weather text and icon
-        setWeather(`${temp.toFixed(1)}°F, ${condition}`);
+        setWeather(`${temp.toFixed(1)}°F, ${condition.charAt(0).toUpperCase() + condition.slice(1) }`);
         setIcon(`http://openweathermap.org/img/wn/${iconCode}@2x.png`);
       } catch (error) {
         console.error("Error fetching weather:", error);
