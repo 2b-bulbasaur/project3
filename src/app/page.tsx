@@ -3,6 +3,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +12,6 @@ import {
   CardHeader,
   CardFooter,
 } from "@/components/ui/card";
-import { useEffect, useState } from "react";
 
 type MenuItem = {
   name: string;
@@ -125,6 +126,51 @@ const menuItemsData: MenuItem[] = [
   },
 ];
 
+const Weather = () => {
+  const [weather, setWeather] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+        const response = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather`,
+          {
+            params: {
+              lat,
+              lon,
+              appid: apiKey,
+              units: "metric",
+            },
+          }
+        );
+        const data = response.data as { main: { temp: number }; weather: { description: string }[] };
+        const temp = (data.main.temp) * (9/5) + 32;
+        const condition = data.weather[0].description;
+        setWeather(`${temp}°F, ${condition}`);
+      } catch (error) {
+        console.error("Error fetching weather:", error);
+      }
+    };
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          fetchWeather(latitude, longitude);
+        },
+        (error) => console.error("Error getting location:", error)
+      );
+    }
+  }, []);
+
+  return (
+    <div className="text-white ml-4">
+      {weather ? weather : "Loading weather..."}
+    </div>
+  );
+};
+
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -154,6 +200,7 @@ export default function HomePage() {
             />
           </div>
           <div className="flex gap-4">
+          <Weather /> {/* Display weather next to the button */}
             <Link href="/customer/login" prefetch>
               <Button
                 variant="outline"
