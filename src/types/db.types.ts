@@ -49,6 +49,7 @@ export interface Transaction {
     meals: number;
     appetizers: number;
     drinks: number;
+    customer_email: string;
 }
 
 export interface MealOrder {
