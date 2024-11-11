@@ -274,9 +274,7 @@ const CashierPage = () => {
             : orderItem
         )
         .filter((orderItem) => 
-          // If it's a meal, keep it regardless of item quantities
           orderItem.meal || 
-          // For individual items, filter if quantity is 0 or less
           (orderItem.item?.quantity ?? 0) > 0
         )
     );
