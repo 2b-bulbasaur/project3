@@ -40,6 +40,7 @@ const LoginPage = () => {
         throw new Error(data.error || 'Login failed');
       }
 
+      localStorage.setItem("employeeName", data.name);
       if (data.job?.toLowerCase() === 'manager') {
         router.push('/manager');
       } else if (data.job?.toLowerCase() === 'crew') {

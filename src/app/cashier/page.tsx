@@ -31,11 +31,13 @@ const CashierPage = () => {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("side");
   const [customerName, setCustomerName] = useState("");
+  const [employeeName, setEmployeeName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentMeal, setCurrentMeal] = useState<MealInProgress | null>(null);
 
   const handleLogout = () => {
+    localStorage.removeItem("employeeName");
     router.push("/login");
   };
 
@@ -54,6 +56,9 @@ const CashierPage = () => {
       }
     };
     fetchMenuItems();
+
+    const name = localStorage.getItem("employeeName");
+    if (name) setEmployeeName(name);
   }, []);
 
   const getMealConstraints = (size: SizeEnum) => {
@@ -290,7 +295,7 @@ const CashierPage = () => {
     try {
       const orderData = {
         customer_name: customerName || "Guest",
-        cashier_name: "Current Cashier",
+        cashier_name: employeeName || "Current Cashier",
         sale_price: getOrderTotal(),
         items: currentOrder.reduce((sum, item) => {
           if (item.type === "meal") return sum + 1;
