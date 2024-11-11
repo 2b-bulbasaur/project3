@@ -154,7 +154,7 @@ export default function HomePage() {
             />
           </div>
           <div className="flex gap-4">
-            <Link href="/customer" prefetch>
+            <Link href="/customer/login" prefetch>
               <Button
                 variant="outline"
                 className="bg-white/10 hover:bg-white/20 text-white border-orange-500 hover:border-orange-600"

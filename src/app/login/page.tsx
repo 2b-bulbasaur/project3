@@ -28,7 +28,7 @@ const LoginPage = () => {
     try {
       const trimmedUsername = username.trim();
 
-      const response = await fetch('/api/auth', {
+      const response = await fetch('/api/employee_auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: trimmedUsername, password }),
