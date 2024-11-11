@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ItemTypeEnum, MenuItem, InventoryItem } from '@/types/db.types';
 import { Trash2, Edit, Plus, X, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ const ManageMenu: React.FC = () => {
   const [ingredients, setIngredients] = useState<InventoryItem[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<SelectedIngredient[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Form states
   const [name, setName] = useState('');
@@ -48,6 +49,7 @@ const ManageMenu: React.FC = () => {
       if (!response.ok) throw new Error('Failed to fetch menu items');
       const data = await response.json();
       setMenuItems(data);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching menu items:', error);
       setError('Failed to load menu items.');
@@ -241,6 +243,20 @@ const ManageMenu: React.FC = () => {
     fetchIngredients();
   }, []);
 
+  const MenuItemSkeleton = () => (
+    <div className="flex items-center justify-between p-3">
+      <div className="space-y-2 flex-1">
+        <Skeleton className="h-5 w-[200px]" />
+        <Skeleton className="h-4 w-[300px]" />
+        <Skeleton className="h-4 w-[250px]" />
+      </div>
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-8 w-8" />
+      </div>
+    </div>
+  );
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center gap-4 mb-4">
@@ -256,7 +272,6 @@ const ManageMenu: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Menu Items List - Takes up 2/3 of the space */}
         <div className="md:col-span-2">
           <Card className="h-[calc(100vh-8rem)] flex flex-col">
             <CardHeader>
@@ -269,7 +284,13 @@ const ManageMenu: React.FC = () => {
                 </div>
               )}
               
-              {menuItems.length === 0 ? (
+              {isLoading ? (
+                <div className="divide-y divide-border rounded-md border">
+                  {[...Array(5)].map((_, i) => (
+                    <MenuItemSkeleton key={i} />
+                  ))}
+                </div>
+              ) : menuItems.length === 0 ? (
                 <p className="text-center text-muted-foreground">No menu items found.</p>
               ) : (
                 <div className="divide-y divide-border rounded-md border">
