@@ -27,19 +27,35 @@ const CheckoutPage = () => {
   const [success, setSuccess] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [orderTotal, setOrderTotal] = useState(0);
+  const [promoCode, setPromoCode] = useState(""); // Promo code input
+  const [isPromoValid, setIsPromoValid] = useState(false); // Promo validation
+  const [discountedTotal, setDiscountedTotal] = useState(0);
+
   const [customerDetails, setCustomerDetails] = useState({
     name: '',
     email: '',
     phone: ''
   });
 
+
   useEffect(() => {
     const order = localStorage.getItem('currentOrder');
     const total = localStorage.getItem('orderTotal');
+    const savedPromoCode = localStorage.getItem("promoCode");
+
     
-    if (order && total) {
+    if (order) {
       setCurrentOrder(JSON.parse(order));
-      setOrderTotal(parseFloat(total));
+    }
+    if (total) {
+      const parsedTotal = parseFloat(total);
+      setOrderTotal(parsedTotal);
+      setDiscountedTotal(parsedTotal);
+    }
+
+    if (savedPromoCode?.trim().toUpperCase() === "PANDA20") {
+      setIsPromoValid(true);
+      setDiscountedTotal((prevTotal) => prevTotal * 0.8); // Apply 20% discount
     }
   }, []);
 
@@ -68,7 +84,7 @@ const CheckoutPage = () => {
       const orderData = {
         customer_name: customerDetails.name,
         cashier_name: "Self Service Kiosk",
-        sale_price: orderTotal,
+        sale_price: discountedTotal,
         items: currentOrder.length,
         meals: currentOrder.filter(item => item.type === 'meal').length,
         appetizers: currentOrder.reduce((sum, item) => 
@@ -91,6 +107,7 @@ const CheckoutPage = () => {
       
       localStorage.removeItem('currentOrder');
       localStorage.removeItem('orderTotal');
+      localStorage.removeItem('promoCode');
       
       setSuccess(true);
       
@@ -147,7 +164,7 @@ const CheckoutPage = () => {
         ))}
         <TableRow>
           <TableCell colSpan={2} className="text-right font-medium">Total:</TableCell>
-          <TableCell className="text-right font-bold">{formatPrice(orderTotal)}</TableCell>
+          <TableCell className="text-right font-bold">{formatPrice(discountedTotal)}</TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -252,7 +269,7 @@ const CheckoutPage = () => {
               onClick={handleSubmitOrder}
               disabled={loading}
             >
-              {loading ? "Processing..." : `Pay ${formatPrice(orderTotal)}`}
+              {loading ? "Processing..." : `Pay ${formatPrice(discountedTotal)}`}
             </Button>
           </CardFooter>
         </Card>

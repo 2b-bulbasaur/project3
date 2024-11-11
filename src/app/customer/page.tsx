@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShoppingCart, XCircle, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import MealBuilder from "@/components/MealBuilder";
 import OrderSummary from "@/components/OrderSummary";
@@ -54,6 +56,9 @@ const CustomerPage = () => {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [currentMeal, setCurrentMeal] = useState<MealInProgress | null>(null);
   const [orderTotal, setOrderTotal] = useState(0);
+  const [discountedTotal, setDiscountedTotal] = useState(orderTotal);
+  const [promoCode, setPromoCode] = useState(""); // Promo code input
+  const [isPromoValid, setIsPromoValid] = useState(false); // Promo validation
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showMealBuilder, setShowMealBuilder] = useState(false);
@@ -87,7 +92,8 @@ const CustomerPage = () => {
     }, 0);
 
     setOrderTotal(total);
-  }, [currentOrder]);
+    setDiscountedTotal(isPromoValid ? total * 0.8 : total);
+  }, [currentOrder, isPromoValid]);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -122,6 +128,28 @@ const CustomerPage = () => {
       }
     }
   }, []);
+
+
+  const validatePromoCode = () => {
+    if (promoCode.trim().toUpperCase() === "PANDA20") {
+      setIsPromoValid(true);
+      setDiscountedTotal(orderTotal * 0.8);
+    } else {
+      setIsPromoValid(false);
+      setDiscountedTotal(orderTotal);
+    }
+  };
+
+  const handlePromoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPromoCode(e.target.value);
+  };
+
+
+
+
+
+
+
 
   const startNewMeal = (size: SizeEnum) => {
     setCurrentMeal({
@@ -284,7 +312,10 @@ const CustomerPage = () => {
     }
 
     localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
-    localStorage.setItem("orderTotal", orderTotal.toString());
+    localStorage.setItem("orderTotal", discountedTotal.toString());
+    localStorage.setItem("promoCode", promoCode); // Save promo code
+
+    
 
     router.push("/customer/checkout");
   };
@@ -387,11 +418,35 @@ const CustomerPage = () => {
           <CardContent>
             <OrderSummary
               order={currentOrder}
-              total={orderTotal}
+              total={discountedTotal}
               onRemoveItem={removeOrderItem}
               onUpdateQuantity={updateItemQuantity}
               onCheckout={handleCheckout}
             />
+
+            <div className="mt-4">
+              <Label htmlFor="promoCode">Promo Code</Label>
+              <Input
+                id="promoCode"
+                placeholder="Enter promo code"
+                value={promoCode}
+                onChange={handlePromoChange}
+                className = "mt-2"
+              />
+              <Button
+                onClick={validatePromoCode}
+                className="mt-2"
+              >
+                Apply Promo
+              </Button>
+              {isPromoValid && (
+                <p className="text-green-600 mt-2">Promo code applied! 20% discounted.</p>
+              )}
+              {!isPromoValid && promoCode.trim() !== "" && (
+                <p className="text-red-600 mt-2">Invalid promo code</p>)}
+            </div>
+
+
           </CardContent>
         </Card>
       </div>
