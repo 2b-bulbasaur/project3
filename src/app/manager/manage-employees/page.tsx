@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit, Plus, Save, X, ArrowLeft } from 'lucide-react';
-
+import { Skeleton } from '@/components/ui/skeleton';
+import { Trash2, Edit, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
 
 interface Employee {
   id: number;
@@ -16,6 +15,19 @@ interface Employee {
   salary: number | string;
   password: string;
 }
+
+const EmployeeSkeleton = () => (
+  <div className="flex items-center justify-between p-3">
+    <div className="space-y-2 flex-1">
+      <Skeleton className="h-5 w-[160px]" />
+      <Skeleton className="h-4 w-[260px]" />
+    </div>
+    <div className="flex gap-2">
+      <Skeleton className="h-8 w-16" />
+      <Skeleton className="h-8 w-16" />
+    </div>
+  </div>
+);
 
 const ManageEmployees: React.FC = () => {
   const router = useRouter();
@@ -30,14 +42,6 @@ const ManageEmployees: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-
-
-
-  const navigateToManager = () => {
-    router.push('/manager');
-  };
-
 
   const showSuccessMessage = (message: string) => {
     setSuccessMessage(message);
@@ -187,11 +191,11 @@ const ManageEmployees: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center gap-4 mb-6">
+    <div className="container mx-auto py-6">
+      <div className="flex items-center gap-4 mb-4">
         <Button
           variant="outline"
-          onClick={navigateToManager}
+          onClick={() => router.push('/manager')}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -199,136 +203,156 @@ const ManageEmployees: React.FC = () => {
         </Button>
         <h2 className="text-2xl font-bold">Manage Employees</h2>
       </div>
-      {error && (
-        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mb-4">
-          {error}
-        </div>
-      )}
 
-      {successMessage && (
-        <div className="bg-green-100 text-green-700 px-4 py-3 rounded-md mb-4">
-          {successMessage}
-        </div>
-      )}
-
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>{selectedEmployee ? 'Update Employee' : 'Add New Employee'}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            selectedEmployee ? handleUpdateEmployee() : handleAddEmployee();
-          }} className="space-y-4">
-            <div className="grid gap-4">
-              <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="p-2 border rounded-md"
-                disabled={isLoading}
-              />
-              <input
-                type="text"
-                placeholder="Job"
-                value={job}
-                onChange={(e) => setJob(e.target.value)}
-                className="p-2 border rounded-md"
-                disabled={isLoading}
-              />
-              <input
-                type="number"
-                placeholder="Hours"
-                value={hours}
-                onChange={(e) => setHours(e.target.value ? Number(e.target.value) : '')}
-                className="p-2 border rounded-md"
-                disabled={isLoading}
-              />
-              <input
-                type="number"
-                placeholder="Salary"
-                value={salary}
-                onChange={(e) => setSalary(e.target.value === '' ? '' : Number(e.target.value))}
-                className="p-2 border rounded-md"
-                disabled={isLoading}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="p-2 border rounded-md"
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              <Button
-                type="submit"
-                disabled={isLoading}
-                variant={selectedEmployee ? "secondary" : "default"}
-              >
-                {isLoading ? 'Processing...' : (selectedEmployee ? <><Save className="h-4 w-4" /> Update Employee</> : <><Plus className="h-4 w-4" /> Add Employee</>)}
-              </Button>
-              {selectedEmployee && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isLoading}
-                  onClick={resetForm}
-                >
-                  <X className="h-4 w-4" /> Cancel
-                </Button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Employee List - Takes up 2/3 of the space */}
+        <div className="md:col-span-2">
+          <Card className="h-[calc(100vh-8rem)] flex flex-col">
+            <CardHeader>
+              <CardTitle>Employee List</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow overflow-y-auto">
+              {error && (
+                <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mb-4">
+                  {error}
+                </div>
               )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              
+              {successMessage && (
+                <div className="bg-green-100 text-green-700 px-4 py-3 rounded-md mb-4">
+                  {successMessage}
+                </div>
+              )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Employee List</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {employees.length === 0 ? (
-            <p className="text-muted-foreground text-center py-4">No employees found.</p>
-          ) : (
-            <ul className="divide-y">
-              {employees.map((employee) => (
-                <li key={employee.id} className="py-4 flex justify-between items-center">
-                  <div>
-                    <h3 className="font-medium">{employee.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {employee.job} • {employee.hours} hours • ${Number(employee.salary).toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
+              {isLoading ? (
+                <div className="divide-y divide-border rounded-md border">
+                  {[...Array(5)].map((_, i) => (
+                    <EmployeeSkeleton key={i} />
+                  ))}
+                </div>
+              ) : employees.length === 0 ? (
+                <p className="text-center text-muted-foreground">No employees found.</p>
+              ) : (
+                <div className="divide-y divide-border rounded-md border">
+                  {employees.map((employee) => (
+                    <div key={employee.id} className="flex items-center justify-between p-3 hover:bg-secondary/10">
+                      <div>
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {employee.job} • {employee.hours} hours • ${Number(employee.salary).toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditClick(employee)}
+                          disabled={isLoading}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteEmployee(employee.id)}
+                          disabled={isLoading}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Add/Edit Form - Takes up 1/3 of the space */}
+        <div className="md:col-span-1">
+          <Card className="sticky top-6">
+            <CardHeader className="pb-3">
+              <CardTitle>{selectedEmployee ? 'Update Employee' : 'Add New Employee'}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (selectedEmployee) {
+                  handleUpdateEmployee();
+                } else {
+                  handleAddEmployee();
+                }
+              }} className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                  disabled={isLoading}
+                />
+                
+                <input
+                  type="text"
+                  placeholder="Job"
+                  value={job}
+                  onChange={(e) => setJob(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                  disabled={isLoading}
+                />
+
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    placeholder="Hours"
+                    value={hours}
+                    onChange={(e) => setHours(e.target.value ? Number(e.target.value) : '')}
+                    className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    disabled={isLoading}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Salary"
+                    value={salary}
+                    onChange={(e) => setSalary(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                  disabled={isLoading}
+                />
+
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-primary"
+                  >
+                    {isLoading ? 'Processing...' : selectedEmployee ? 'Update' : 'Add'}
+                  </Button>
+                  {selectedEmployee && (
                     <Button
+                      type="button"
                       variant="outline"
-                      size="sm"
-                      onClick={() => handleEditClick(employee)}
+                      onClick={resetForm}
                       disabled={isLoading}
                     >
-                      <Edit className="h-4 w-4" />
-                      Edit
+                      Cancel
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteEmployee(employee.id)}
-                      disabled={isLoading}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+                  )}
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
