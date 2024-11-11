@@ -472,7 +472,7 @@ const CashierPage = () => {
                 className="mt-2"
               />
             </CardHeader>
-            <CardContent className="flex-grow flex flex-col">
+            <CardContent className="flex-grow flex flex-col overflow-y-auto max-h-[calc(100vh-200px)]"> {/* Added scroll and height constraint */}
               <ScrollArea className="flex-grow">
                 <div className="space-y-4">
                   {currentOrder.map((orderItem, index) => (
@@ -493,11 +493,7 @@ const CashierPage = () => {
                             )}
                             <div className="flex items-center gap-1">
                               <span className="font-medium">Entrées:</span>
-                              {[
-                                orderItem.meal.entree1?.name,
-                                orderItem.meal.entree2?.name,
-                                orderItem.meal.entree3?.name,
-                              ]
+                              {[orderItem.meal.entree1?.name, orderItem.meal.entree2?.name, orderItem.meal.entree3?.name]
                                 .filter(Boolean)
                                 .join(", ")}
                             </div>
@@ -547,13 +543,13 @@ const CashierPage = () => {
                   ))}
                 </div>
               </ScrollArea>
-  
+
               <div className="mt-4 space-y-4 border-t pt-4">
                 <div className="flex justify-between text-lg font-medium">
                   <span>Total</span>
                   <span>${getOrderTotal().toFixed(2)}</span>
                 </div>
-  
+
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     variant="outline"
