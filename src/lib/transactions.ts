@@ -4,7 +4,7 @@ import type { OrderItem, TransactionWithSummary } from '@/types/api.types';
 
 interface CreateTransactionInput {
   customer_name: string;
-  customer_email: string; // Added customer_email
+  customer_email: string; // added customer_email
   cashier_name: string;
   sale_price: number;
   items: number;
@@ -100,13 +100,13 @@ export async function getTransactions(withSummary: boolean = false): Promise<Tra
       id,
       date,
       customer_name,
-      customer_email, -- Added customer_email
       cashier_name,
       sale_price,
       items,
       meals,
       appetizers,
-      drinks
+      drinks,
+      customer_email,
     FROM transactionhistory 
     ORDER BY date DESC 
     LIMIT 50;
@@ -119,21 +119,22 @@ export async function addTransaction(input: CreateTransactionInput): Promise<Tra
   try {
     const [transaction] = await query<Transaction>(`
       INSERT INTO transactionhistory (
-        date, customer_name, customer_email, cashier_name, sale_price, 
-        items, meals, appetizers, drinks
+        date, customer_name, cashier_name, sale_price, 
+        items, meals, appetizers, drinks, customer_email
       ) VALUES (
         CURRENT_TIMESTAMP, $1, $2, $3, $4, $5, $6, $7, $8
       )
       RETURNING *;
     `, [
       input.customer_name,
-      input.customer_email, // Insert customer_email
       input.cashier_name,
       input.sale_price,
       input.items,
       input.meals,
       input.appetizers,
-      input.drinks
+      input.drinks,
+      input.customer_email || null // insert customer_email
+
     ]);
 
     for (const item of input.orderItems) {
