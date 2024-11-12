@@ -3,21 +3,47 @@ import { useEffect, useRef } from 'react';
 declare global {
   interface Window {
     google: any; 
-  }
+  googleTranslateElementInit: () => void; 
+}
 }
 
 const GoogleTranslate = () => {
   const initialized = useRef(false);
 
   useEffect(() => {
+    const hideFloatingToolbar = () => {
+      const toolbar = document.querySelector('.goog-te-banner-frame');
+      if (toolbar) {
+        (toolbar as HTMLElement).style.display = 'none'; 
+      }
+    };
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .goog-te-banner-frame { display: none !important; }
+      .goog-te-gadget { display: inline-block !important; }
+    `;
+    document.head.appendChild(style);
+
     if (initialized.current) return;
 
     const loadGoogleTranslate = () => {
-      if (window.google && window.google.translate) {
-        new window.google.translate.TranslateElement(
-          { pageLanguage: 'en' },
-          'google_translate_element'
-        );
+      if (window.google && window.google.translate && window.google.translate.TranslateElement) {
+        try {
+          new window.google.translate.TranslateElement(
+            {
+              pageLanguage: 'en', 
+              floating: false, 
+            },
+            'google_translate_element' 
+          );
+          
+          hideFloatingToolbar();
+        } catch (error) {
+          console.error('Google Translate initialization failed', error);
+        }
+      } else {
+        console.error('Google Translate API is not available or TranslateElement is not a constructor');
       }
     };
 
@@ -25,10 +51,14 @@ const GoogleTranslate = () => {
     script.type = 'text/javascript';
     script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     script.async = true;
-    script.onload = loadGoogleTranslate;
-    document.body.appendChild(script);
 
-    (window as any).googleTranslateElementInit = loadGoogleTranslate;
+    window.googleTranslateElementInit = loadGoogleTranslate;
+
+    script.onload = () => {
+      console.log('Google Translate script loaded successfully!');
+    };
+
+    document.body.appendChild(script);
 
     initialized.current = true;
 
@@ -40,22 +70,9 @@ const GoogleTranslate = () => {
         }
       });
     };
-  }, []); 
+  }, []);
 
-  const triggerTranslation = () => {
-    if (window.google && window.google.translate) {
-      window.google.translate.TranslateElement({
-        pageLanguage: 'en', 
-      }, 'google_translate_element');
-    }
-  };
-
-  return (
-    <div>
-      <div id="google_translate_element"></div>
-      <button onClick={triggerTranslation}>Force Translate</button>
-    </div>
-  );
+  return <div id="google_translate_element"></div>;
 };
 
 export default GoogleTranslate;
