@@ -33,12 +33,14 @@ const GoogleTranslate = () => {
       }
 
       .goog-te-badge {
-        display: flex !important;               
-        flex-direction: row !important;          
-        align-items: center !important;         
-        white-space: nowrap !important;         
-        padding: 0 5px !important;            
-        font-size: 8px !important;   
+        display: inline-flex !important;           
+        flex-direction: row !important;             
+        align-items: center !important;            
+        white-space: nowrap !important;             
+        padding: 0 5px !important;                 
+        font-size: 8px !important;                  
+        overflow: hidden !important;                
+        max-width: 200px !important; 
       }
     `;
     document.head.appendChild(style);

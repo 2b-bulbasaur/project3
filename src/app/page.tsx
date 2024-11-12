@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardFooter,
 } from "@/components/ui/card";
+import GoogleTranslate from "@/components/Translation";
 
 type MenuItem = {
   name: string;
@@ -199,7 +200,7 @@ export default function HomePage() {
       {/* Header Section */}
       <div className="absolute top-0 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
         <div className="container mx-auto flex justify-between items-center py-4 px-4">
-          <div className="flex-shrink-0">
+          <div className="flex gap-4">
             <Image
               src="/images/panda-logo.png"
               alt="Panda Express Logo"
@@ -208,6 +209,7 @@ export default function HomePage() {
               className="object-contain"
               priority
             />
+            <GoogleTranslate />
           </div>
           <div className="flex gap-4">
           <Weather />
