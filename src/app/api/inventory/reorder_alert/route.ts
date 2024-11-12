@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getReorderInventory } from '@/lib/inventory'
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
     try {
         const inventory = await getReorderInventory();
         return NextResponse.json(inventory);

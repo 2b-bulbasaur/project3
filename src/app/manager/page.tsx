@@ -32,6 +32,17 @@ import {
   Home,
 } from "lucide-react";
 import { Transaction } from "@/types/db.types";
+import { getReorderInventory } from "@/lib/inventory";
+import { InventoryItem } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 interface TransactionWithSummary extends Transaction {
   order_summary: string;
@@ -43,6 +54,8 @@ const ManagerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [employeeName, setEmployeeName] = useState("");
+  const [reorderItems, setReorderItems] = useState<boolean>(false); 
+  const [reorderInventory, setReorderInventory] = useState<string[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -61,8 +74,25 @@ const ManagerDashboard = () => {
         setIsLoading(false);
       }
     };
-    fetchTransactions();
+    
+    const fetchReorderInventory = async () => {
+      try {
+        const response = await fetch("/api/inventory/reorder_alert");
+        if (!response.ok) throw new Error("Failed to fetch reorder inventory items");
+        const data: { name: string }[] = await response.json();
+        setReorderInventory(data.map(item => item.name));
+        if (data.length > 0) setReorderItems(true);
+      } catch (error) {
+        console.error("Error fetching reorder inventory items:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
+        setError(errorMessage);
+      }
+    }
 
+    fetchTransactions();
+    fetchReorderInventory();
+    
     const name = localStorage.getItem("employeeName");
     if (name) setEmployeeName(name);
   }, []);
@@ -198,6 +228,37 @@ const ManagerDashboard = () => {
           </ScrollArea>
         </CardContent>
       </Card>
+
+      {reorderItems && (
+        <Dialog open={reorderItems} onOpenChange={setReorderItems}>
+          
+          <DialogContent className="max-w-md w-full p-6 bg-white rounded-lg">
+            <DialogHeader>
+              <DialogTitle>Reorder Inventory Alert</DialogTitle>
+              <DialogDescription>
+                The following inventory items need to be reordered:
+              </DialogDescription>
+            </DialogHeader>
+
+            <ul className="list-disc list-inside mb-4">
+              {reorderInventory.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <div className="flex justify-end space-x-4">
+              <DialogClose asChild>
+                <Button variant="outline">Close</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button onClick={() => window.location.href = "/manager/manage-inventory"}>
+                  Go to Inventory
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
