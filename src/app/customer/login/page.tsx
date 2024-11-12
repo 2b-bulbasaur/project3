@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import GoogleTranslate from '@/components/Translation';
 
 const CustomerLoginPage = () => {
   const { data: session, status } = useSession();
@@ -53,6 +54,8 @@ const CustomerLoginPage = () => {
         />
       </Link>
 
+      <GoogleTranslate />
+      
       <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm shadow-2xl">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center text-orange-600">Customer Login</CardTitle>
@@ -116,6 +119,7 @@ const CustomerLoginPage = () => {
               </Link>
             </div>
           )}
+
         </CardContent>
       </Card>
     </div>
