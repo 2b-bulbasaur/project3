@@ -24,6 +24,10 @@ export async function getInventoryNameById(id: number): Promise<InventoryItem | 
   return item || null;
 }
 
+export async function getReorderInventory(): Promise<InventoryItem[]> {
+  return query<InventoryItem>('SELECT name FROM inventory WHERE reorder = true');
+}
+
 // add a new inventory item
 export async function addInventory(
   name: string,
