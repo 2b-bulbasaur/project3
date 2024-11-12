@@ -24,10 +24,21 @@ const GoogleTranslate = () => {
       .goog-te-banner-frame { display: none !important; }
       .goog-te-combo {
         font-size: 15px !important; 
-        padding: 5px 15px !important; 
+        padding: 8px 15px !important; 
         background-color: white !important; 
         color: black !important; 
-        border-radius: 10px !important;
+        border-radius: 5px !important;
+        border: 0.5px solid black !important;
+        margin: 1px !important;
+      }
+
+      .goog-te-badge {
+        display: flex !important;               
+        flex-direction: row !important;          
+        align-items: center !important;         
+        white-space: nowrap !important;         
+        padding: 0 5px !important;            
+        font-size: 8px !important;   
       }
     `;
     document.head.appendChild(style);

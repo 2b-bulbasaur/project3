@@ -45,7 +45,7 @@ const CustomerLoginPage = () => {
       <div className="absolute top-5 left-5 p-4 z-50">
         <GoogleTranslate />
       </div>
-      {/* Logo Section */}
+      
       <Link href="/" className="mb-8">
         <Image 
           src="/images/panda-logo.png" 

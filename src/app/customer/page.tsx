@@ -16,6 +16,8 @@ import type { MenuItem, SizeEnum, ItemTypeEnum } from "@/types/db.types";
 import type { OrderItem, MealInProgress } from "@/types/api.types";
 import { set } from "date-fns";
 
+import GoogleTranslate from "@/components/Translation";
+
 const CategorySection = ({
   items,
   category,
@@ -144,13 +146,6 @@ const CustomerPage = () => {
   const handlePromoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPromoCode(e.target.value);
   };
-
-
-
-
-
-
-
 
   const startNewMeal = (size: SizeEnum) => {
     setCurrentMeal({
@@ -348,6 +343,9 @@ const CustomerPage = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Place Your Order</CardTitle>
             <div className="flex gap-2">
+            
+              <GoogleTranslate />
+      
               <Button variant="outline" onClick={goToHome} className="gap-2">
                 <Home className="h-4 w-4" />
                 Back to Home
