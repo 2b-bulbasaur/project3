@@ -12,6 +12,13 @@ import {
   CardHeader,
   CardFooter,
 } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import GoogleTranslate from "@/components/Translation";
 
 type MenuItem = {
@@ -127,6 +134,53 @@ const menuItemsData: MenuItem[] = [
   },
 ];
 
+const MenuCarousel = ({ items }: { items: MenuItem[] }) => {
+  return (
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      className="w-full"
+    >
+      <CarouselContent className="-ml-2 md:-ml-4">
+        {items.map((item) => (
+          <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
+            <Card className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl">
+              <div className="relative h-52">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              </div>
+              <CardHeader className="text-center">
+                <h3 className="text-xl font-frutiger font-bold text-white">
+                  {item.name}
+                </h3>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  {item.description}
+                </p>
+              </CardContent>
+              <CardFooter className="flex justify-center">
+                <p className="text-amber-500 font-medium">
+                  {item.calories} calories
+                </p>
+              </CardFooter>
+            </Card>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious className="hidden md:flex" />
+      <CarouselNext className="hidden md:flex" />
+    </Carousel>
+  );
+};
+
 const Weather = () => {
   const [weather, setWeather] = useState<string | null>(null);
   const [icon, setIcon] = useState<string | null>(null);
@@ -150,13 +204,17 @@ const Weather = () => {
           main: { temp: number };
           weather: { description: string; icon: string }[];
         };
-        
-        const temp = (data.main.temp) * (9/5) + 32;
+
+        const temp = data.main.temp * (9 / 5) + 32;
         const condition = data.weather[0].description;
         const iconCode = data.weather[0].icon;
 
         // Set the weather text and icon
-        setWeather(`${temp.toFixed(1)}°F, ${condition.charAt(0).toUpperCase() + condition.slice(1) }`);
+        setWeather(
+          `${temp.toFixed(1)}°F, ${
+            condition.charAt(0).toUpperCase() + condition.slice(1)
+          }`
+        );
         setIcon(`http://openweathermap.org/img/wn/${iconCode}@2x.png`);
       } catch (error) {
         console.error("Error fetching weather:", error);
@@ -212,7 +270,7 @@ export default function HomePage() {
             <GoogleTranslate />
           </div>
           <div className="flex gap-4">
-          <Weather />
+            <Weather />
             <Link href="/customer/login" prefetch>
               <Button
                 variant="outline"
@@ -249,41 +307,42 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Menu Grid */}
-      <div className="container mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {menuItems.map((item) => (
-            <Card
-              key={item.name}
-              className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
-            >
-              <div className="relative h-52">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-              </div>
-              <CardHeader className="text-center">
-                <h3 className="text-xl font-frutiger font-bold text-white">
-                  {item.name}
-                </h3>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {item.description}
-                </p>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <p className="text-amber-500 font-medium">
-                  {item.calories} calories
-                </p>
-              </CardFooter>
-            </Card>
-          ))}
+      {/* Menu Images Section */}
+      <div className="container mx-auto px-4 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative h-[300px] rounded-lg overflow-hidden group">
+            <Image
+              src="/images/entree_menu.jpg"
+              alt="Entree Menu"
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div className="absolute bottom-4 left-4">
+              <h2 className="text-2xl font-bold text-white">Entree Menu</h2>
+            </div>
+          </div>
+          <div className="relative h-[300px] rounded-lg overflow-hidden group">
+            <Image
+              src="/images/sides_menu.jpeg"
+              alt="Sides Menu"
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div className="absolute bottom-4 left-4">
+              <h2 className="text-2xl font-bold text-white">Sides Menu</h2>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Menu Carousel */}
+      <div className="container mx-auto px-4 pb-16">
+        <h2 className="text-3xl font-bold mb-8 text-center">
+          Featured Entrees
+        </h2>
+        <MenuCarousel items={menuItems} />
       </div>
     </main>
   );
