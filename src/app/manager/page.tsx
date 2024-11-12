@@ -48,7 +48,6 @@ interface TransactionWithSummary extends Transaction {
   order_summary: string;
 }
 
-
 const ManagerDashboard = () => {
   const [transactions, setTransactions] = useState<TransactionWithSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
