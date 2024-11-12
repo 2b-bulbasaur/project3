@@ -42,6 +42,9 @@ const CustomerLoginPage = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-black to-orange-950">
+      <div className="absolute top-5 left-5 p-4 z-50">
+        <GoogleTranslate />
+      </div>
       {/* Logo Section */}
       <Link href="/" className="mb-8">
         <Image 
@@ -54,8 +57,6 @@ const CustomerLoginPage = () => {
         />
       </Link>
 
-      <GoogleTranslate />
-      
       <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm shadow-2xl">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center text-orange-600">Customer Login</CardTitle>

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+
 declare global {
   interface Window {
     google: any; 
@@ -21,7 +22,13 @@ const GoogleTranslate = () => {
     const style = document.createElement('style');
     style.innerHTML = `
       .goog-te-banner-frame { display: none !important; }
-      .goog-te-gadget { display: inline-block !important; }
+      .goog-te-combo {
+        font-size: 15px !important; 
+        padding: 5px 15px !important; 
+        background-color: white !important; 
+        color: black !important; 
+        border-radius: 10px !important;
+      }
     `;
     document.head.appendChild(style);
 
