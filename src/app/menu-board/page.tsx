@@ -242,13 +242,14 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
       <CarouselContent className="-ml-2 md:-ml-4">
         {items.map((item) => (
           <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
-            <Card className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl">
-              <div className="relative h-52">
+            <Card className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl h-full">
+              <div className="relative aspect-[4/3] w-full">
                 <Image
                   src={item.image}
                   alt={item.name}
                   fill
-                  className="object-cover"
+                  className="object-contain p-4"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
               </div>
