@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 import {
   MenuIcon,
   Package,
@@ -51,9 +53,16 @@ const ManagerDashboard = () => {
   const [employeeName, setEmployeeName] = useState("");
   const [reorderItems, setReorderItems] = useState<boolean>(false); 
   const [reorderInventory, setReorderInventory] = useState<string[]>([]);
+  const [showAlerts, setShowAlerts] = useState(() => {
+    const savedAlertPreference = localStorage.getItem("showInventoryAlerts");
+    return savedAlertPreference === null ? true : savedAlertPreference === "true";
+  });
+const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    setIsInitialized(true);
+
     const fetchTransactions = async () => {
       try {
         const response = await fetch("/api/transactions?summary=true");
@@ -72,6 +81,11 @@ const ManagerDashboard = () => {
     
     const fetchReorderInventory = async () => {
       try {
+        if (!showAlerts) {
+          setReorderItems(false);
+          return;
+        }
+
         const response = await fetch("/api/inventory/reorder_alert");
         if (!response.ok) throw new Error("Failed to fetch reorder inventory items");
         const data: { name: string }[] = await response.json();
@@ -90,7 +104,15 @@ const ManagerDashboard = () => {
     
     const name = localStorage.getItem("employeeName");
     if (name) setEmployeeName(name);
-  }, []);
+  }, [showAlerts]);
+
+  const handleAlertToggle = (checked: boolean) => {
+    setShowAlerts(checked);
+    localStorage.setItem("showInventoryAlerts", checked.toString());
+    if (!checked) {
+      setReorderItems(false);
+    }
+  };
 
   const switchToCashierView = () => {
     router.push("/cashier");
@@ -150,16 +172,27 @@ const ManagerDashboard = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="flex items-center space-x-2">
-              <p> Welcome {employeeName}!</p>
-              <Button variant="outline" onClick={switchToCashierView}>
-                <Settings className="mr-2 h-4 w-4" />
-                Switch to Cashier View
-              </Button>
-              <Button variant="destructive" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="show-alerts" className="text-sm">Show Inventory Alerts</Label>
+                <Switch
+                  id="show-alerts"
+                  checked={showAlerts}
+                  disabled={!isInitialized}
+                  onCheckedChange={handleAlertToggle}
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <p>Welcome {employeeName}!</p>
+                <Button variant="outline" onClick={switchToCashierView}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Switch to Cashier View
+                </Button>
+                <Button variant="destructive" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -222,7 +255,6 @@ const ManagerDashboard = () => {
 
       {reorderItems && (
         <Dialog open={reorderItems} onOpenChange={setReorderItems}>
-          
           <DialogContent className="max-w-md w-full p-6 bg-white rounded-lg">
             <DialogHeader>
               <DialogTitle>Reorder Inventory Alert</DialogTitle>
