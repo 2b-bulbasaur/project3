@@ -198,6 +198,38 @@ const Weather = () => {
   );
 };
 
+const sidesData: MenuBoardItem[] = [
+  {
+    name: "Chow Mein",
+    image: "/images/chow-mein.png",
+    description: "Stir-fried wheat noodles with onions, celery and cabbage",
+    calories: "510",
+    type: "side",
+  },
+  {
+    name: "White Steamed Rice",
+    image: "/images/white-steamed-rice.png",
+    description: "Steamed white rice",
+    calories: "380",
+    type: "side",
+  },
+  {
+    name: "Fried Rice",
+    image: "/images/fried-rice.png",
+    description:
+      "Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions",
+    calories: "520",
+    type: "side",
+  },
+  {
+    name: "Super Greens",
+    image: "/images/super-greens.png",
+    description: "A hot blend of broccoli, kale, and cabbage",
+    calories: "90",
+    type: "side",
+  },
+];
+
 const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
   return (
     <Carousel
@@ -247,12 +279,10 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
 
 export default function MenuBoard() {
   const [mounted, setMounted] = useState(false);
-  const [menuItems, setMenuItems] = useState<MenuBoardItem[]>([]);
   const [activeMenu, setActiveMenu] = useState<"entree" | "side">("entree");
 
   useEffect(() => {
     setMounted(true);
-    setMenuItems(menuItemsData);
   }, []);
 
   if (!mounted) {
@@ -317,115 +347,14 @@ export default function MenuBoard() {
           </button>
         </div>
 
-        {activeMenu === "entree" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems
-              .filter((item) => item.type === "entree")
-              .map((item) => (
-                <Card
-                  key={item.name}
-                  className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
-                >
-                  <div className="relative h-52">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  </div>
-                  <CardHeader className="text-center">
-                    <h3 className="text-xl font-frutiger font-bold text-white">
-                      {item.name}
-                    </h3>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {item.description}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex justify-center">
-                    <p className="text-amber-500 font-medium">
-                      {item.calories} calories
-                    </p>
-                  </CardFooter>
-                </Card>
-              ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Chow Mein",
-                image: "/images/chow-mein.png",
-                description:
-                  "Stir-fried wheat noodles with onions, celery and cabbage",
-                calories: "510",
-                type: "side",
-              },
-              {
-                name: "White Steamed Rice",
-                image: "/images/white-steamed-rice.png",
-                description: "Steamed white rice",
-                calories: "380",
-                type: "side",
-              },
-              {
-                name: "Fried Rice",
-                image: "/images/fried-rice.png",
-                description:
-                  "Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions",
-                calories: "520",
-                type: "side",
-              },
-              {
-                name: "Super Greens",
-                image: "/images/super-greens.png",
-                description: "A hot blend of broccoli, kale, and cabbage",
-                calories: "90",
-                type: "side",
-              },
-            ].map((item) => (
-              <Card
-                key={item.name}
-                className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
-              >
-                <div className="relative h-52">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                </div>
-                <CardHeader className="text-center">
-                  <h3 className="text-xl font-frutiger font-bold text-white">
-                    {item.name}
-                  </h3>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    {item.description}
-                  </p>
-                </CardContent>
-                <CardFooter className="flex justify-center">
-                  <p className="text-amber-500 font-medium">
-                    {item.calories} calories
-                  </p>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="container mx-auto px-4 pb-16">
-        <h2 className="text-3xl font-bold mb-8 text-center">
-          Featured Entrees
-        </h2>
-        <MenuCarousel items={menuItems} />
+        <div className="container mx-auto px-4 pb-16">
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            {activeMenu === "entree" ? "Entrees" : "Sides"}
+          </h2>
+          <MenuCarousel
+            items={activeMenu === "entree" ? menuItemsData : sidesData}
+          />
+        </div>
       </div>
     </main>
   );
