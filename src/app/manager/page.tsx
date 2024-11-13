@@ -29,18 +29,14 @@ import {
   LogOut,
   Settings,
   ChevronDown,
-  Home,
 } from "lucide-react";
 import { Transaction } from "@/types/db.types";
-import { getReorderInventory } from "@/lib/inventory";
-import { InventoryItem } from "@/types";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
 
@@ -101,10 +97,6 @@ const ManagerDashboard = () => {
   };
 
   const handleLogout = () => {
-    router.push("/");
-  };
-
-  const goToHome = () => {
     router.push("/");
   };
 
