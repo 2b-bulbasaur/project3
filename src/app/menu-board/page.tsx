@@ -358,7 +358,7 @@ export default function MenuBoard() {
             {[
               {
                 name: "Chow Mein",
-                image: "/images/chow-mein.jpg",
+                image: "/images/chow-mein.png",
                 description:
                   "Stir-fried wheat noodles with onions, celery and cabbage",
                 calories: "510",
@@ -366,14 +366,14 @@ export default function MenuBoard() {
               },
               {
                 name: "White Steamed Rice",
-                image: "/images/steamed-rice.jpg",
+                image: "/images/white-steamed-rice.png",
                 description: "Steamed white rice",
                 calories: "380",
                 type: "side",
               },
               {
                 name: "Fried Rice",
-                image: "/images/fried-rice.jpg",
+                image: "/images/fried-rice.png",
                 description:
                   "Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions",
                 calories: "520",
@@ -381,7 +381,7 @@ export default function MenuBoard() {
               },
               {
                 name: "Super Greens",
-                image: "/images/super-greens.jpg",
+                image: "/images/super-greens.png",
                 description: "A hot blend of broccoli, kale, and cabbage",
                 calories: "90",
                 type: "side",
