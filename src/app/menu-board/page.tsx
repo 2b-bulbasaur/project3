@@ -69,7 +69,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Broccoli Beef",
-    image: "/images/brocolli-beef.png",
+    image: "/images/broccoli-beef.png",
     description: "Tender beef and fresh broccoli in a ginger soy sauce.",
     calories: "150",
     type: "entree",
