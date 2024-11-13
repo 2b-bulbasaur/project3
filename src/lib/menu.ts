@@ -1,3 +1,5 @@
+//menu.ts
+
 import { query } from './db';
 import { InventoryItem, MenuItem, Recipe } from '../types';
 

@@ -1,75 +1,108 @@
-import { NextResponse } from 'next/server'
-import { getTransactions } from '@/lib/transactions';
-import { getIngredientsForMenuItem } from '@/lib/menu';
-import { getItemsInAppOrder, getItemsInMealOrder } from '@/lib/orders';
-import { getInventoryById } from '@/lib/inventory';
+import { NextResponse } from 'next/server';
+import { query } from '@/lib/db';
 
-type IngredientCount = {
-    [key: string]: number;
+interface ProductUsageResult {
+    ingredient_name: string;
+    usage_count: number;
 }
 
 export async function POST(request: Request) {
     try {
         const { input1, input2 } = await request.json();
-        const year1 = input1.substring(0, 4);
-        const month1 = input1.substring(5, 7);
-        const day1 = input1.substring(8, 10);
-        //const [year5, month1, day1] = input1.split('-').map(Number);
-        const startDate = new Date(year1, month1-1, day1, 0, 0, 0);
+        const startDate = new Date(input1);
+        const endDate = new Date(input2);
+        endDate.setHours(23, 59, 59);
 
-        const year2 = input2.substring(0, 4);
-        const month2 = input2.substring(5, 7);
-        const day2 = input2.substring(8, 10);
-        //const [month2, day2, year2] = input2.split('/').map(Number);
-        const endDate = new Date(year2, month2-1, day2, 23, 59, 59);
+        const result = await query<ProductUsageResult>(`
+            WITH all_menu_items AS (
+                -- Get all menu items from meal orders
+                SELECT mo.entree1 AS menu_id
+                FROM mealorders mo
+                WHERE mo.o_id IN (
+                    SELECT id 
+                    FROM transactionhistory 
+                    WHERE date >= $1 AND date <= $2
+                )
+                AND mo.entree1 IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT mo.entree2 AS menu_id
+                FROM mealorders mo
+                WHERE mo.o_id IN (
+                    SELECT id 
+                    FROM transactionhistory 
+                    WHERE date >= $1 AND date <= $2
+                )
+                AND mo.entree2 IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT mo.entree3 AS menu_id
+                FROM mealorders mo
+                WHERE mo.o_id IN (
+                    SELECT id 
+                    FROM transactionhistory 
+                    WHERE date >= $1 AND date <= $2
+                )
+                AND mo.entree3 IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT mo.side1 AS menu_id
+                FROM mealorders mo
+                WHERE mo.o_id IN (
+                    SELECT id 
+                    FROM transactionhistory 
+                    WHERE date >= $1 AND date <= $2
+                )
+                AND mo.side1 IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT mo.side2 AS menu_id
+                FROM mealorders mo
+                WHERE mo.o_id IN (
+                    SELECT id 
+                    FROM transactionhistory 
+                    WHERE date >= $1 AND date <= $2
+                )
+                AND mo.side2 IS NOT NULL
+                
+                UNION ALL
+                
+                -- Get all menu items from appetizer orders
+                SELECT ao.item AS menu_id
+                FROM appetizerorders ao
+                WHERE ao.o_id IN (
+                    SELECT id 
+                    FROM transactionhistory 
+                    WHERE date >= $1 AND date <= $2
+                )
+                AND ao.item IS NOT NULL
+            )
+            SELECT 
+                i.name AS ingredient_name,
+                COUNT(*) AS usage_count
+            FROM all_menu_items ami
+            JOIN recipes r ON r.menu_id = ami.menu_id
+            JOIN inventory i ON i.id = r.ingredient_id
+            GROUP BY i.name
+            ORDER BY usage_count DESC;
+        `, [startDate.toISOString(), endDate.toISOString()]);
 
-        const transactions = await getTransactions();
-        const ingredientCount: IngredientCount = {};
-
-        for (const transaction of transactions) {
-            const transactionDate = new Date(transaction.date);
-           
-            if (transactionDate >= startDate && transactionDate <= endDate) {
-                const orderId = transaction.id;
-                const mealItems = await getItemsInMealOrder(orderId);
-
-                for (const item of mealItems) {
-                    const ingredients = await getIngredientsForMenuItem(item);
-                    for (const ingredient of ingredients) {
-                        const ingredientQuery = await getInventoryById(ingredient.id);
-                        if (ingredientQuery) {
-                            const ingredientName = ingredientQuery.name;
-                            ingredientCount[ingredientName] = (ingredientCount[ingredientName] || 0) + 1;
-                        }
-                    }
-                }
-
-                const appItems = await getItemsInAppOrder(orderId);
-                for (const item of appItems) {
-                    const ingredients = await getIngredientsForMenuItem(item);
-                    for (const ingredient of ingredients) {
-                        const ingredientQuery = await getInventoryById(ingredient.id);
-                        if (ingredientQuery) {
-                            const ingredientName = ingredientQuery.name;
-                            ingredientCount[ingredientName] = (ingredientCount[ingredientName] || 0) + 1;
-                        }
-                    }
-                }
-            }
-        }
-        
-        const reportData = Object.keys(ingredientCount).map(ingredient => ({
-            ingredient,
-            count: ingredientCount[ingredient]
+        const reportData = result.map(row => ({
+            ingredient: row.ingredient_name,
+            count: Number(row.usage_count)
         }));
-    
-        return NextResponse.json(reportData);    
-    }
-    catch (error) {
+
+        return NextResponse.json(reportData);
+
+    } catch (error) {
         console.error('Error in generateProductUsage:', error);
         return NextResponse.json(
             { error: 'Failed to generate Product Usage', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
-};
+}
