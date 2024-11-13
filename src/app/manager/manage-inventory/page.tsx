@@ -47,7 +47,10 @@ const ManageInventory: React.FC = () => {
         throw new Error('Failed to fetch inventory');
       }
       const data = await response.json();
-      setInventory(data);
+      const sortedData = data.sort((a: InventoryItem, b: InventoryItem) => 
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+      );
+      setInventory(sortedData);
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching inventory:', error);
