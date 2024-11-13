@@ -30,7 +30,7 @@ type MenuBoardItem = {
 const menuItemsData: MenuBoardItem[] = [
   {
     name: "The Original Orange Chicken",
-    image: "/images/orange-chicken.jpg",
+    image: "/images/orange-chicken.png",
     description:
       "Our signature dish. Crispy chicken wok-tossed in a sweet and spicy orange sauce.",
     calories: "490",
@@ -38,14 +38,14 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Beijing Beef",
-    image: "/images/beijing-beef.jpg",
+    image: "/images/beijing-beef.png",
     description: "Crispy beef, bell peppers and onions in a sweet-tangy sauce.",
     calories: "470",
     type: "entree",
   },
   {
     name: "Black Pepper Chicken",
-    image: "/images/black-pepper-chicken.jpg",
+    image: "/images/black-pepper-chicken.png",
     description:
       "Marinated chicken, celery and onions in a bold black pepper sauce.",
     calories: "280",
@@ -53,7 +53,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Black Pepper Sirloin Steak",
-    image: "/images/black-pepper-steak.jpg",
+    image: "/images/black-pepper-steak.png",
     description:
       "Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
     calories: "450",
@@ -61,7 +61,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Hot Ones Blazing Bourbon Chicken",
-    image: "/images/bourbon-chicken.jpg",
+    image: "/images/bourbon-chicken.png",
     description:
       "Chicken breast pieces wok-fired in a signature bourbon sauce.",
     calories: "460",
@@ -69,14 +69,14 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Broccoli Beef",
-    image: "/images/brocolli-beef.jpg",
+    image: "/images/brocolli-beef.png",
     description: "Tender beef and fresh broccoli in a ginger soy sauce.",
     calories: "150",
     type: "entree",
   },
   {
     name: "Mushroom Chicken",
-    image: "/images/mushroom-chicken.jpg",
+    image: "/images/mushroom-chicken.png",
     description:
       "Light and savory chicken with mushrooms, zucchini and carrots in a ginger soy sauce.",
     calories: "220",
@@ -84,7 +84,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "String Bean Chicken Breast",
-    image: "/images/string-bean-chicken-breast.jpg",
+    image: "/images/string-bean-chicken-breast.png",
     description:
       "Chicken breast, string beans and onions wok-tossed in a mild ginger soy sauce.",
     calories: "190",
@@ -92,7 +92,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "SweetFire Chicken Breast",
-    image: "/images/sweetfire-chicken-breast.jpg",
+    image: "/images/sweetfire-chicken-breast.png",
     description:
       "Crispy white meat chicken, red bell peppers, onions and pineapples in a sweet and spicy sauce.",
     calories: "380",
@@ -100,7 +100,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Honey Sesame Chicken Breast",
-    image: "/images/honey-sesame-chicken-breast.jpg",
+    image: "/images/honey-sesame-chicken-breast.png",
     description:
       "Crispy chicken breast strips tossed with fresh string beans and yellow bell peppers in a sweet honey sesame sauce.",
     calories: "420",
@@ -108,7 +108,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Kung Pao Chicken",
-    image: "/images/kung-pao-chicken.jpg",
+    image: "/images/kung-pao-chicken.png",
     description:
       "A Szechwan-inspired dish with chicken, peanuts, vegetables and chili peppers.",
     calories: "290",
@@ -116,7 +116,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Teriyaki Chicken",
-    image: "/images/teriyaki-chicken.jpg",
+    image: "/images/teriyaki-chicken.png",
     description:
       "Grilled chicken thigh hand-sliced to order and served with teriyaki sauce.",
     calories: "300",
@@ -124,7 +124,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Honey Walnut Shrimp",
-    image: "/images/walnut-shrimp.jpg",
+    image: "/images/walnut-shrimp.png",
     description:
       "Large tempura-battered shrimp, wok-tossed in a honey sauce and topped with glazed walnuts.",
     calories: "510",
