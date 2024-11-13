@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { signIn, useSession, signOut } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import GoogleTranslate from '@/components/Translation';
 
@@ -59,7 +57,7 @@ const CustomerLoginPage = () => {
 
       <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm shadow-2xl">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center text-orange-600">Customer Login</CardTitle>
+          <CardTitle className="text-2xl text-center text-orange-600">Welcome to Panda Express!</CardTitle>
           <CardDescription className="text-center">
             Sign in to access your account or place an order
           </CardDescription>
@@ -109,15 +107,6 @@ const CustomerLoginPage = () => {
               >
                 Place an Order as Guest
               </Button>
-              <Link href="/">
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-                  disabled={isLoading}
-                >
-                  View Menu Board
-                </Button>
-              </Link>
             </div>
           )}
 

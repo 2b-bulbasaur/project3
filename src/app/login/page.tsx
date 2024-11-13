@@ -55,10 +55,6 @@ const LoginPage = () => {
     }
   };
 
-  const handleGuestAccess = () => {
-    router.push('/customer');
-  };
-
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-black to-orange-950">
       {/* Logo Section */}
@@ -141,15 +137,6 @@ const LoginPage = () => {
                   'Sign In'
                 )}
               </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
-                onClick={handleGuestAccess}
-                disabled={isLoading}
-              >
-                Place an Order as a Customer
-              </Button>
               <Link href="/">
                 <Button 
                   type="button" 
@@ -157,7 +144,7 @@ const LoginPage = () => {
                   className="w-full text-gray-600 hover:text-orange-600 hover:bg-orange-50"
                   disabled={isLoading}
                 >
-                  View Menu Board
+                  Go to device setup
                 </Button>
               </Link>
             </div>
