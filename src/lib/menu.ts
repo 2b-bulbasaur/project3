@@ -25,6 +25,7 @@ export async function getAllMenuItems(): Promise<MenuItem[]> {
      ORDER BY m.id`
   );
 
+
   const menuItemsMap = new Map<number, MenuItem>();
 
   for (const row of result) {
@@ -54,6 +55,10 @@ export async function getAllMenuItems(): Promise<MenuItem[]> {
   }
 
   return Array.from(menuItemsMap.values());
+}
+
+export async function getMenuNameById(id: number) : Promise<MenuItem[]> {
+  return query('SELECT * FROM menu WHERE id = $1', [id]);
 }
 
 export async function getMenuItemById(id: number): Promise<MenuItem | null> {
