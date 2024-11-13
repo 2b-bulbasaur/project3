@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +76,16 @@ const CheckoutPage = () => {
     router.push('/customer');
   };
 
+  const handleLogoutAndRedirect = async () => {
+    try {
+      await signOut({ redirect: false });
+      router.push('/customer/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      router.push('/customer/login');
+    }
+  };
+
   const handleSubmitOrder = async () => {
     if (!customerDetails.name || !customerDetails.email || !customerDetails.phone) {
       setError("Please fill in all required fields");
@@ -145,7 +156,7 @@ const CheckoutPage = () => {
       setSuccess(true);
       
       setTimeout(() => {
-        router.push('/');
+        handleLogoutAndRedirect();
       }, 2000);
 
     } catch (err) {
