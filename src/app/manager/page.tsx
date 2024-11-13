@@ -51,17 +51,27 @@ const ManagerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [employeeName, setEmployeeName] = useState("");
-  const [reorderItems, setReorderItems] = useState<boolean>(false); 
+  const [reorderItems, setReorderItems] = useState<boolean>(false);
   const [reorderInventory, setReorderInventory] = useState<string[]>([]);
-  const [showAlerts, setShowAlerts] = useState(() => {
-    const savedAlertPreference = localStorage.getItem("showInventoryAlerts");
-    return savedAlertPreference === null ? true : savedAlertPreference === "true";
-  });
-const [isInitialized, setIsInitialized] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
+  const [hasMounted, setHasMounted] = useState(false);
+
   useEffect(() => {
-    setIsInitialized(true);
+    if (typeof window !== 'undefined') {
+      const savedAlertPreference = localStorage.getItem("showInventoryAlerts");
+      setShowAlerts(savedAlertPreference === null ? true : savedAlertPreference === "true");
+      const name = localStorage.getItem("employeeName");
+      if (name) setEmployeeName(name);
+      setIsInitialized(true);
+      setHasMounted(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted) return;
 
     const fetchTransactions = async () => {
       try {
@@ -83,6 +93,7 @@ const [isInitialized, setIsInitialized] = useState(false);
       try {
         if (!showAlerts) {
           setReorderItems(false);
+          setReorderInventory([]);
           return;
         }
 
@@ -90,7 +101,7 @@ const [isInitialized, setIsInitialized] = useState(false);
         if (!response.ok) throw new Error("Failed to fetch reorder inventory items");
         const data: { name: string }[] = await response.json();
         setReorderInventory(data.map(item => item.name));
-        if (data.length > 0) setReorderItems(true);
+        setReorderItems(data.length > 0);
       } catch (error) {
         console.error("Error fetching reorder inventory items:", error);
         const errorMessage =
@@ -101,16 +112,16 @@ const [isInitialized, setIsInitialized] = useState(false);
 
     fetchTransactions();
     fetchReorderInventory();
-    
-    const name = localStorage.getItem("employeeName");
-    if (name) setEmployeeName(name);
-  }, [showAlerts]);
+  }, [showAlerts, hasMounted]);
 
   const handleAlertToggle = (checked: boolean) => {
-    setShowAlerts(checked);
-    localStorage.setItem("showInventoryAlerts", checked.toString());
-    if (!checked) {
-      setReorderItems(false);
+    if (typeof window !== 'undefined') {
+      setShowAlerts(checked);
+      localStorage.setItem("showInventoryAlerts", checked.toString());
+      if (!checked) {
+        setReorderItems(false);
+        setReorderInventory([]);
+      }
     }
   };
 
