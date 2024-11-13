@@ -185,9 +185,9 @@ const Weather = () => {
   return (
     <div className="flex items-center text-white ml-4">
       {icon && (
-        <Image 
-          src={icon} 
-          alt="Weather icon" 
+        <Image
+          src={icon}
+          alt="Weather icon"
           width={32}
           height={32}
           className="mr-2"
@@ -248,6 +248,7 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
 export default function MenuBoard() {
   const [mounted, setMounted] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuBoardItem[]>([]);
+  const [activeMenu, setActiveMenu] = useState<"entree" | "side">("entree");
 
   useEffect(() => {
     setMounted(true);
@@ -293,36 +294,137 @@ export default function MenuBoard() {
       </div>
 
       <div className="container mx-auto px-4 mb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="relative h-[300px] rounded-lg overflow-hidden group">
-            <Image
-              src="/images/entree_menu.jpg"
-              alt="Entree Menu"
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            <div className="absolute bottom-4 left-4">
-              <h2 className="text-2xl font-bold text-white">Entree Menu</h2>
-            </div>
-          </div>
-          <div className="relative h-[300px] rounded-lg overflow-hidden group">
-            <Image
-              src="/images/sides_menu.jpeg"
-              alt="Sides Menu"
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            <div className="absolute bottom-4 left-4">
-              <h2 className="text-2xl font-bold text-white">Sides Menu</h2>
-            </div>
-          </div>
+        <div className="flex justify-center gap-4 mb-8">
+          <button
+            onClick={() => setActiveMenu("entree")}
+            className={`px-6 py-3 rounded-lg text-lg font-bold transition-colors ${
+              activeMenu === "entree"
+                ? "bg-amber-500 text-white"
+                : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+            }`}
+          >
+            Entree Menu
+          </button>
+          <button
+            onClick={() => setActiveMenu("side")}
+            className={`px-6 py-3 rounded-lg text-lg font-bold transition-colors ${
+              activeMenu === "side"
+                ? "bg-amber-500 text-white"
+                : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+            }`}
+          >
+            Sides Menu
+          </button>
         </div>
+
+        {activeMenu === "entree" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {menuItems
+              .filter((item) => item.type === "entree")
+              .map((item) => (
+                <Card
+                  key={item.name}
+                  className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+                >
+                  <div className="relative h-52">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  </div>
+                  <CardHeader className="text-center">
+                    <h3 className="text-xl font-frutiger font-bold text-white">
+                      {item.name}
+                    </h3>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      {item.description}
+                    </p>
+                  </CardContent>
+                  <CardFooter className="flex justify-center">
+                    <p className="text-amber-500 font-medium">
+                      {item.calories} calories
+                    </p>
+                  </CardFooter>
+                </Card>
+              ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Chow Mein",
+                image: "/images/chow-mein.jpg",
+                description:
+                  "Stir-fried wheat noodles with onions, celery and cabbage",
+                calories: "510",
+                type: "side",
+              },
+              {
+                name: "White Steamed Rice",
+                image: "/images/steamed-rice.jpg",
+                description: "Steamed white rice",
+                calories: "380",
+                type: "side",
+              },
+              {
+                name: "Fried Rice",
+                image: "/images/fried-rice.jpg",
+                description:
+                  "Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions",
+                calories: "520",
+                type: "side",
+              },
+              {
+                name: "Super Greens",
+                image: "/images/super-greens.jpg",
+                description: "A hot blend of broccoli, kale, and cabbage",
+                calories: "90",
+                type: "side",
+              },
+            ].map((item) => (
+              <Card
+                key={item.name}
+                className="border-0 bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+              >
+                <div className="relative h-52">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                </div>
+                <CardHeader className="text-center">
+                  <h3 className="text-xl font-frutiger font-bold text-white">
+                    {item.name}
+                  </h3>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
+                </CardContent>
+                <CardFooter className="flex justify-center">
+                  <p className="text-amber-500 font-medium">
+                    {item.calories} calories
+                  </p>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="container mx-auto px-4 pb-16">
-        <h2 className="text-3xl font-bold mb-8 text-center">Featured Entrees</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center">
+          Featured Entrees
+        </h2>
         <MenuCarousel items={menuItems} />
       </div>
     </main>

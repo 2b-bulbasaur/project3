@@ -22,7 +22,7 @@ export default function SetupPage() {
     <main className="min-h-screen bg-black text-white">
       <div className="container mx-auto flex justify-center py-8">
         <Image
-          src="/images/panda-logo.png" // new logo with transparent background
+          src="/images/panda-logo.png"
           alt="Panda Express Logo"
           width={200}
           height={66}
