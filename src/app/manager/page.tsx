@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -56,7 +58,6 @@ const ManagerDashboard = () => {
   const [showAlerts, setShowAlerts] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
-
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
@@ -133,6 +134,208 @@ const ManagerDashboard = () => {
     router.push("/");
   };
 
+  const Weather = () => {
+    const [weather, setWeather] = useState<string | null>(null);
+    const [icon, setIcon] = useState<string | null>(null);
+  
+    useEffect(() => {
+      const fetchWeather = async (lat: number, lon: number) => {
+        try {
+          const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+          const response = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather`,
+            {
+              params: {
+                lat,
+                lon,
+                appid: apiKey,
+                units: "metric",
+              },
+            }
+          );
+          const data = response.data as {
+            main: { temp: number };
+            weather: { description: string; icon: string }[];
+          };
+  
+          const temp = data.main.temp * (9 / 5) + 32;
+          const condition = data.weather[0].description;
+          const iconCode = data.weather[0].icon;
+  
+          setWeather(
+            `${temp.toFixed(1)}°F, ${
+              condition.charAt(0).toUpperCase() + condition.slice(1)
+            }`
+          );
+          setIcon(`http://openweathermap.org/img/wn/${iconCode}@2x.png`);
+        } catch (error) {
+          console.error("Error fetching weather:", error);
+        }
+      };
+  
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            fetchWeather(latitude, longitude);
+          },
+          (error) => console.error("Error getting location:", error)
+        );
+      }
+    }, []);
+  
+    return (
+      <div className="flex items-center text-white ml-4">
+        {icon && (
+          <Image
+            src={icon}
+            alt="Weather icon"
+            width={32}
+            height={32}
+            className="mr-2"
+          />
+        )}
+        {weather ? weather : "Loading weather..."}
+      </div>
+    );
+  };
+
+  const WeatherDialog = () => {
+    const [open, setOpen] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [weatherData, setWeatherData] = useState({
+      cityName: '',
+      temperature: 0,
+      description: '',
+      icon: '',
+    });
+  
+    const getBusinessImpact = (description: string) => {
+      const lowercaseDesc = description.toLowerCase();
+      if (lowercaseDesc.includes('clear') || lowercaseDesc.includes('sunny')) {
+        return "The current weather is sunny, which indicates a likely increase in customer volume today compared to the usual.";
+      } else if (lowercaseDesc.includes('rain') || lowercaseDesc.includes('drizzle')) {
+        return "The current weather is rainy, which could lead to a decrease in customer volume today compared to typical levels.";
+      } else if (lowercaseDesc.includes('cloud')) {
+        return "The current weather is cloudy, which may result in moderate customer volume today.";
+      }
+      return "Current weather conditions suggest typical customer volume patterns for today.";
+    };
+  
+    useEffect(() => {
+      const fetchWeather = async (lat: number, lon: number) => {
+        try {
+          // Get city name from coordinates
+          const geoResponse = await axios.get(
+            `https://api.openweathermap.org/geo/1.0/reverse`,
+            {
+              params: {
+                lat,
+                lon,
+                limit: 1,
+                appid: process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY,
+              },
+            }
+          );
+  
+          const geoData = geoResponse.data as { name: string }[];
+          const cityName = geoData[0].name;
+  
+          // Get weather data
+          const weatherResponse = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather`,
+            {
+              params: {
+                lat,
+                lon,
+                appid: process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY,
+                units: 'imperial',
+              },
+            }
+          );
+  
+          const data = weatherResponse.data as {
+            main: { temp: number };
+            weather: { description: string; icon: string }[];
+          };
+          setWeatherData({
+            cityName,
+            temperature: Math.round(data.main.temp),
+            description: data.weather[0].description,
+            icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+          });
+        } catch (error) {
+          console.error('Error fetching weather:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            fetchWeather(latitude, longitude);
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            setLoading(false);
+          }
+        );
+      } else {
+        setLoading(false);
+      }
+    }, []);
+  
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Today's Weather Forecast</DialogTitle>
+          </DialogHeader>
+          
+          {loading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-[250px]" />
+              <Skeleton className="h-4 w-[200px]" />
+              <Skeleton className="h-4 w-[300px]" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold">{weatherData.cityName}</h3>
+                  <p className="text-3xl font-bold">{weatherData.temperature}°F</p>
+                  <p className="text-gray-600 capitalize">{weatherData.description}</p>
+                </div>
+                {weatherData.icon && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={weatherData.icon}
+                      alt="Weather icon"
+                      width={64}
+                      height={64}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <DialogDescription className="text-base">
+                {getBusinessImpact(weatherData.description)}
+              </DialogDescription>
+  
+              <div className="flex justify-end">
+                <DialogClose asChild>
+                  <Button>Close</Button>
+                </DialogClose>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   // Loading skeleton row component
   const SkeletonRow = () => (
     <TableRow>
@@ -148,6 +351,7 @@ const ManagerDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Top Navigation Bar */}
+      <WeatherDialog />
       <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
