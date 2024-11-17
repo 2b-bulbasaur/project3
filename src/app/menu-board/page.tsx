@@ -272,8 +272,8 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="hidden md:flex" />
-      <CarouselNext className="hidden md:flex" />
+      <CarouselPrevious className="flex [&>svg]:inline [&>svg]:text-black" />
+      <CarouselNext className="flex [&>svg]:inline [&>svg]:text-black" />
     </Carousel>
   );
 };
@@ -328,7 +328,7 @@ export default function MenuBoard() {
         <div className="flex justify-center gap-4 mb-8">
           <button
             onClick={() => setActiveMenu("entree")}
-            className={`px-6 py-3 rounded-lg text-lg font-bold transition-colors ${
+            className={`px-6 py-3 rounded-lg text-lg font-bold transition-colors border border-white/50 ${
               activeMenu === "entree"
                 ? "bg-amber-500 text-white"
                 : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
@@ -338,7 +338,7 @@ export default function MenuBoard() {
           </button>
           <button
             onClick={() => setActiveMenu("side")}
-            className={`px-6 py-3 rounded-lg text-lg font-bold transition-colors ${
+            className={`px-6 py-3 rounded-lg text-lg font-bold transition-colors border border-white/50 ${
               activeMenu === "side"
                 ? "bg-amber-500 text-white"
                 : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
