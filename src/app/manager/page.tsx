@@ -285,7 +285,6 @@ const ManagerDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Top Navigation Bar */}
-      <WeatherDialog />
       <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
@@ -431,6 +430,7 @@ const ManagerDashboard = () => {
           </DialogContent>
         </Dialog>
       )}
+      <WeatherDialog />
     </div>
   );
 };
