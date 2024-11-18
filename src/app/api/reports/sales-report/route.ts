@@ -53,13 +53,15 @@ export async function POST(request: Request) {
             item,
             count: salesCount[item]
         }));
+
+        if(reportData.length === 0) { throw new Error('No data found for the selected date range'); }
     
         return NextResponse.json(reportData);    
     }
     catch (error) {
         console.error('Error in generateSalesReport:', error);
         return NextResponse.json(
-            { error: 'Failed to generate Sales Report', details: error instanceof Error ? error.message : 'Unknown error' },
+            { error: error instanceof Error ? error.message : 'Failed to generate Sales Report', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
