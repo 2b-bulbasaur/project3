@@ -117,15 +117,17 @@ export async function addTransaction(input: CreateTransactionInput): Promise<Tra
   await query('BEGIN');
 
   try {
+    const now = new Date();
     const [transaction] = await query<Transaction>(`
       INSERT INTO transactionhistory (
         date, customer_name, cashier_name, sale_price, 
         items, meals, appetizers, drinks, customer_email
       ) VALUES (
-        CURRENT_TIMESTAMP, $1, $2, $3, $4, $5, $6, $7, $8
+        $1, $2, $3, $4, $5, $6, $7, $8, $9
       )
       RETURNING *;
     `, [
+      now,
       input.customer_name,
       input.cashier_name,
       input.sale_price,
