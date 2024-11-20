@@ -59,6 +59,7 @@ const ManagerDashboard = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
+  const [showWeatherDialog, setShowWeatherDialog] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -80,6 +81,7 @@ const ManagerDashboard = () => {
         if (!response.ok) throw new Error("Failed to fetch transactions");
         const data: TransactionWithSummary[] = await response.json();
         setTransactions(data);
+        setShowWeatherDialog(true);
       } catch (error) {
         console.error("Error fetching transactions:", error);
         const errorMessage =
@@ -430,7 +432,7 @@ const ManagerDashboard = () => {
           </DialogContent>
         </Dialog>
       )}
-      <WeatherDialog />
+      {!isLoading && showWeatherDialog && <WeatherDialog />}
     </div>
   );
 };
