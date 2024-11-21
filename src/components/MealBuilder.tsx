@@ -151,10 +151,18 @@ export const MealBuilder = ({
                       onClick={() => onUpdateMeal(item)}
                       disabled={isSideDisabled(item)}
                     >
-                      <div className="flex justify-between w-full">
-                        <span>{item.name}</span>
-                        <span>${formatPrice(item.price)}</span>
+                      <div className="flex flex-col items-center w-full">
+                        <img
+                          src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.jpg`}
+                          alt={item.name}
+                          className="w-full h-32 object-cover"
+                        />
+                        <div className="flex justify-between w-full">
+                          <span>{item.name}</span>
+                          <span>${formatPrice(item.price)}</span>
+                        </div>
                       </div>
+                      
                     </Button>
                   ))}
               </div>
@@ -183,10 +191,18 @@ export const MealBuilder = ({
                       onClick={() => onUpdateMeal(item)}
                       disabled={isEntreeDisabled(item)}
                     >
+                    <div className="flex flex-col items-center w-full">
+                      <img
+                        src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.jpg`}
+                        alt={item.name}
+                        className="w-full h-32 object-cover"
+                      />
+                      
                       <div className="flex justify-between w-full">
                         <span>{item.name}</span>
                         <span>${formatPrice(item.price)}</span>
                       </div>
+                    </div>
                     </Button>
                   ))}
               </div>
