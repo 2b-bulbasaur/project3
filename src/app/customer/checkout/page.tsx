@@ -39,6 +39,11 @@ const CheckoutPage = () => {
     phone: ''
   });
 
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
 
   useEffect(() => {
     const order = localStorage.getItem('currentOrder');
@@ -72,6 +77,38 @@ const CheckoutPage = () => {
     }));
   };
 
+  const validate = () => {
+    const newErrors: { name: string; email: string; phone: string } = { name: '', email: '', phone: '' };
+    let isValid = true;
+
+    if (!customerDetails.name.trim()) {
+      newErrors.name = 'Name is required';
+      isValid = false;
+    }
+
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!customerDetails.email.trim()) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!emailPattern.test(customerDetails.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    const phonePattern = /^\d{10}$/; 
+    if (!customerDetails.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+      isValid = false;
+    } else if (!phonePattern.test(customerDetails.phone)) {
+      newErrors.phone = 'Please enter a valid 10-digit phone number';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+
   const handleBackToOrder = () => {
     router.push('/customer');
   };
@@ -89,6 +126,10 @@ const CheckoutPage = () => {
   const handleSubmitOrder = async () => {
     if (!customerDetails.name || !customerDetails.email || !customerDetails.phone) {
       setError("Please fill in all required fields");
+      return;
+    }
+
+    if (!validate()) {
       return;
     }
 
@@ -302,6 +343,10 @@ const CheckoutPage = () => {
                   value={customerDetails.name}
                   onChange={handleInputChange}
                 />
+
+                {errors.name && (
+                  <span className="text-red-500 text-sm">Invalid Name</span>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -326,6 +371,10 @@ const CheckoutPage = () => {
                   value={customerDetails.phone}
                   onChange={handleInputChange}
                 />
+
+                {errors.phone && (
+                  <span className="text-red-500 text-sm">Invalid Phone Number</span>
+                )}
               </div>
 
               {error && (
