@@ -359,6 +359,10 @@ const CheckoutPage = () => {
                   value={customerDetails.email}
                   onChange={handleInputChange}
                 />
+
+                {errors.email && (
+                  <span className="text-red-500 text-sm">Invalid Email Address</span>
+                )}
               </div>
               
               <div className="space-y-2">
