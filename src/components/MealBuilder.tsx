@@ -134,10 +134,10 @@ export const MealBuilder = ({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <Card>
+        <Card className="h-[600px]">
           <CardContent className="p-4">
             <h3 className="font-medium mb-2">Sides</h3>
-            <ScrollArea className="h-48">
+            <ScrollArea className="h-[550px]">
               <div className="grid grid-cols-1 gap-2">
                 {menuItems
                   .filter(item => item.item_type === 'side')
@@ -151,12 +151,15 @@ export const MealBuilder = ({
                       onClick={() => onUpdateMeal(item)}
                       disabled={isSideDisabled(item)}
                     >
-                      <div className="flex flex-col items-center w-full">
+                      <div className="flex flex-col items-center w-full gap-2">
+                        
                         <img
-                          src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.jpg`}
+                          src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                           alt={item.name}
-                          className="w-full h-32 object-cover"
+                          className="w-full h-56 object-cover rounded-md"
                         />
+                        
+                        
                         <div className="flex justify-between w-full">
                           <span>{item.name}</span>
                           <span>${formatPrice(item.price)}</span>
@@ -170,10 +173,10 @@ export const MealBuilder = ({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="h-[600px]">
           <CardContent className="p-4">
             <h3 className="font-medium mb-2">Entrées</h3>
-            <ScrollArea className="h-48">
+            <ScrollArea className="h-[550px]">
               <div className="grid grid-cols-1 gap-2">
                 {menuItems
                   .filter(item => item.item_type === 'entree')
@@ -191,11 +194,11 @@ export const MealBuilder = ({
                       onClick={() => onUpdateMeal(item)}
                       disabled={isEntreeDisabled(item)}
                     >
-                    <div className="flex flex-col items-center w-full">
+                    <div className="flex flex-col items-center w-full gap-2">
                       <img
-                        src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.jpg`}
+                        src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                         alt={item.name}
-                        className="w-full h-32 object-cover"
+                        className="w-full h-56 object-cover rounded-md"
                       />
                       
                       <div className="flex justify-between w-full">

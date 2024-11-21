@@ -35,9 +35,17 @@ const CategorySection = ({
           <Button
             key={item.id}
             variant="outline"
-            className="h-32 relative flex flex-col items-center justify-center text-left p-4 hover:border-primary"
+            className="h-auto relative flex flex-col items-center justify-center text-left p-4 hover:border-primary"
             onClick={() => onItemClick(item)}
           >
+             <div className="flex flex-col items-center w-full gap-2">
+                        
+              <img
+                src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
+                alt={item.name}
+                className="w-full h-56 object-cover rounded-md"
+              />
+                        
             <span className="font-medium text-lg">{item.name}</span>
             <span className="text-sm text-muted-foreground mt-1">
               ${Number(item.price).toFixed(2)}
@@ -47,6 +55,7 @@ const CategorySection = ({
                 Premium
               </span>
             )}
+            </div>
           </Button>
         ))}
     </div>
