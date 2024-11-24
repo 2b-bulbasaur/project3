@@ -1,7 +1,7 @@
-// src/app/menu-board/page.tsx
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -305,7 +305,15 @@ export default function MenuBoard() {
             />
             <GoogleTranslate />
           </div>
-          <Weather />
+          <div className="flex items-center gap-4">
+            <Link
+              href="../"
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors border border-white/50"
+            >
+              Device Setup
+            </Link>
+            <Weather />
+          </div>
         </div>
       </div>
 
