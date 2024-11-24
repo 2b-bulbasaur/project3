@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+
 import axios from "axios";
 import {
   Card,
@@ -231,6 +233,27 @@ const sidesData: MenuBoardItem[] = [
 ];
 
 const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
+  const [speaking, setSpeaking] = useState<string | null>(null);
+  const speak = (text: string, itemName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    window.speechSynthesis.cancel();
+
+    if (speaking === itemName) {
+      setSpeaking(null);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onend = () => setSpeaking(null);
+    window.speechSynthesis.speak(utterance);
+    setSpeaking(itemName);
+  };
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
   return (
     <Carousel
       opts={{
@@ -251,7 +274,25 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
                   className="object-contain p-4"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"/>
+                <button
+                  onClick={(e) =>
+                    speak(
+                      `${item.name}. ${item.description}. ${item.calories} calories.`,
+                      item.name,
+                      e
+                    )
+                  }
+                  className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+                  aria-label={speaking === item.name ? "Stop speaking" : "Read aloud"}
+                >
+                  {speaking === item.name ? (
+                    <VolumeX className="w-5 h-5 text-amber-500" />
+                  ) : (
+                    <Volume2 className="w-5 h-5 text-gray-400 hover:text-amber-500" />
+                  )}
+                </button>
+                
               </div>
               <CardHeader className="text-center">
                 <h3 className="text-xl font-frutiger font-bold text-white">
@@ -284,6 +325,10 @@ export default function MenuBoard() {
 
   useEffect(() => {
     setMounted(true);
+    // Clean up any ongoing speech when page unmounts
+    return () => {
+      window.speechSynthesis.cancel();
+    };
   }, []);
 
   if (!mounted) {
