@@ -210,7 +210,7 @@ const sidesData: MenuBoardItem[] = [
   },
   {
     name: "White Steamed Rice",
-    image: "/images/white-steamed-rice.png",
+    image: "/images/white-rice.png",
     description: "Steamed white rice",
     calories: "380",
     type: "side",
