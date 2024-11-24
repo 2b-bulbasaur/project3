@@ -32,7 +32,7 @@ type MenuBoardItem = {
 const menuItemsData: MenuBoardItem[] = [
   {
     name: "The Original Orange Chicken",
-    image: "/images/orange-chicken.png",
+    image: "/images/the-original-orange-chicken.png",
     description:
       "Our signature dish. Crispy chicken wok-tossed in a sweet and spicy orange sauce.",
     calories: "490",
@@ -55,7 +55,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Black Pepper Sirloin Steak",
-    image: "/images/black-pepper-steak.png",
+    image: "/images/black-pepper-sirloin-steak.png",
     description:
       "Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
     calories: "450",
@@ -63,7 +63,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Hot Ones Blazing Bourbon Chicken",
-    image: "/images/bourbon-chicken.png",
+    image: "/images/hot-ones-blazing-bourbon-chicken.png",
     description:
       "Chicken breast pieces wok-fired in a signature bourbon sauce.",
     calories: "460",
@@ -118,7 +118,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Teriyaki Chicken",
-    image: "/images/teriyaki-chicken.png",
+    image: "/images/grilled-teriyaki-chicken.png",
     description:
       "Grilled chicken thigh hand-sliced to order and served with teriyaki sauce.",
     calories: "300",
@@ -126,7 +126,7 @@ const menuItemsData: MenuBoardItem[] = [
   },
   {
     name: "Honey Walnut Shrimp",
-    image: "/images/walnut-shrimp.png",
+    image: "/images/honey-walnut-shrimp.png",
     description:
       "Large tempura-battered shrimp, wok-tossed in a honey sauce and topped with glazed walnuts.",
     calories: "510",
@@ -266,15 +266,17 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
         {items.map((item) => (
           <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
             <Card className="border border-white bg-zinc-900 overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl h-full">
+
+
               <div className="relative aspect-[4/3] w-full">
                 <Image
                   src={item.image}
                   alt={item.name}
                   fill
-                  className="object-contain p-4"
+                  className="object-contain p-4 z-0"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"/>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10"/>
                 <button
                   onClick={(e) =>
                     speak(
@@ -283,7 +285,7 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
                       e
                     )
                   }
-                  className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+                  className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors z-20"
                   aria-label={speaking === item.name ? "Stop speaking" : "Read aloud"}
                 >
                   {speaking === item.name ? (
