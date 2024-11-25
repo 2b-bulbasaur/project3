@@ -43,12 +43,22 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { set } from "date-fns";
 
+/**
+ * @typedef {Object} TransactionWithSummary
+ * @extends Transaction
+ * @property {string} order_summary - Summary of the transaction order.
+ */
 interface TransactionWithSummary extends Transaction {
   order_summary: string;
 }
 
+/**
+ * ManagerDashboard Component
+ * Displays a dashboard for the manager, including transaction data, inventory alerts, and weather updates.
+ *
+ * @returns {JSX.Element} The rendered ManagerDashboard component.
+ */
 const ManagerDashboard = () => {
   const [transactions, setTransactions] = useState<TransactionWithSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +89,10 @@ const ManagerDashboard = () => {
   useEffect(() => {
     if (!hasMounted) return;
 
+    /**
+     * Fetch transaction data.
+     * Includes order summaries.
+     */
     const fetchTransactions = async () => {
       try {
         const response = await fetch("/api/transactions?summary=true");
@@ -96,6 +110,9 @@ const ManagerDashboard = () => {
       }
     };
     
+    /**
+     * Fetch reorder inventory alerts.
+     */
     const fetchReorderInventory = async () => {
       try {
         if (!showAlerts) {
@@ -121,6 +138,10 @@ const ManagerDashboard = () => {
     fetchReorderInventory();
   }, [showAlerts, hasMounted]);
 
+   /**
+   * Toggles the inventory alert system.
+   * @param {boolean} checked - New state of the alert toggle.
+   */
   const handleAlertToggle = (checked: boolean) => {
     if (typeof window !== 'undefined') {
       setShowAlerts(checked);
@@ -132,6 +153,10 @@ const ManagerDashboard = () => {
     }
   };
 
+  /**
+   * Toggles the weather alert system.
+   * @param {boolean} checked - New state of the weather alert toggle.
+   */
   const handleWeatherAlertToggle = (checked: boolean) => {
     if (typeof window !== 'undefined') {
       setShowWeatherBoard(checked);
@@ -142,14 +167,24 @@ const ManagerDashboard = () => {
     }
   };
 
+  /**
+   * Switches the view to the cashier dashboard.
+   */
   const switchToCashierView = () => {
     router.push("/cashier");
   };
 
+  /**
+   * Logs the user out and redirects to the home page.
+   */
   const handleLogout = () => {
     router.push("/");
   };
 
+  /**
+   * weather dialog component
+   * @returns {JSX.Element} The WeatherDialog component.
+   */
   const WeatherDialog = () => {
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -160,6 +195,11 @@ const ManagerDashboard = () => {
       icon: '',
     });
   
+    /**
+     * Gets the business impact of the current weather.
+     * @param description 
+     * @returns {string} The business impact of the current weather.
+     */
     const getBusinessImpact = (description: string) => {
       const lowercaseDesc = description.toLowerCase();
       if (lowercaseDesc.includes('clear') || lowercaseDesc.includes('sunny')) {
