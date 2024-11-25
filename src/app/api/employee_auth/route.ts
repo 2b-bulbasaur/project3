@@ -1,7 +1,33 @@
+/**
+ * @file route.ts
+ * @description Authentication route handler for employee login
+ */
+
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import type { Employee } from '@/types';
 
+/**
+ * Handles employee authentication via POST request
+ * 
+ * @async
+ * @param {Request} request - The incoming HTTP request
+ * @returns {Promise<NextResponse>} JSON response containing:
+ * - On success: Employee data (id, name, job, hours)
+ * - On auth failure: 401 status with error message
+ * - On error: 500 status with error message
+ * 
+ * @example
+ * // Success Response
+ * {
+ *   id: number,
+ *   name: string,
+ *   job: string,
+ *   hours: number
+ * }
+ * 
+ * @throws {Error} When database query fails
+ */
 export async function POST(request: Request) {
   try {
     const { name, password } = await request.json();
