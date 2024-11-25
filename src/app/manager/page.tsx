@@ -43,6 +43,7 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { set } from "date-fns";
 
 interface TransactionWithSummary extends Transaction {
   order_summary: string;
@@ -56,15 +57,18 @@ const ManagerDashboard = () => {
   const [reorderItems, setReorderItems] = useState<boolean>(false);
   const [reorderInventory, setReorderInventory] = useState<string[]>([]);
   const [showAlerts, setShowAlerts] = useState(true);
+  const [showWeatherBoard, setShowWeatherBoard] = useState(true);
+  const [showWeatherDialog, setShowWeatherDialog] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
-  const [showWeatherDialog, setShowWeatherDialog] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedAlertPreference = localStorage.getItem("showInventoryAlerts");
+      const savedWeatherPreference = localStorage.getItem("showWeatherBoard");
       setShowAlerts(savedAlertPreference === null ? true : savedAlertPreference === "true");
+      setShowWeatherBoard(savedWeatherPreference === null ? true : savedWeatherPreference === "true");
       const name = localStorage.getItem("employeeName");
       if (name) setEmployeeName(name);
       setIsInitialized(true);
@@ -81,7 +85,7 @@ const ManagerDashboard = () => {
         if (!response.ok) throw new Error("Failed to fetch transactions");
         const data: TransactionWithSummary[] = await response.json();
         setTransactions(data);
-        setShowWeatherDialog(true);
+        setShowWeatherDialog(showWeatherBoard);
       } catch (error) {
         console.error("Error fetching transactions:", error);
         const errorMessage =
@@ -128,6 +132,16 @@ const ManagerDashboard = () => {
     }
   };
 
+  const handleWeatherAlertToggle = (checked: boolean) => {
+    if (typeof window !== 'undefined') {
+      setShowWeatherBoard(checked);
+      localStorage.setItem("showWeatherBoard", checked.toString());
+    }
+    if(!checked) {
+      setShowWeatherDialog(false);
+    }
+  };
+
   const switchToCashierView = () => {
     router.push("/cashier");
   };
@@ -161,6 +175,9 @@ const ManagerDashboard = () => {
     useEffect(() => {
       const fetchWeather = async (lat: number, lon: number) => {
         try {
+
+          
+
           // Get city name from coordinates
           const geoResponse = await axios.get(
             `https://api.openweathermap.org/geo/1.0/reverse`,
@@ -323,14 +340,25 @@ const ManagerDashboard = () => {
               </DropdownMenu>
             </div>
             <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="show-alerts" className="text-sm">Show Inventory Alerts</Label>
-                <Switch
-                  id="show-alerts"
-                  checked={showAlerts}
-                  disabled={!isInitialized}
-                  onCheckedChange={handleAlertToggle}
-                />
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="show-alerts" className="text-sm">Show Inventory Alerts</Label>
+                  <Switch
+                    id="show-alerts"
+                    checked={showAlerts}
+                    disabled={!isInitialized}
+                    onCheckedChange={handleAlertToggle}
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="show-alerts" className="text-sm">Show Weather Board</Label>
+                  <Switch
+                    id="show-alerts"
+                    checked={showWeatherBoard}
+                    disabled={!isInitialized}
+                    onCheckedChange={handleWeatherAlertToggle}
+                  />
+                </div>
               </div>
               <div className="flex items-center space-x-2">
                 <p>Welcome {employeeName}!</p>
