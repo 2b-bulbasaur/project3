@@ -16,6 +16,7 @@ async function getLastGeneratedDate(): Promise<string | null> {
     const status = JSON.parse(data);
     return status.lastGenerated;
   } catch (error) {
+    console.error('Error in getLastGeneratedDate:', error);
     return null;
   }
 }
@@ -28,7 +29,7 @@ async function setLastGeneratedDate(date: string): Promise<void> {
   );
 }
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const now = new Date();
     const currentHour = now.getHours();
