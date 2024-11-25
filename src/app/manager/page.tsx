@@ -136,7 +136,7 @@ const ManagerDashboard = () => {
 
     fetchTransactions();
     fetchReorderInventory();
-  }, [showAlerts, hasMounted]);
+  }, [showAlerts, hasMounted, showWeatherBoard]);
 
    /**
    * Toggles the inventory alert system.
