@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getTransactions, addTransaction } from '@/lib/transactions';
 
+/**
+ * Handles GET requests for transactions.
+ * 
+ * Fetches transactions from the database. If the `summary` query parameter is set to `true`,
+ * it fetches a summarized version of the transactions.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<NextResponse>} The response containing the transactions or an error message.
+ */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,6 +26,15 @@ export async function GET(request: Request) {
   }
 }
 
+/**
+ * Handles POST requests for transactions.
+ * 
+ * Adds a new transaction to the database. The request body must contain `customer_name`, `cashier_name`,
+ * and `sale_price` fields.
+ * 
+ * @param {Request} request - The incoming request object.
+ * @returns {Promise<NextResponse>} The response containing the created transaction or an error message.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
