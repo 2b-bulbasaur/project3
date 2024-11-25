@@ -18,6 +18,16 @@ import type { OrderItem, MealInProgress } from "@/types/api.types";
 
 import GoogleTranslate from "@/components/Translation";
 
+/**
+ * CategorySection component renders a list of menu items categorized by type (e.g., appetizer, drink).
+ *
+ * @param {Object} props - The props for CategorySection component.
+ * @param {MenuItem[]} props.items - Array of menu items.
+ * @param {ItemTypeEnum} props.category - The category type to filter items (e.g., "appetizer", "drink").
+ * @param {Function} props.onItemClick - Callback function when an item is clicked.
+ * 
+ * @returns {JSX.Element} The CategorySection component rendering a list of items.
+ */
 const CategorySection = ({
   items,
   category,
@@ -63,6 +73,12 @@ const CategorySection = ({
   </ScrollArea>
 );
 
+/**
+ * CustomerPage component allows the customer to place an order, including building meals, adding appetizers, drinks,
+ * and applying promo codes.
+ *
+ * @returns {JSX.Element} The main CustomerPage rendering the order creation and order summary.
+ */
 const CustomerPage = () => {
   const router = useRouter();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -79,6 +95,9 @@ const CustomerPage = () => {
     router.push("/");
   };
 
+  /**
+   * Calculates the total price of the current order, considering meal size and premium items.
+   */
   const calculateTotal = useCallback(() => {
     const total = currentOrder.reduce((sum, item) => {
       if (item.type === "meal" && item.meal) {
@@ -108,6 +127,9 @@ const CustomerPage = () => {
     setDiscountedTotal(isPromoValid ? total * 0.8 : total);
   }, [currentOrder, isPromoValid]);
 
+  /**
+   * Fetches the menu items from the server on initial load.
+   */
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
@@ -142,7 +164,9 @@ const CustomerPage = () => {
     }
   }, []);
 
-
+  /**
+   * Validates the promo code entered by the user.
+   */
   const validatePromoCode = () => {
     if (promoCode.trim().toUpperCase() === "PANDA20") {
       setIsPromoValid(true);
@@ -153,10 +177,18 @@ const CustomerPage = () => {
     }
   };
 
+  /**
+ * Updates the promo code input field value.
+ * @param {React.ChangeEvent<HTMLInputElement>} e - Event object for input change.
+ */
   const handlePromoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPromoCode(e.target.value);
   };
 
+  /**
+   * Starts a new meal creation process with the selected size.
+   * @param {SizeEnum} size - The size of the meal being created (e.g., "bowl", "plate").
+   */
   const startNewMeal = (size: SizeEnum) => {
     setCurrentMeal({
       size,
@@ -169,6 +201,10 @@ const CustomerPage = () => {
     setShowMealBuilder(true);
   };
 
+  /**
+   * Handles meal updates based on the selected item (side, entree).
+   * @param {MenuItem} item - The menu item selected to update the meal.
+   */
   const handleMealUpdate = (item: MenuItem) => {
     if (!currentMeal) return;
 
@@ -250,6 +286,12 @@ const CustomerPage = () => {
     });
   };
 
+  /**
+ * Handles the item click event. If the meal builder is active, it updates the current meal;
+ * otherwise, it adds a simple item to the order.
+ *
+ * @param {MenuItem} item - The menu item that was clicked.
+ */
   const handleItemClick = (item: MenuItem) => {
     if (showMealBuilder) {
       handleMealUpdate(item);
@@ -258,11 +300,19 @@ const CustomerPage = () => {
     }
   };
 
+  /**
+ * Cancels the current meal creation process by resetting the meal state and hiding the meal builder.
+ */
   const cancelMeal = () => {
     setCurrentMeal(null);
     setShowMealBuilder(false);
   };
 
+  /**
+   * Cancels the current order by clearing all the order details, resetting the meal state, 
+   * clearing the promo code, and removing all localStorage items related to the order.
+   * Afterward, it redirects the user to the login page.
+   */
   const cancelOrder = () => {
     setCurrentOrder([]);
     setCurrentMeal(null);
@@ -278,6 +328,10 @@ const CustomerPage = () => {
     router.push("/customer/login");
   };
 
+  /**
+   * Completes the current meal by adding it to the order and saving the updated order to localStorage.
+   * Afterward, it resets the current meal and hides the meal builder.
+   */
   const completeMeal = () => {
     if (!currentMeal) return;
     const newMealItem: OrderItem = { type: "meal", meal: currentMeal };
@@ -288,6 +342,11 @@ const CustomerPage = () => {
     setShowMealBuilder(false);
   };
 
+  /**
+   * Removes an item from the current order based on its index and updates the localStorage with the new order.
+   * 
+   * @param {number} index - The index of the order item to remove.
+   */
   const removeOrderItem = (index: number) => {
     setCurrentOrder((prev) => {
       const updatedOrder = prev.filter((_, i) => i !== index);
@@ -296,6 +355,13 @@ const CustomerPage = () => {
     });
   };
 
+  /**
+   * Updates the quantity of an item in the current order based on the provided index and quantity change.
+   * If the quantity goes below 1, the item is removed from the order. The updated order is saved to localStorage.
+   * 
+   * @param {number} index - The index of the order item to update.
+   * @param {number} change - The change in quantity (positive for increase, negative for decrease).
+   */
   const updateItemQuantity = (index: number, change: number) => {
     setCurrentOrder((prev) => {
       const updatedOrder = prev
@@ -317,6 +383,11 @@ const CustomerPage = () => {
     });
   };
 
+  /**
+   * Handles the checkout process. It ensures that the order has at least one item, 
+   * saves the current order details (including the total and promo code) to localStorage, 
+   * and redirects the user to the checkout page.
+   */
   const handleCheckout = () => {
     if (currentOrder.length === 0) {
       setError("Please add items to your order before checking out");
