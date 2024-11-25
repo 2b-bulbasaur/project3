@@ -1,9 +1,18 @@
+/**
+ * @fileoverview Route handler for managing promotional email functionality
+ * @module route
+ */
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth"; 
 import { getTransactions } from "@/lib/transactions";
 import { google } from "googleapis";
 
+/**
+ * OAuth2 client for Gmail API authentication
+ * @constant {google.auth.OAuth2}
+ */
 const oauth2Client = new google.auth.OAuth2(
   process.env.GMAIL_GOOGLE_CLIENT_ID,
   process.env.GMAIL_GOOGLE_CLIENT_SECRET,
@@ -14,6 +23,13 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GMAIL_GOOGLE_REFRESH_TOKEN,
 });
 
+/**
+ * Sends a promotional email to the specified recipient
+ * @async
+ * @param {string} to - Email address of the recipient
+ * @throws {Error} When email sending fails
+ * @returns {Promise<void>}
+ */
 async function sendPromoEmail(to: string) {
   try {
     console.log("DEBUG: Initializing Gmail service...");
@@ -48,7 +64,14 @@ async function sendPromoEmail(to: string) {
   }
 }
 
-// Export GET handler for App Router
+/**
+ * GET route handler for checking promotional eligibility
+ * @async
+ * @route GET /api/promo
+ * @returns {Promise<NextResponse>} JSON response with promo status
+ * - 200: Success with promo eligibility info
+ * - 401: Unauthorized if no valid session
+ */
 export async function GET() {
   try {
     console.log("DEBUG: Starting promo check...");
