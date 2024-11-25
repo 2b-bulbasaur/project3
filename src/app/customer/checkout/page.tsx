@@ -21,6 +21,15 @@ import { ShoppingCart, CreditCard, ArrowLeft, Check } from 'lucide-react';
 
 import type { OrderItem } from '@/types/api.types';
 
+/**
+ * CheckoutPage Component
+ * 
+ * This component allows users to review their order, input customer details, 
+ * and submit the order for processing. It handles form validation, promo code checks,
+ * and order submission, while also managing loading, success, and error states.
+ * 
+ * @component
+ */
 const CheckoutPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -45,6 +54,10 @@ const CheckoutPage = () => {
     phone: ''
   });
 
+   /**
+   * useEffect hook to retrieve order and customer data from local storage
+   * and initialize state variables when the component mounts.
+   */
   useEffect(() => {
     const order = localStorage.getItem('currentOrder');
     const total = localStorage.getItem('orderTotal');
@@ -69,6 +82,11 @@ const CheckoutPage = () => {
     }
   }, []);
 
+  /**
+   * Handles input changes for customer details form.
+   * 
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event.
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCustomerDetails(prev => ({
@@ -77,6 +95,12 @@ const CheckoutPage = () => {
     }));
   };
 
+  /**
+   * Validates customer details (name, email, phone).
+   * Displays error messages if validation fails.
+   * 
+   * @returns {boolean} - Returns true if validation is successful, false otherwise.
+   */
   const validate = () => {
     const newErrors: { name: string; email: string; phone: string } = { name: '', email: '', phone: '' };
     let isValid = true;
@@ -108,11 +132,16 @@ const CheckoutPage = () => {
     return isValid;
   };
 
-
+  /**
+   * Redirects the user back to the order page.
+   */
   const handleBackToOrder = () => {
     router.push('/customer');
   };
 
+  /**
+   * Handles user logout and redirects to the login page.
+   */
   const handleLogoutAndRedirect = async () => {
     try {
       await signOut({ redirect: false });
@@ -123,6 +152,11 @@ const CheckoutPage = () => {
     }
   };
 
+  /**
+   * Submits the order data, including customer details, order summary, 
+   * and promo code. Handles API request for order submission and checks 
+   * promo eligibility for the next order.
+   */
   const handleSubmitOrder = async () => {
     if (!customerDetails.name || !customerDetails.email || !customerDetails.phone) {
       setError("Please fill in all required fields");
@@ -208,8 +242,19 @@ const CheckoutPage = () => {
     }
   };
 
+  /**
+   * Formats the price value to a string with 2 decimal points.
+   * 
+   * @param {number} price - The price to format.
+   * @returns {string} - The formatted price string.
+   */
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
 
+  /**
+   * Renders the order summary in a table format.
+   * 
+   * @returns {JSX.Element} - The rendered table displaying the order summary.
+   */
   const renderOrderSummary = () => (
     <Table>
       <TableHeader>
