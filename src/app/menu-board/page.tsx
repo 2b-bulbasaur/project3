@@ -448,12 +448,13 @@ const MenuItem = ({
   return (
     <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
       <Card
-        className={`border border-white bg-zinc-900 overflow-hidden shadow-lg transition-all cursor-pointer
+        className={`border border-white bg-zinc-900 shadow-lg transition-all duration-300 cursor-pointer
           ${
             isSelected
               ? "border-amber-500 scale-[1.02]"
               : "hover:border-white/50 hover:scale-[1.01]"
-          }`}
+          }
+          ${isSelected ? "h-auto" : "h-[32rem]"}`}
         onClick={() => onItemClick(item.name)}
       >
         <div className="relative aspect-[4/3] w-full">
@@ -490,7 +491,7 @@ const MenuItem = ({
           </h3>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-gray-300 text-sm leading-relaxed">
+          <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
             {item.description}
           </p>
           {isSelected && itemNutrition && (
