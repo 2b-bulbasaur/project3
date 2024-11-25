@@ -1,11 +1,27 @@
 import { useEffect, useRef } from 'react';
 
+interface GoogleTranslateConfig {
+  pageLanguage: string;
+  floating: boolean;
+}
+
+interface GoogleTranslateElement {
+  new (config: GoogleTranslateConfig, element: string): void;
+}
+
+interface GoogleTranslateAPI {
+  translate: {
+    TranslateElement: GoogleTranslateElement;
+  };
+}
 
 declare global {
   interface Window {
-    google: any; 
-  googleTranslateElementInit: () => void; 
-}
+    google: {
+      translate: GoogleTranslateAPI['translate'];
+    };
+    googleTranslateElementInit: () => void;
+  }
 }
 
 const GoogleTranslate = () => {
@@ -15,7 +31,7 @@ const GoogleTranslate = () => {
     const hideFloatingToolbar = () => {
       const toolbar = document.querySelector('.goog-te-banner-frame');
       if (toolbar) {
-        (toolbar as HTMLElement).style.display = 'none'; 
+        (toolbar as HTMLElement).style.display = 'none';
       }
     };
 
@@ -48,14 +64,14 @@ const GoogleTranslate = () => {
     if (initialized.current) return;
 
     const loadGoogleTranslate = () => {
-      if (window.google && window.google.translate && window.google.translate.TranslateElement) {
+      if (window.google?.translate?.TranslateElement) {
         try {
           new window.google.translate.TranslateElement(
             {
-              pageLanguage: 'en', 
-              floating: false, 
+              pageLanguage: 'en',
+              floating: false,
             },
-            'google_translate_element' 
+            'google_translate_element'
           );
           
           hideFloatingToolbar();

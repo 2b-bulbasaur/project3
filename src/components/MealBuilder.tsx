@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { XCircle } from 'lucide-react';
+import Image from 'next/image';
 import type { MealInProgress, MenuItem, SizeEnum } from '@/types';
 
 interface MealBuilderProps {
@@ -152,13 +153,13 @@ export const MealBuilder = ({
                       disabled={isSideDisabled(item)}
                     >
                       <div className="flex flex-col items-center w-full gap-2">
-                        
-                        <img
+                        <Image
                           src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                           alt={item.name}
+                          width={500}
+                          height={224}
                           className="w-full h-56 object-cover rounded-md"
-                        />
-                        
+                        />                        
                         
                         <div className="flex justify-between w-full">
                           <span>{item.name}</span>
@@ -195,9 +196,11 @@ export const MealBuilder = ({
                       disabled={isEntreeDisabled(item)}
                     >
                     <div className="flex flex-col items-center w-full gap-2">
-                      <img
+                      <Image
                         src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                         alt={item.name}
+                        width={500}
+                        height={224}
                         className="w-full h-56 object-cover rounded-md"
                       />
                       
