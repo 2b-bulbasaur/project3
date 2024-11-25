@@ -495,8 +495,8 @@ const MenuItem = ({
           </p>
           {isSelected && itemNutrition && (
             <div className="mt-4 p-4 bg-zinc-800 rounded-lg border border-white/20">
-              <h4 className="font-bold mb-2">Nutrition Facts</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <h4 className="font-bold mb-2 text-white">Nutrition Facts</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm text-white">
                 <div>Serving: {itemNutrition["Serving Size (oz)"]}</div>
                 <div>Calories: {itemNutrition.Calories}</div>
                 <div>Total Fat: {itemNutrition["Total Fat (g)"]}g</div>
