@@ -14,6 +14,13 @@ interface CreateTransactionInput {
   orderItems: OrderItem[];
 }
 
+/**
+ * Fetches the list of transactions from the database.
+ * If `withSummary` is true, it includes additional summary information about the meals, appetizers, and drinks ordered.
+ * 
+ * @param {boolean} [withSummary=false] - Whether to include a summary of the transaction details.
+ * @returns {Promise<Transaction[] | TransactionWithSummary[]>} - The list of transactions, optionally with summary details.
+ */
 export async function getTransactions(withSummary: boolean = false): Promise<Transaction[] | TransactionWithSummary[]> {
   if (withSummary) {
     const result = await query<TransactionWithSummary>(`
@@ -113,6 +120,13 @@ export async function getTransactions(withSummary: boolean = false): Promise<Tra
   `);
 }
 
+/**
+ * Adds a new transaction to the database, including the details of the items ordered (meals, appetizers, and drinks).
+ * It wraps the operation in a transaction to ensure that the database state remains consistent.
+ *
+ * @param {CreateTransactionInput} input - The details of the transaction to be added.
+ * @returns {Promise<Transaction>} - The newly created transaction record.
+ */
 export async function addTransaction(input: CreateTransactionInput): Promise<Transaction> {
   await query('BEGIN');
 

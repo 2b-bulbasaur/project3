@@ -61,6 +61,12 @@ interface SalesData {
   count: number;
 }
 
+/**
+ * Component that allows the user to generate and view various reports, such as X Report, Z Report, Product Usage Report, and Sales Report.
+ * It provides options to generate charts based on the data and displays them accordingly.
+ * 
+ * @component
+ */
 const GenerateReport: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +87,10 @@ const GenerateReport: React.FC = () => {
   const [input1, setInput1] = useState('');
   const [input2, setInput2] = useState('');
 
+  /**
+   * Chart configuration options.
+   * @type {object}
+   */
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -117,6 +127,10 @@ const GenerateReport: React.FC = () => {
     }
   };
 
+  /**
+   * Chart configuration options.
+   * @type {object}
+   */
   const updateChartData = (
     data: ReportData[] | ProductUsageData[] | SalesData[] | null, 
     type: 'x' | 'z' | 'product' | 'sales'
@@ -205,6 +219,9 @@ const GenerateReport: React.FC = () => {
   };
 
 
+  /**
+   * Resets the report data and form visibility.
+   */
   const resetReport = () => {
     setReportData(null);
     setShowForm1(false);
@@ -216,24 +233,37 @@ const GenerateReport: React.FC = () => {
     setError(null);
   };
 
+  /**
+   * Resets the graph data and chart.
+   */
   const resetGraphData = () => {
     setXReportData(null);
     setZReportData(null);
     setChartData(null);
   };
 
+  /**
+   * Handles click for displaying the first product usage form.
+   */
   const handleProductUsageClick1 = () => {
     resetGraphData();
     resetReport();
     setShowForm1(true);
   };
 
+  /**
+   * Handles click for displaying the second product usage form.
+   */
   const handleProductUsageClick2 = () => {
     resetGraphData();
     resetReport();
     setShowForm2(true);
   }
 
+  /**
+   * Generates the X report by making an API call.
+   * It processes the response and updates the report and chart data.
+   */
   const generateXReport = async () => {
     try {
       resetGraphData();
@@ -262,6 +292,10 @@ const GenerateReport: React.FC = () => {
     }
   };
 
+   /**
+   * Generates the Z report by making an API call.
+   * It processes the response and updates the report and chart data.
+   */
   const generateZReport = async () => {
     try {
       resetGraphData();
@@ -289,7 +323,12 @@ const GenerateReport: React.FC = () => {
     }
   };
 
-
+  /**
+   * Generates the Product Usage report by making an API call.
+   * It processes the response and updates the report and chart data.
+   * It also updates the chart data based on the response.
+   * @function generateProductUsage
+   */
   const generateProductUsage = async () => {
     try {
       setIsLoadingProduct(true);
@@ -316,6 +355,11 @@ const GenerateReport: React.FC = () => {
     }
   };
 
+  /**
+   * Generates the Sales report by making an API call.
+   * It processes the response and updates the report and chart data.
+   * It also updates the chart data based on the response.
+   */
   const generateSalesReport = async () => {
     try {
       setIsLoadingSales(true);

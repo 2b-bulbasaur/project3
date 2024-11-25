@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db';
 
+
+/**
+ * Handles the POST request to generate a sales report based on the given date range.
+ * The function extracts two dates (input1, input2), parses them, and retrieves sales data 
+ * for each item sold between the specified dates.
+ * 
+ * @param {Request} request - The incoming request object containing the date range in JSON format.
+ * @returns {Promise<NextResponse>} - A JSON response with the sales report or an error message.
+ * 
+ * @throws {Error} Throws an error if the date range is invalid or no sales data is found.
+ */
 export async function POST(request: Request) {
     try {
         const { input1, input2 } = await request.json();
