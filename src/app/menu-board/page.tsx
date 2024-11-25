@@ -448,12 +448,13 @@ const MenuItem = ({
   return (
     <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
       <Card
-        className={`border border-white bg-zinc-900 overflow-hidden shadow-lg transition-all cursor-pointer
-          ${
-            isSelected
-              ? "border-amber-500 scale-[1.02]"
-              : "hover:border-white/50 hover:scale-[1.01]"
-          }`}
+        className={`border bg-zinc-900 shadow-lg transition-all duration-300 cursor-pointer
+    ${
+      isSelected
+        ? "border-transparent scale-[1.02]"
+        : "border-white hover:border-transparent hover:scale-[1.01]"
+    }
+    ${isSelected ? "h-auto" : "h-[32rem]"}`}
         onClick={() => onItemClick(item.name)}
       >
         <div className="relative aspect-[4/3] w-full">
@@ -490,13 +491,13 @@ const MenuItem = ({
           </h3>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-gray-300 text-sm leading-relaxed">
+          <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
             {item.description}
           </p>
           {isSelected && itemNutrition && (
             <div className="mt-4 p-4 bg-zinc-800 rounded-lg border border-white/20">
-              <h4 className="font-bold mb-2">Nutrition Facts</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <h4 className="font-bold mb-2 text-white">Nutrition Facts</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm text-white">
                 <div>Serving: {itemNutrition["Serving Size (oz)"]}</div>
                 <div>Calories: {itemNutrition.Calories}</div>
                 <div>Total Fat: {itemNutrition["Total Fat (g)"]}g</div>
