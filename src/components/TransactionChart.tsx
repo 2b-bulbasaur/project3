@@ -1,19 +1,37 @@
-// components/TransactionChart.tsx
-
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartData,
+  ChartOptions
+} from 'chart.js';
 
-// Register chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface TransactionData {
   hour: string;
   count: number;
 }
 
+type ChartDataType = ChartData<'line', number[], string>;
+
 const TransactionChart = ({ data }: { data: TransactionData[] }) => {
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<ChartDataType | null>(null);
 
   useEffect(() => {
     // Map the data into x (hour) and y (count)
@@ -36,10 +54,23 @@ const TransactionChart = ({ data }: { data: TransactionData[] }) => {
 
   if (!chartData) return <div>Loading...</div>;
 
+  const options: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Transaction Count by Hour',
+      },
+    },
+  };
+
   return (
     <div>
       <h3>Transaction Count by Hour</h3>
-      <Line data={chartData} />
+      <Line data={chartData} options={options} />
     </div>
   );
 };

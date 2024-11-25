@@ -308,9 +308,158 @@ In the previous SCRUM meeting, we reviewed the remaining tasks and assigned spec
 
 ---
 
+## SCRUM Meeting 1 for Sprint 3
+**Prepared by:** Irene Diao  
+**Meeting Date:** November 18, 2024
 
+### Meeting Attendees
+- Irene Diao
+- Kevin Lei
+- Harsitha Marepally
+- Poyi Ou
+- Jaya Sundarrajan
 
+### Meeting Agenda Items
+- Assign tasks for sprint 2 written materials document
+- Look over product backlog for sprint 3
 
+### Status Update Since Last Meeting
+
+#### Accomplishments:
+- Second iteration of project completed and github release 
+- Product backlog and burn-down charts updated
+
+#### Tasks Completed:
+
+| Task Description | Assigned to | Completed? |
+|-----------------|-------------|------------|
+| Google OAuth API implemented on customer page | Jaya Sundarrajan | Yes |
+| Translation API connected for entire webpage | Irene Diao | Yes |
+| Weather API connected to mood board | Poyi Ou | Yes |
+
+### Before The Next Meeting
+
+#### Plans:
+- Finish sprint 2 written materials document
+- Work on accessibility requirements
+- Fix error popups around application
+
+#### Task Assignments:
+
+| Task Description | Assigned to |
+|-----------------|-------------|
+| Sprint 2 written materials retrospective summary | Jaya Sundarrajan |
+| Sprint 2 product backlogs and burn down charts | Kevin Lei |
+| Add pictures on customer interface | Irene Diao | 
+| Fix database timezone | Poyi Ou |
+
+### Minutes from Previous Meeting
+In our previous SCRUM meeting, we reviewed the remaining tasks that needed to be completed before the end of the previous sprint. We scheduled time to record our Sprint 2 demo video. In addition to finishing up Sprint 2, our team discussed the accessibility personas we wanted to target and how we were going to implement these into our application. We also put emphasis on the API connections needed for the completion of this project. 
+
+---
+
+## SCRUM Meeting 2 for Sprint 3
+**Prepared by:** Irene Diao  
+**Meeting Date:** November 22, 2024
+
+### Meeting Attendees
+- Irene Diao
+- Kevin Lei
+- Harsitha Marepally
+- Poyi Ou
+- Jaya Sundarrajan
+
+### Meeting Agenda Items
+- Target areas of improvement on all interfaces
+- Pinpoint errors that need to be resolved
+
+### Status Update Since Last Meeting
+
+#### Accomplishments:
+- Sprint 2 written materials completed
+- Customer interface completed with pictures for each item
+- Database timezone manually corrected to right timezone
+
+#### Tasks Completed:
+
+| Task Description | Assigned to | Completed? |
+|-----------------|-------------|------------|
+| Sprint 2 written materials | Everyone | Yes |
+| Pictures on customer interface | Irene Diao | Yes |
+| Time zone adjustment for weird database error | Poyi Ou | Yes |
+
+### Before The Next Meeting
+
+#### Plans:
+- Implement text to speech accessibility standard
+- Continue fixing errors across entire web application
+- Ensure connection between different pages
+
+#### Task Assignments:
+
+| Task Description | Assigned to |
+|-----------------|-------------|
+| Implement text to speech option | Jaya Sundarrajan | 
+| Make sure there are buttons to get from one page to another | Kevin Lei |
+| Fix console errors and logic errors across entire application | Irene Diao, Poyi Ou, Harshitha Marepally |
+
+### Minutes from Previous Meeting
+In our previous SCRUM meeting, we discussed the tasks we wanted to complete for the remainder of Sprint 3. This included making sure we covered all accessibility compliances and making sure we resolved all visible errors displayed on the application. Another issue we addressed was the differing time zone in our database that could mess with the generation of our reports.
+
+---
+
+## SCRUM Meeting 3 for Sprint 3
+**Prepared by:** Irene Diao  
+**Meeting Date:** November 24, 2024
+
+### Meeting Attendees
+- Irene Diao
+- Kevin Lei
+- Harsitha Marepally
+- Poyi Ou
+- Jaya Sundarrajan
+
+### Meeting Agenda Items
+- Discuss possibility of a chatbot and nutrition info for “beyond requirements”
+- Look over expert panel document
+- Schedule time for sprint 3 demo
+
+### Status Update Since Last Meeting
+
+#### Accomplishments:
+- Text to speech ability implemented on web application
+- Button added from each page back to device setup page
+
+#### Tasks Completed:
+
+| Task Description | Assigned to | Completed? |
+|-----------------|-------------|------------|
+| Implementation of text to speech | Jaya Sundarrajan | Yes |
+| Navigational buttons added to pages | Kevin Lei | Yes |
+| Fix console errors across application | Everyone | Yes |
+
+### Before The Next Meeting
+
+#### Plans:
+- Start sprint 3 written materials document
+- Finish expert panel document
+- Wrap up sprint 3 tasks and github release
+
+#### Task Assignments:
+
+| Task Description | Assigned to |
+|-----------------|-------------|
+| Sprint 3 meeting minutes completion | Irene Diao |
+| Sprint 3 backlogs and burn-down charts | Kevin Lei |
+| Sprint 3 executive summary | Jaya Sundarrajan |
+| Expert panel interviews | Everyone | 
+| Expert panel executive summary | Poyi Ou | 
+| Expert panel design moves | Harshitha Marepally |
+
+### Minutes from Previous Meeting
+In our previous SCRUM meeting, we continued discussing how we will implement accessibility standards further including text to speech. We also reviewed each interface for any improvements that could be made before the end of the sprint or the conclusion of this project. Additionally, we pinpointed the console errors that we could see or any logic errors that we observed that need to be fixed before our next demo.
+
+---
 
 
 

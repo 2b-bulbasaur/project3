@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShoppingCart, XCircle, Home } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +15,6 @@ import MealBuilder from "@/components/MealBuilder";
 import OrderSummary from "@/components/OrderSummary";
 import type { MenuItem, SizeEnum, ItemTypeEnum } from "@/types/db.types";
 import type { OrderItem, MealInProgress } from "@/types/api.types";
-import { set } from "date-fns";
 
 import GoogleTranslate from "@/components/Translation";
 
@@ -39,10 +39,11 @@ const CategorySection = ({
             onClick={() => onItemClick(item)}
           >
              <div className="flex flex-col items-center w-full gap-2">
-                        
-              <img
+              <Image
                 src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                 alt={item.name}
+                width={400}
+                height={224}
                 className="w-full h-56 object-cover rounded-md"
               />
                         
@@ -274,7 +275,7 @@ const CustomerPage = () => {
     localStorage.removeItem("orderTotal");
     localStorage.removeItem("originalTotal");
     localStorage.removeItem("promoCode");
-    router.push("/");
+    router.push("/customer/login");
   };
 
   const completeMeal = () => {

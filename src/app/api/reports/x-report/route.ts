@@ -5,11 +5,9 @@ type HourlyCount = {
   [key: string]: number;
 };
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const now = new Date();
-    const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0); // 9 AM
-    const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0); // Next hour
     let hour = now.getHours();
 
     const transactions = await getTransactions();
@@ -26,7 +24,12 @@ export async function POST(request: Request) {
       const transactionDate = new Date(transaction.date);
       const transactionHour = transactionDate.getHours();
 
-      if (transactionDate >= startDate && transactionDate < endDate && transactionHour >= 9) {
+      if (
+        transactionDate.getDate() === now.getDate() &&
+        transactionDate.getMonth() === now.getMonth() &&
+        transactionDate.getFullYear() === now.getFullYear() &&
+        transactionHour >= 9 && transactionHour <= 21
+      ) {
         hourlyCount[`${transactionHour}:00`] = (hourlyCount[`${transactionHour}:00`] || 0) + 1;
       }
     });

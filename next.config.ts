@@ -2,8 +2,17 @@ import type { NextConfig } from 'next'
 
 const config: NextConfig = {
   images: {
-    domains: ['openweathermap.org'],
     remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'openweathermap.org',
+        pathname: '/img/wn/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'openweathermap.org',
+        pathname: '/img/wn/**',
+      },
       {
         protocol: 'https',
         hostname: 'dummyimage.com',

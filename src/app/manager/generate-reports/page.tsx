@@ -21,7 +21,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -284,7 +283,7 @@ const GenerateReport: React.FC = () => {
       updateChartData(data, 'z');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate report');
-      console.error('Error generating report:', err);
+      // console.error('Error generating report:', err);
     } finally {
       setIsLoadingZ(false);
     }

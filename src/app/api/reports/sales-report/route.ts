@@ -1,12 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getTransactions } from '@/lib/transactions';
-import { getItemsInAppOrder, getItemsInMealOrder } from '@/lib/orders';
-import { getMenuNameById } from '@/lib/menu';
 import { query } from '@/lib/db';
-
-type SalesCount = {
-    [key: string]: number;
-}
 
 export async function POST(request: Request) {
     try {
