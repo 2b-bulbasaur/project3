@@ -19,7 +19,166 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import GoogleTranslate from "@/components/Translation";
+
+const nutritionData = {
+  "Chow Mein": {
+    "Serving Size (oz)": "9.4 oz",
+    Calories: 500,
+    "Total Fat (g)": 23,
+    "Sodium (mg)": 980,
+    "Total Carb (g)": 61,
+    "Protein (g)": 18,
+    "Sugars (g)": 5,
+    "Dietary Fiber (g)": 4,
+  },
+  "White Steamed Rice": {
+    "Serving Size (oz)": "8.1 oz",
+    Calories: 380,
+    "Total Fat (g)": 0,
+    "Sodium (mg)": 0,
+    "Total Carb (g)": 86,
+    "Protein (g)": 7,
+    "Sugars (g)": 0,
+    "Dietary Fiber (g)": 0,
+  },
+  "Fried Rice": {
+    "Serving Size (oz)": "9.3 oz",
+    Calories: 530,
+    "Total Fat (g)": 16,
+    "Sodium (mg)": 820,
+    "Total Carb (g)": 82,
+    "Protein (g)": 12,
+    "Sugars (g)": 3,
+    "Dietary Fiber (g)": 1,
+  },
+  "Super Greens": {
+    "Serving Size (oz)": "8.6 oz",
+    Calories: 70,
+    "Total Fat (g)": 0.5,
+    "Sodium (mg)": 530,
+    "Total Carb (g)": 13,
+    "Protein (g)": 4,
+    "Sugars (g)": 4,
+    "Dietary Fiber (g)": 5,
+  },
+  "The Original Orange Chicken": {
+    "Serving Size (oz)": "5.7 oz",
+    Calories: 420,
+    "Total Fat (g)": 21,
+    "Sodium (mg)": 620,
+    "Total Carb (g)": 43,
+    "Protein (g)": 15,
+    "Sugars (g)": 18,
+    "Dietary Fiber (g)": 0,
+  },
+  "Beijing Beef": {
+    "Serving Size (oz)": "5.6 oz",
+    Calories: 690,
+    "Total Fat (g)": 40,
+    "Sodium (mg)": 890,
+    "Total Carb (g)": 57,
+    "Protein (g)": 26,
+    "Sugars (g)": 25,
+    "Dietary Fiber (g)": 4,
+  },
+  "Black Pepper Chicken": {
+    "Serving Size (oz)": "6.1 oz",
+    Calories: 250,
+    "Total Fat (g)": 14,
+    "Sodium (mg)": 930,
+    "Total Carb (g)": 12,
+    "Protein (g)": 19,
+    "Sugars (g)": 5,
+    "Dietary Fiber (g)": 2,
+  },
+  "Broccoli Beef": {
+    "Serving Size (oz)": "5.4 oz",
+    Calories: 130,
+    "Total Fat (g)": 4,
+    "Sodium (mg)": 710,
+    "Total Carb (g)": 13,
+    "Protein (g)": 10,
+    "Sugars (g)": 3,
+    "Dietary Fiber (g)": 3,
+  },
+  "Mushroom Chicken": {
+    "Serving Size (oz)": "5.9 oz",
+    Calories: 220,
+    "Total Fat (g)": 13,
+    "Sodium (mg)": 760,
+    "Total Carb (g)": 9,
+    "Protein (g)": 17,
+    "Sugars (g)": 4,
+    "Dietary Fiber (g)": 1,
+  },
+  "String Bean Chicken Breast": {
+    "Serving Size (oz)": "5.6 oz",
+    Calories: 170,
+    "Total Fat (g)": 7,
+    "Sodium (mg)": 740,
+    "Total Carb (g)": 13,
+    "Protein (g)": 15,
+    "Sugars (g)": 5,
+    "Dietary Fiber (g)": 2,
+  },
+  "SweetFire Chicken Breast": {
+    "Serving Size (oz)": "5.8 oz",
+    Calories: 440,
+    "Total Fat (g)": 18,
+    "Sodium (mg)": 370,
+    "Total Carb (g)": 53,
+    "Protein (g)": 17,
+    "Sugars (g)": 27,
+    "Dietary Fiber (g)": 1,
+  },
+  "Honey Sesame Chicken Breast": {
+    "Serving Size (oz)": "5.5 oz",
+    Calories: 380,
+    "Total Fat (g)": 17,
+    "Sodium (mg)": 320,
+    "Total Carb (g)": 40,
+    "Protein (g)": 15,
+    "Sugars (g)": 23,
+    "Dietary Fiber (g)": 1,
+  },
+  "Kung Pao Chicken": {
+    "Serving Size (oz)": "5.8 oz",
+    Calories: 280,
+    "Total Fat (g)": 18,
+    "Sodium (mg)": 800,
+    "Total Carb (g)": 12,
+    "Protein (g)": 18,
+    "Sugars (g)": 4,
+    "Dietary Fiber (g)": 2,
+  },
+  "Teriyaki Chicken": {
+    "Serving Size (oz)": "5.8 oz",
+    Calories: 300,
+    "Total Fat (g)": 16,
+    "Sodium (mg)": 740,
+    "Total Carb (g)": 8,
+    "Protein (g)": 34,
+    "Sugars (g)": 8,
+    "Dietary Fiber (g)": 0,
+  },
+  "Honey Walnut Shrimp": {
+    "Serving Size (oz)": "3.7 oz",
+    Calories: 370,
+    "Total Fat (g)": 23,
+    "Sodium (mg)": 470,
+    "Total Carb (g)": 27,
+    "Protein (g)": 14,
+    "Sugars (g)": 9,
+    "Dietary Fiber (g)": 2,
+  },
+};
 
 type MenuBoardItem = {
   name: string;
@@ -27,6 +186,43 @@ type MenuBoardItem = {
   description: string;
   calories: string;
   type: "entree" | "side";
+};
+
+type NutritionData = {
+  [key: string]: {
+    "Serving Size (oz)": string;
+    Calories: number;
+    "Total Fat (g)": number;
+    "Sodium (mg)": number;
+    "Total Carb (g)": number;
+    "Protein (g)": number;
+    "Sugars (g)": number;
+    "Dietary Fiber (g)": number;
+  };
+};
+
+const NutritionInfo = ({
+  nutritionData,
+  name,
+}: {
+  nutritionData: NutritionData;
+  name: string;
+}) => {
+  const data = nutritionData[name];
+  if (!data) return null;
+
+  return (
+    <div className="grid grid-cols-2 gap-2 p-4 text-sm bg-zinc-900 rounded-lg border border-white/20">
+      <div>Serving: {data["Serving Size (oz)"]}</div>
+      <div>Calories: {data.Calories}</div>
+      <div>Total Fat: {data["Total Fat (g)"]}g</div>
+      <div>Sodium: {data["Sodium (mg)"]}mg</div>
+      <div>Carbs: {data["Total Carb (g)"]}g</div>
+      <div>Protein: {data["Protein (g)"]}g</div>
+      <div>Sugar: {data["Sugars (g)"]}g</div>
+      <div>Fiber: {data["Dietary Fiber (g)"]}g</div>
+    </div>
+  );
 };
 
 const menuItemsData: MenuBoardItem[] = [
@@ -232,11 +428,107 @@ const sidesData: MenuBoardItem[] = [
   },
 ];
 
-const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
+const MenuItem = ({
+  item,
+  speaking,
+  onSpeak,
+  onItemClick,
+  isSelected,
+  nutritionData,
+}: {
+  item: MenuBoardItem;
+  speaking: string | null;
+  onSpeak: (text: string, itemName: string, e: React.MouseEvent) => void;
+  onItemClick: (name: string) => void;
+  isSelected: boolean;
+  nutritionData: NutritionData;
+}) => {
+  const itemNutrition = nutritionData[item.name as keyof NutritionData];
+
+  return (
+    <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
+      <Card
+        className={`border border-white bg-zinc-900 overflow-hidden shadow-lg transition-all cursor-pointer
+          ${
+            isSelected
+              ? "border-amber-500 scale-[1.02]"
+              : "hover:border-white/50 hover:scale-[1.01]"
+          }`}
+        onClick={() => onItemClick(item.name)}
+      >
+        <div className="relative aspect-[4/3] w-full">
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            className="object-contain p-4 z-0"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSpeak(
+                `${item.name}. ${item.description}. ${item.calories} calories.`,
+                item.name,
+                e
+              );
+            }}
+            className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors z-20"
+            aria-label={speaking === item.name ? "Stop speaking" : "Read aloud"}
+          >
+            {speaking === item.name ? (
+              <VolumeX className="w-5 h-5 text-amber-500" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-gray-400 hover:text-amber-500" />
+            )}
+          </button>
+        </div>
+        <CardHeader className="text-center">
+          <h3 className="text-xl font-frutiger font-bold text-white">
+            {item.name}
+          </h3>
+        </CardHeader>
+        <CardContent className="text-center">
+          <p className="text-gray-300 text-sm leading-relaxed">
+            {item.description}
+          </p>
+          {isSelected && itemNutrition && (
+            <div className="mt-4 p-4 bg-zinc-800 rounded-lg border border-white/20">
+              <h4 className="font-bold mb-2">Nutrition Facts</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>Serving: {itemNutrition["Serving Size (oz)"]}</div>
+                <div>Calories: {itemNutrition.Calories}</div>
+                <div>Total Fat: {itemNutrition["Total Fat (g)"]}g</div>
+                <div>Sodium: {itemNutrition["Sodium (mg)"]}mg</div>
+                <div>Carbs: {itemNutrition["Total Carb (g)"]}g</div>
+                <div>Protein: {itemNutrition["Protein (g)"]}g</div>
+                <div>Sugar: {itemNutrition["Sugars (g)"]}g</div>
+                <div>Fiber: {itemNutrition["Dietary Fiber (g)"]}g</div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-amber-500 font-medium">{item.calories} calories</p>
+        </CardFooter>
+      </Card>
+    </CarouselItem>
+  );
+};
+
+const MenuCarousel = ({
+  items,
+  nutritionData,
+}: {
+  items: MenuBoardItem[];
+  nutritionData: NutritionData;
+}) => {
   const [speaking, setSpeaking] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+
   const speak = (text: string, itemName: string, e: React.MouseEvent) => {
     e.stopPropagation();
-
     window.speechSynthesis.cancel();
 
     if (speaking === itemName) {
@@ -248,6 +540,11 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
     window.speechSynthesis.speak(utterance);
     setSpeaking(itemName);
   };
+
+  const handleItemClick = (name: string) => {
+    setSelectedItem(selectedItem === name ? null : name);
+  };
+
   useEffect(() => {
     return () => {
       window.speechSynthesis.cancel();
@@ -255,63 +552,18 @@ const MenuCarousel = ({ items }: { items: MenuBoardItem[] }) => {
   }, []);
 
   return (
-    <Carousel
-      opts={{
-        align: "start",
-        loop: true,
-      }}
-      className="w-full"
-    >
+    <Carousel opts={{ align: "start", loop: true }} className="w-full">
       <CarouselContent className="-ml-2 md:-ml-4">
         {items.map((item) => (
-          <CarouselItem key={item.name} className="pl-2 md:pl-4 md:basis-1/3">
-            <Card className="border border-white bg-zinc-900 overflow-hidden shadow-lg transition-all hover:border-transparent hover:scale-[1.02] hover:shadow-xl hover:z-10 h-full">
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-contain p-4 z-0"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
-                <button
-                  onClick={(e) =>
-                    speak(
-                      `${item.name}. ${item.description}. ${item.calories} calories.`,
-                      item.name,
-                      e
-                    )
-                  }
-                  className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors z-20"
-                  aria-label={
-                    speaking === item.name ? "Stop speaking" : "Read aloud"
-                  }
-                >
-                  {speaking === item.name ? (
-                    <VolumeX className="w-5 h-5 text-amber-500" />
-                  ) : (
-                    <Volume2 className="w-5 h-5 text-gray-400 hover:text-amber-500" />
-                  )}
-                </button>
-              </div>
-              <CardHeader className="text-center">
-                <h3 className="text-xl font-frutiger font-bold text-white">
-                  {item.name}
-                </h3>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {item.description}
-                </p>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <p className="text-amber-500 font-medium">
-                  {item.calories} calories
-                </p>
-              </CardFooter>
-            </Card>
-          </CarouselItem>
+          <MenuItem
+            key={item.name}
+            item={item}
+            speaking={speaking}
+            onSpeak={speak}
+            onItemClick={handleItemClick}
+            isSelected={selectedItem === item.name}
+            nutritionData={nutritionData}
+          />
         ))}
       </CarouselContent>
       <CarouselPrevious className="flex [&>svg]:inline [&>svg]:text-black" />
@@ -326,7 +578,6 @@ export default function MenuBoard() {
 
   useEffect(() => {
     setMounted(true);
-    // Clean up any ongoing speech when page unmounts
     return () => {
       window.speechSynthesis.cancel();
     };
@@ -408,6 +659,7 @@ export default function MenuBoard() {
           </h2>
           <MenuCarousel
             items={activeMenu === "entree" ? menuItemsData : sidesData}
+            nutritionData={nutritionData}
           />
         </div>
       </div>
