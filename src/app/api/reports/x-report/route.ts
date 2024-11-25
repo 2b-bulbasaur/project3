@@ -1,10 +1,38 @@
+/**
+ * @file route.ts
+ * @description API route handler for generating hourly transaction reports
+ */
+
 import { NextResponse } from 'next/server';
 import { getTransactions } from '@/lib/transactions';
 
+/**
+ * @typedef {Object.<string, number>} HourlyCount
+ * Record of hours mapped to their transaction counts
+ */
 type HourlyCount = {
   [key: string]: number;
 };
 
+/**
+ * Generates an hourly transaction report for the current day
+ * 
+ * @async
+ * @function POST
+ * @returns {Promise<NextResponse>} JSON response containing:
+ * - On success: Array of objects with hour and count
+ * - On error: Error object with message and 500 status
+ * 
+ * @example
+ * // Successful response format:
+ * [
+ *   { hour: "9:00", count: 5 },
+ *   { hour: "10:00", count: 3 },
+ *   ...
+ * ]
+ * 
+ * @throws {Error} When transaction fetching or processing fails
+ */
 export async function POST() {
   try {
     const now = new Date();
