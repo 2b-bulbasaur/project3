@@ -25,6 +25,17 @@ import {
 import { Input } from "@/components/ui/input";
 import type { MealInProgress, MenuItem, OrderItem, SizeEnum } from "@/types/";
 
+/**
+ * CashierPage component for handling the entire process of placing an order
+ * in a cashier system. It allows adding items to an order, building meals
+ * with specific sides and entrees, calculating prices, and submitting orders.
+ *
+ * @component
+ * @example
+ * return (
+ *   <CashierPage />
+ * )
+ */
 const CashierPage = () => {
   const router = useRouter();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -36,11 +47,19 @@ const CashierPage = () => {
   const [error, setError] = useState("");
   const [currentMeal, setCurrentMeal] = useState<MealInProgress | null>(null);
 
+  /**
+   * Handles the logout process by clearing the employee's name from local storage
+   * and redirecting the user to the login page.
+   */
   const handleLogout = () => {
     localStorage.removeItem("employeeName");
     router.push("/login");
   };
 
+  /**
+   * Fetches the menu items from the API and updates the state with the menu data.
+   * Also, loads the employee's name from local storage.
+   */
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
@@ -61,6 +80,12 @@ const CashierPage = () => {
     if (name) setEmployeeName(name);
   }, []);
 
+  /**
+   * Returns the meal constraints based on the size.
+   *
+   * @param {SizeEnum} size - The size of the meal (bowl, plate, bigger plate).
+   * @returns {Object} - An object containing maxSides and maxEntrees for the meal.
+   */
   const getMealConstraints = (size: SizeEnum) => {
     switch (size) {
       case "bowl":
@@ -74,12 +99,26 @@ const CashierPage = () => {
     }
   };
 
+  /**
+   * Gets the count of sides and entrees in the current meal.
+   *
+   * @param {MealInProgress} meal - The current meal being built.
+   * @returns {Object} - An object containing sideCount and entreeCount.
+   */
   const getCurrentMealCounts = (meal: MealInProgress) => {
     const sideCount = [meal.side1, meal.side2].filter(Boolean).length;
     const entreeCount = [meal.entree1, meal.entree2, meal.entree3].filter(Boolean).length;
     return { sideCount, entreeCount };
   };
 
+  /**
+   * Determines whether an item can be added to the current meal based on the
+   * meal's size constraints and the item's type (side or entree).
+   *
+   * @param {MealInProgress} meal - The current meal being built.
+   * @param {MenuItem} item - The menu item to check.
+   * @returns {boolean} - True if the item can be added, otherwise false.
+   */
   const canAddItemToMeal = (meal: MealInProgress, item: MenuItem) => {
     const constraints = meal.size ? getMealConstraints(meal.size) : { maxSides: 0, maxEntrees: 0 };
     const counts = getCurrentMealCounts(meal);
@@ -93,6 +132,11 @@ const CashierPage = () => {
     return false;
   };
 
+  /**
+   * Starts a new meal with the specified size.
+   *
+   * @param {SizeEnum} size - The size of the meal (bowl, plate, bigger plate).
+   */
   const startNewMeal = (size: SizeEnum) => {
     setCurrentMeal({
       id: Math.random().toString(36).slice(2, 11),
@@ -105,6 +149,12 @@ const CashierPage = () => {
     });
   };
 
+  /**
+   * Adds a menu item (side or entree) to the current meal if it's allowed
+   * based on the meal's constraints.
+   *
+   * @param {MenuItem} item - The item to add to the meal.
+   */
   const addToMeal = (item: MenuItem) => {
     if (!currentMeal) return;
 
@@ -136,6 +186,12 @@ const CashierPage = () => {
     });
   };
 
+  /**
+   * Checks whether the current meal is complete based on the size and item constraints.
+   *
+   * @param {MealInProgress} meal - The current meal being built.
+   * @returns {boolean} - True if the meal is complete, otherwise false.
+   */
   const isMealComplete = (meal: MealInProgress) => {
     const constraints = meal.size ? getMealConstraints(meal.size) : { maxSides: 0, maxEntrees: 0 };
     const counts = getCurrentMealCounts(meal);
@@ -143,12 +199,21 @@ const CashierPage = () => {
            counts.entreeCount === constraints.maxEntrees;
   };
 
+  /**
+   * Completes the current meal and adds it to the current order.
+   * Resets the current meal after completing.
+   */
   const completeMeal = () => {
     if (!currentMeal || !isMealComplete(currentMeal)) return;
     setCurrentOrder((prev) => [...prev, { type: "meal", meal: currentMeal }]);
     setCurrentMeal(null);
   };
 
+  /**
+   * Adds a simple item (appetizer or drink) to the order.
+   *
+   * @param {MenuItem} item - The item to add.
+   */
   const addSimpleItem = (item: MenuItem) => {
     if (item.item_type !== "appetizer" && item.item_type !== "drink") return;
 
@@ -182,6 +247,12 @@ const CashierPage = () => {
     });
   };
 
+  /**
+   * Calculates the price of a complete meal based on the size and any premium items added.
+   *
+   * @param {MealInProgress} meal - The completed meal.
+   * @returns {number} - The total price of the meal.
+   */
   const getMealPrice = (meal: MealInProgress) => {
     let basePrice = 0;
     if (meal.size === "bowl") basePrice = 8.99;
@@ -199,6 +270,12 @@ const CashierPage = () => {
     return basePrice + premiumAddons * 1.5;
   };
 
+  /**
+   * Calculates the total price of the current order.
+   * It considers both meals and individual items, adding their prices and quantities.
+   * 
+   * @returns {number} The total price of the current order.
+   */
   const getOrderTotal = () => {
     return currentOrder.reduce((total, orderItem) => {
       if (orderItem.type === "meal" && orderItem.meal) {
@@ -211,6 +288,12 @@ const CashierPage = () => {
     }, 0);
   };
 
+  /**
+   * Checks if a given item is already selected in the current meal.
+   * 
+   * @param {MenuItem} item - The item to check for selection.
+   * @returns {boolean} True if the item is selected in the current meal, otherwise false.
+   */
   const isItemSelected = (item: MenuItem) => {
     if (!currentMeal) return false;
     
@@ -227,6 +310,12 @@ const CashierPage = () => {
     return false;
   };
 
+  /**
+   * Removes a menu item (side or entree) from the current meal.
+   * If the item exists as side1, side2, entree1, entree2, or entree3, it will be removed from the meal.
+   * 
+   * @param {MenuItem} item - The item to remove from the current meal.
+   */
   const removeFromMeal = (item: MenuItem) => {
     if (!currentMeal) return;
 
@@ -248,6 +337,13 @@ const CashierPage = () => {
     });
   };
 
+  /**
+   * Handles a click on a menu item. If the item is a side or entree, it will either add or remove the item 
+   * from the current meal based on its current selection state. If the item is an appetizer or drink, 
+   * it will be added to the order as a simple item.
+   * 
+   * @param {MenuItem} item - The menu item that was clicked.
+   */
   const handleItemClick = (item: MenuItem) => {
     if (currentMeal && (item.item_type === "entree" || item.item_type === "side")) {
       if (isItemSelected(item)) {
@@ -260,10 +356,22 @@ const CashierPage = () => {
     }
   };
 
+  /**
+   * Removes an item from the current order based on its index.
+   * 
+   * @param {number} index - The index of the item to remove from the order.
+   */
   const removeOrderItem = (index: number) => {
     setCurrentOrder((prev) => prev.filter((_, i) => i !== index));
   };
 
+  /**
+   * Updates the quantity of an item in the current order. The `delta` value determines 
+   * whether the quantity is increased or decreased.
+   * 
+   * @param {number} index - The index of the order item to update.
+   * @param {number} delta - The amount to change the item's quantity by (positive or negative).
+   */
   const onUpdateQuantity = (index: number, delta: number) => {
     setCurrentOrder((prev) =>
       prev
@@ -285,12 +393,23 @@ const CashierPage = () => {
     );
   };
 
+  /**
+   * Clears the current order, current meal, and resets the customer name.
+   */
   const clearOrder = () => {
     setCurrentOrder([]);
     setCurrentMeal(null);
     setCustomerName("");
   };
 
+  /**
+   * Submits the current order by sending it to the API. The order data includes the 
+   * customer name, cashier name, total sale price, and other details of the order.
+   * 
+   * @async
+   * @function
+   * @returns {Promise<void>} Resolves when the order has been successfully submitted.
+   */
   const submitOrder = async () => {
     try {
       const orderData = {
@@ -330,6 +449,14 @@ const CashierPage = () => {
     }
   };
 
+  /**
+   * Renders the current meal builder UI if a meal is selected. 
+   * It retrieves the constraints for the current meal based on its size and calculates 
+   * the counts for the current meal's sides and entrees.
+   * 
+   * @returns {JSX.Element | null} A JSX element representing the meal builder UI, 
+   * or null if there is no current meal selected.
+   */
   const renderCurrentMealBuilder = () => {
     if (!currentMeal) return null;
 
