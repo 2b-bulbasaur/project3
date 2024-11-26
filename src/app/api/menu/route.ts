@@ -1,4 +1,8 @@
-// /app/api/menu/route.ts
+/**
+ * @fileoverview API routes for managing menu items in a restaurant application
+ * @module app/api/menu/route
+ */
+
 import { NextResponse } from 'next/server';
 import {
   getAllMenuItems,
@@ -8,7 +12,13 @@ import {
   deleteMenuItem,
 } from '@/lib/menu';
 
-// GET: gets all menu items or a specific one by ID
+/**
+ * Handles GET requests to fetch menu items
+ * @async
+ * @param {Request} request - The incoming HTTP request
+ * @returns {Promise<NextResponse>} JSON response containing menu items or error
+ * @throws {Error} When database operations fail
+ */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id'); // Optional: Fetch menu item by ID
@@ -33,7 +43,23 @@ export async function GET(request: Request) {
   }
 }
 
-// POST: adds a new menu item with ingredients
+/**
+ * Handles POST requests to create new menu items
+ * @async
+ * @param {Request} request - The incoming HTTP request
+ * @returns {Promise<NextResponse>} JSON response containing the created item or error
+ * @throws {Error} When validation fails or database operations fail
+ * 
+ * @example
+ * // Request body format
+ * {
+ *   "item_type": "main",
+ *   "name": "Pizza",
+ *   "price": 12.99,
+ *   "premium": false,
+ *   "ingredients": ["cheese", "tomato"]
+ * }
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -65,7 +91,22 @@ export async function POST(request: Request) {
   }
 }
 
-// PUT: updates an existing menu item with ingredients
+/**
+ * Handles PUT requests to update existing menu items
+ * @async
+ * @param {Request} request - The incoming HTTP request
+ * @returns {Promise<NextResponse>} JSON response containing the updated item or error
+ * @throws {Error} When validation fails or database operations fail
+ * 
+ * @example
+ * // Request body format
+ * {
+ *   "id": 1,
+ *   "name": "Updated Pizza",
+ *   "price": 14.99,
+ *   "ingredients": ["cheese", "tomato", "basil"]
+ * }
+ */
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
