@@ -250,11 +250,24 @@ const ManageInventory: React.FC = () => {
               ) : (
                 <div className="divide-y divide-border rounded-md border">
                   {inventory.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 hover:bg-secondary/10">
+                    <div 
+                      key={item.id} 
+                      className={`flex items-center justify-between p-3 ${
+                        item.reorder 
+                          ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' 
+                          : 'hover:bg-secondary/10'
+                      }`}
+                    >
                       <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.amount} {item.unit} • {item.reorder ? 'Reorder needed' : 'Stock OK'}
+                        <div className={`font-medium ${item.reorder ? 'text-red-700' : ''}`}>
+                          {item.name}
+                        </div>
+                        <div className={`text-sm ${item.reorder ? 'text-red-600' : 'text-muted-foreground'}`}>
+                          {item.amount} {item.unit} • {item.reorder ? (
+                            <span className="font-medium">Reorder needed</span>
+                          ) : (
+                            'Stock OK'
+                          )}
                         </div>
                       </div>
                       <div className="flex gap-2">
