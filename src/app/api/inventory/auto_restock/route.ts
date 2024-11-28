@@ -8,7 +8,6 @@ import { query } from '@/lib/db';
  */
 export async function POST() {
     try {
-        // Get items that need restocking
         const inventory = await getReorderInventory();
         
         if (!inventory || inventory.length === 0) {
