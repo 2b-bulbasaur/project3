@@ -138,7 +138,46 @@ const ManagerDashboard = () => {
     fetchReorderInventory();
   }, [showAlerts, hasMounted, showWeatherBoard]);
 
-   /**
+  /**
+   * Handles auto-restocking of inventory
+   * @returns {Promise<void>}
+   */
+  const handleAutoRestock = async () => {
+    try {
+      const response = await fetch('/api/inventory/auto_restock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        // Refetch the reorder inventory to update the UI
+        const reorderResponse = await fetch("/api/inventory/reorder_alert");
+        if (!reorderResponse.ok) {
+          throw new Error("Failed to fetch updated inventory status");
+        }
+        
+        const data = await reorderResponse.json();
+        setReorderInventory(data.map((item: { name: string }) => item.name));
+        setReorderItems(data.length > 0);
+        
+        // Clear any existing error
+        setError(null);
+      } else {
+        throw new Error(result.error || 'Restock operation failed');
+      }
+      
+    } catch (error) {
+      console.error('Error restocking inventory:', error);
+      setError(error instanceof Error ? error.message : 'Failed to auto-restock inventory');
+      setReorderItems(true);
+    }
+  };
+
+  /**
    * Toggles the inventory alert system.
    * @param {boolean} checked - New state of the alert toggle.
    */
@@ -215,9 +254,6 @@ const ManagerDashboard = () => {
     useEffect(() => {
       const fetchWeather = async (lat: number, lon: number) => {
         try {
-
-          
-
           // Get city name from coordinates
           const geoResponse = await axios.get(
             `https://api.openweathermap.org/geo/1.0/reverse`,
@@ -381,7 +417,7 @@ const ManagerDashboard = () => {
             </div>
             <div className="flex items-center space-x-6">
               <div className="flex flex-col space-y-2">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                   <Label htmlFor="show-alerts" className="text-sm">Show Inventory Alerts</Label>
                   <Switch
                     id="show-alerts"
@@ -391,9 +427,9 @@ const ManagerDashboard = () => {
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="show-alerts" className="text-sm">Show Weather Board</Label>
+                  <Label htmlFor="show-weather" className="text-sm">Show Weather Board</Label>
                   <Switch
-                    id="show-alerts"
+                    id="show-weather"
                     checked={showWeatherBoard}
                     disabled={!isInitialized}
                     onCheckedChange={handleWeatherAlertToggle}
@@ -471,6 +507,7 @@ const ManagerDashboard = () => {
         </CardContent>
       </Card>
 
+      {/* Reorder Inventory Dialog */}
       {reorderItems && (
         <Dialog open={reorderItems} onOpenChange={setReorderItems}>
           <DialogContent className="max-w-md w-full p-6 bg-white rounded-lg">
@@ -486,20 +523,27 @@ const ManagerDashboard = () => {
                 <li key={item}>{item}</li>
               ))}
             </ul>
-
             <div className="flex justify-end space-x-4">
               <DialogClose asChild>
                 <Button variant="outline">Close</Button>
               </DialogClose>
+              <Button onClick={() => window.location.href = "/manager/manage-inventory"}>
+                Go to Inventory
+              </Button>
               <DialogClose asChild>
-                <Button onClick={() => window.location.href = "/manager/manage-inventory"}>
-                  Go to Inventory
+                <Button 
+                  onClick={handleAutoRestock}
+                  variant="secondary"
+                >
+                  Auto Restock All
                 </Button>
               </DialogClose>
             </div>
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Weather Dialog */}
       {!isLoading && showWeatherDialog && <WeatherDialog />}
     </div>
   );
