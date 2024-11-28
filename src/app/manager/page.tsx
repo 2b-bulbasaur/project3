@@ -72,6 +72,8 @@ const ManagerDashboard = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -154,7 +156,6 @@ const ManagerDashboard = () => {
       const result = await response.json();
       
       if (response.ok) {
-        // Refetch the reorder inventory to update the UI
         const reorderResponse = await fetch("/api/inventory/reorder_alert");
         if (!reorderResponse.ok) {
           throw new Error("Failed to fetch updated inventory status");
@@ -164,8 +165,13 @@ const ManagerDashboard = () => {
         setReorderInventory(data.map((item: { name: string }) => item.name));
         setReorderItems(data.length > 0);
         
-        // Clear any existing error
         setError(null);
+        setSuccessMessage("Inventory has been successfully restocked!");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+        
+
       } else {
         throw new Error(result.error || 'Restock operation failed');
       }
@@ -458,6 +464,16 @@ const ManagerDashboard = () => {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {/* Success Alert */}
+      {successMessage && (
+        <Alert variant="default" className="mb-6 border-green-500 bg-green-50 text-green-700">
+          <AlertDescription>{successMessage}</AlertDescription>
+        </Alert>
+      )}
+
+
+      {/* Inventory Alert */}
 
       {/* Transactions Table */}
       <Card>
