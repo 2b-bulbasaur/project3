@@ -24,6 +24,16 @@ declare global {
   }
 }
 
+
+/**
+ * GoogleTranslate component to integrate Google Translate functionality into a webpage.
+ *
+ * This component initializes the Google Translate widget and allows users to translate
+ * the content of the webpage. The floating toolbar is hidden by default, and the translation
+ * UI is styled to fit seamlessly into the page.
+ *
+ * @returns {JSX.Element} A `div` element that serves as the container for the Google Translate UI.
+ */
 const GoogleTranslate = () => {
   const initialized = useRef(false);
 
