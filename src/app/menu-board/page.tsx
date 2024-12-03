@@ -257,24 +257,21 @@ const menuItemsData: MenuBoardItem[] = [
   {
     name: "Black Pepper Chicken",
     image: "/images/black-pepper-chicken.png",
-    description:
-      "Marinated chicken, celery and onions in a bold black pepper sauce.",
+    description: "Marinated chicken, celery and onions in a bold black pepper sauce.",
     calories: "280",
     type: "entree",
   },
   {
     name: "Black Pepper Sirloin Steak",
     image: "/images/black-pepper-sirloin-steak.png",
-    description:
-      "Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
+    description:"Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
     calories: "450",
     type: "entree",
   },
   {
     name: "Hot Ones Blazing Bourbon Chicken",
     image: "/images/hot-ones-blazing-bourbon-chicken.png",
-    description:
-      "Chicken breast pieces wok-fired in a signature bourbon sauce.",
+    description: "Chicken breast pieces wok-fired in a signature bourbon sauce.",
     calories: "460",
     type: "entree",
   },
@@ -288,8 +285,7 @@ const menuItemsData: MenuBoardItem[] = [
   {
     name: "Mushroom Chicken",
     image: "/images/mushroom-chicken.png",
-    description:
-      "Light and savory chicken with mushrooms, zucchini and carrots in a ginger soy sauce.",
+    description: "Light and savory chicken with mushrooms, zucchini and carrots in a ginger soy sauce.",
     calories: "220",
     type: "entree",
   },

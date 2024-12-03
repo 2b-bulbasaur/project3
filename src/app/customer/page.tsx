@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShoppingCart, XCircle, Home } from "lucide-react";
+import { ShoppingCart, XCircle, Home, ZoomOut, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -37,18 +37,18 @@ const CategorySection = ({
   category: ItemTypeEnum;
   onItemClick: (item: MenuItem) => void;
 }) => (
-  <ScrollArea className="h-[calc(100vh-15rem)]">
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+  <ScrollArea className="h-[calc(100vh-15rem)] dynamic-text">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 dynamic-text">
       {items
         .filter((item) => item.item_type === category)
         .map((item) => (
           <Button
             key={item.id}
             variant="outline"
-            className="h-auto relative flex flex-col items-center justify-center text-left p-4 hover:border-primary"
+            className="h-auto relative flex flex-col items-center justify-center text-left p-4 hover:border-primary dynamic-text"
             onClick={() => onItemClick(item)}
           >
-             <div className="flex flex-col items-center w-full gap-2">
+             <div className="flex flex-col items-center w-full gap-2 dynamic-text">
               <Image
                 src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                 alt={item.name}
@@ -57,8 +57,8 @@ const CategorySection = ({
                 className="w-full h-56 object-cover rounded-md"
               />
                         
-            <span className="font-medium text-lg">{item.name}</span>
-            <span className="text-sm text-muted-foreground mt-1">
+            <span className="font-medium text-lg dynamic-text">{item.name}</span>
+            <span className="text-sm text-muted-foreground mt-1 dynamic-text">
               ${Number(item.price).toFixed(2)}
             </span>
             {item.premium && (
@@ -94,6 +94,28 @@ const CustomerPage = () => {
   const goToHome = () => {
     router.push("/");
   };
+  const [textSize, setTextSize] = useState(16);
+
+  const increaseTextSize = () => {
+    setTextSize(prevSize => Math.min(prevSize + 3, 23)); // Maximum size of 32px
+  };
+
+  const decreaseTextSize = () => {
+    setTextSize(prevSize => Math.max(prevSize - 3, 12)); // Minimum size of 12px
+  };
+
+  useEffect(() => {
+    localStorage.setItem('textSize', textSize.toString());
+    document.documentElement.style.setProperty('--dynamic-text-size', `${textSize}px`);
+    document.documentElement.style.setProperty('--dynamic-button-text-size', `${textSize}px`);
+  }, [textSize]);
+
+  useEffect(() => {
+    const savedTextSize = localStorage.getItem('textSize');
+    if (savedTextSize) {
+      setTextSize(parseInt(savedTextSize, 10));
+    }
+  }, []);
 
   /**
    * Calculates the total price of the current order, considering meal size and premium items.
@@ -406,25 +428,43 @@ const CustomerPage = () => {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen dynamic-text">
         Loading...
       </div>
     );
   if (error)
     return (
-      <div className="flex items-center justify-center h-screen text-red-500">
+      <div className="flex items-center justify-center h-screen text-red-500 dynamic-text">
         {error}
       </div>
     );
 
   return (
-    <div className="h-screen flex">
+    
+    <div className="h-screen flex" style={{ fontSize: `${textSize}px`, '--dynamic-button-text-size': `${textSize}px` } as React.CSSProperties}>
       <div className="w-2/3 flex flex-col">
         <Card className="m-4 flex-grow">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Place Your Order</CardTitle>
+            <CardTitle className="dynamic-text">Place Your Order</CardTitle>
             <div className="flex gap-2">
-            
+
+            <Button 
+                variant="outline" 
+                onClick={decreaseTextSize} 
+                title="Decrease Text Size"
+                className="gap-2"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={increaseTextSize} 
+                title="Increase Text Size"
+                className="gap-2"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              
               <GoogleTranslate />
       
               <Button variant="outline" onClick={goToHome} className="gap-2">
@@ -445,13 +485,13 @@ const CustomerPage = () => {
             {!showMealBuilder ? (
               <Tabs defaultValue="meals" className="h-full">
                 <TabsList>
-                  <TabsTrigger value="meals">Create a Meal</TabsTrigger>
-                  <TabsTrigger value="appetizers">Appetizers</TabsTrigger>
-                  <TabsTrigger value="drinks">Drinks</TabsTrigger>
+                  <TabsTrigger className="dynamic-text" value="meals">Create a Meal</TabsTrigger>
+                  <TabsTrigger className="dynamic-text" value="appetizers">Appetizers</TabsTrigger>
+                  <TabsTrigger className="dynamic-text" value="drinks">Drinks</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="meals" className="h-full">
-                  <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="grid grid-cols-3 gap-4 mb-4 dynamic-text">
                     <Button onClick={() => startNewMeal("bowl")}>
                       Create bowl
                     </Button>
@@ -464,7 +504,7 @@ const CustomerPage = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="appetizers">
+                <TabsContent value="appetizers" className="dynamic-text">
                   <CategorySection
                     items={menuItems}
                     category="appetizer"
@@ -472,7 +512,7 @@ const CustomerPage = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="drinks">
+                <TabsContent value="drinks" className="dynamic-text">
                   <CategorySection
                     items={menuItems}
                     category="drink"
@@ -512,17 +552,17 @@ const CustomerPage = () => {
             />
 
             <div className="mt-4">
-              <Label htmlFor="promoCode">Promo Code</Label>
+              <Label className="dynamic-text" htmlFor="promoCode">Promo Code</Label>
               <Input
                 id="promoCode"
                 placeholder="Enter promo code"
                 value={promoCode}
                 onChange={handlePromoChange}
-                className = "mt-2"
+                className="dynamic-text"
               />
               <Button
                 onClick={validatePromoCode}
-                className="mt-2"
+                className="mt-2 dynamic-text"
               >
                 Apply Promo
               </Button>

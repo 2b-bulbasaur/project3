@@ -157,12 +157,12 @@ export const MealBuilder = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">{getMealDescription()}</h2>
+        <h2 className="text-lg font-semibold dynamic-text">{getMealDescription()}</h2>
         <Button 
           variant="destructive" 
           size="sm"
           onClick={onCancel}
-          className="gap-2"
+          className="gap-2 dynamic-text"
         >
           <XCircle className="h-4 w-4" />
           Cancel Meal
@@ -173,7 +173,7 @@ export const MealBuilder = ({
         <Progress value={getProgress()} className="w-full" />
         {getRequiredItems().length > 0 && (
           <Alert>
-            <AlertDescription>
+            <AlertDescription className="dynamic-text">
               Please select your {getRequiredItems().join(', ')}
             </AlertDescription>
           </Alert>
@@ -194,11 +194,11 @@ export const MealBuilder = ({
                       variant={meal.side1?.id === item.id || meal.side2?.id === item.id 
                         ? "default" 
                         : "outline"}
-                      className="w-full justify-start h-auto py-2"
+                      className="w-full justify-start h-auto py-2 dynamic-text"
                       onClick={() => onUpdateMeal(item)}
                       disabled={isSideDisabled(item)}
                     >
-                      <div className="flex flex-col items-center w-full gap-2">
+                      <div className="flex flex-col items-center w-full gap-2 dynamic-text">
                         <Image
                           src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                           alt={item.name}
@@ -224,7 +224,7 @@ export const MealBuilder = ({
           <CardContent className="p-4">
             <h3 className="font-medium mb-2">Entrées</h3>
             <ScrollArea className="h-[550px]">
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-2 dynamic-text">
                 {menuItems
                   .filter(item => item.item_type === 'entree')
                   .map(item => (
@@ -237,7 +237,7 @@ export const MealBuilder = ({
                           ? "default" 
                           : "outline"
                       }
-                      className="w-full justify-start h-auto py-2"
+                      className="w-full justify-start h-auto py-2 dynamic-text"
                       onClick={() => onUpdateMeal(item)}
                       disabled={isEntreeDisabled(item)}
                     >
