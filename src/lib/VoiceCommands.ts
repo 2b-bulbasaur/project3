@@ -17,55 +17,210 @@ type CommandPattern = {
   example: string;
 };
 
-// Enhanced menu items with common variations and alternate names
+const DEBUG = true;
+
+const log = {
+  debug: (...args: any[]) => {
+    if (DEBUG) console.log('%c[VoiceCommand]', 'color: #4CAF50', ...args);
+  },
+  error: (...args: any[]) => {
+    if (DEBUG) console.error('%c[VoiceCommand Error]', 'color: #f44336', ...args);
+  },
+  info: (...args: any[]) => {
+    if (DEBUG) console.info('%c[VoiceCommand Info]', 'color: #2196F3', ...args);
+  }
+};
+
 const COMMON_MENU_ITEMS = {
   entrees: [
-    { name: 'original orange chicken', variations: ['orange', 'orange express'] },
-    { name: 'beijing beef', variations: ['beijing'] },
-    { name: 'broccoli beef', variations: ['beef broccoli', 'beef and broccoli'] },
-    { name: 'kung pao chicken', variations: ['kung pao'] },
-    { name: 'mushroom chicken', variations: ['chicken mushroom'] },
-    { name: 'black pepper chicken', variations: ['pepper chicken'] },
-    { name: 'string bean chicken breast', variations: ['string bean chicken', 'green bean chicken'] },
-    { name: 'sweetfire chicken breast', variations: ['sweetfire chicken', 'sweet fire'] },
-    { name: 'grilled teriyaki chicken', variations: ['teriyaki chicken', 'teriyaki'] },
-    { name: 'honey walnut shrimp', variations: ['walnut shrimp', 'honey shrimp'] },
-    {name: 'hot ones blazing bourbon chicken', variations: ['hot ones chicken']},
-    {name: 'black pepper sirloin steak', variations: ['black pepper steak']},
-    {name: 'honey walnut shrimp', variations: ['honey shrimp', 'shrimp']},
-    {name: 'honey sesame chicken', variations: ['sesame chicken']},
-    {name: 'mushroom chicken', variations: ['mushroom chicken']},
-    {name: 'sweetfire chicken breast', variations: ['sweetfire chicken']},
-    {name: 'string bean chicken', variations: [' bean chicken']},
-  
-    
-
+    { 
+      name: 'The Original Orange Chicken',
+      variations: ['orange chicken', 'orange', 'orange express', 'original orange']
+    },
+    { 
+      name: 'Hot Ones Blazing Bourbon Chicken',
+      variations: ['hot ones chicken', 'bourbon chicken', 'blazing chicken', 'hot ones']
+    },
+    { 
+      name: 'Black Pepper Sirloin Steak',
+      variations: ['sirloin steak', 'pepper steak', 'black pepper steak']
+    },
+    { 
+      name: 'Honey Walnut Shrimp',
+      variations: ['walnut shrimp', 'honey shrimp']
+    },
+    { 
+      name: 'Grilled Teriyaki Chicken',
+      variations: ['teriyaki chicken', 'teriyaki']
+    },
+    { 
+      name: 'Broccoli Beef',
+      variations: ['beef broccoli', 'beef and broccoli']
+    },
+    { 
+      name: 'Kung Pao Chicken',
+      variations: ['kung pao']
+    },
+    { 
+      name: 'Honey Sesame Chicken Breast',
+      variations: ['sesame chicken', 'honey sesame']
+    },
+    { 
+      name: 'Beijing Beef',
+      variations: ['beijing']
+    },
+    { 
+      name: 'Mushroom Chicken',
+      variations: ['chicken mushroom']
+    },
+    { 
+      name: 'SweetFire Chicken Breast',
+      variations: ['sweetfire chicken', 'sweet fire']
+    },
+    { 
+      name: 'String Bean Chicken Breast',
+      variations: ['string bean chicken', 'green bean chicken', 'bean chicken']
+    },
+    { 
+      name: 'Black Pepper Chicken',
+      variations: ['pepper chicken']
+    },
+    {
+      name: 'super chicken chicken',
+      variations: ['super chicken']
+    }
   ],
   sides: [
-    { name: 'chow mein', variations: ['noodles', 'lo mein', 'chinese noodles'] },
-    { name: 'fried rice', variations: ['rice'] },
-    { name: 'white rice', variations: ['steamed rice', 'plain rice'] },
-    { name: 'brown rice', variations: ['whole grain rice'] },
-    { name: 'super greens', variations: ['mixed veggies', 'vegetables', 'greens', 'broccoli'] }
+    { 
+      name: 'Super Greens',
+      variations: ['mixed veggies', 'vegetables', 'greens', 'broccoli']
+    },
+    { 
+      name: 'Chow Mein',
+      variations: ['noodles', 'lo mein', 'chinese noodles']
+    },
+    { 
+      name: 'Fried Rice',
+      variations: ['rice']
+    },
+    { 
+      name: 'White Rice',
+      variations: ['steamed rice', 'plain rice']
+    }
   ],
   appetizers: [
-    { name: 'chicken egg roll', variations: ['egg roll'] },
-    { name: 'veggie spring roll', variations: ['spring roll', 'vegetable roll'] },
-    { name: 'apple pie roll', variations: ['apple roll', 'dessert roll'] },
-    { name: 'cream cheese rangoon', variations: ['rangoon', 'crab rangoon', 'cheese rangoon'] }
+    { 
+      name: 'Chicken Egg Roll',
+      variations: ['egg roll']
+    },
+    { 
+      name: 'Veggie Spring Roll',
+      variations: ['spring roll', 'vegetable roll']
+    },
+    { 
+      name: 'Cream Cheese Rangoon',
+      variations: ['rangoon', 'crab rangoon', 'cheese rangoon']
+    },
+    { 
+      name: 'Apple Pie Roll',
+      variations: ['apple roll', 'dessert roll']
+    }
   ],
   drinks: [
-    { name: 'Dr. Pepper', variations: ['doctor pepper', 'dr pepper'] },
-    { name: 'Coca Cola', variations: ['coke', 'cola'] },
-    { name: 'Diet Coke', variations: ['diet cola'] },
-    { name: 'Sprite', variations: ['lemon lime soda'] },
-    { name: 'Fanta Orange', variations: ['orange soda', 'fanta'] },
-    { name: 'Minute Maid Lemonade', variations: ['lemonade'] },
-    { name: 'Dasani Water', variations: ['water', 'dasani'] },
-    { name: 'Mango Guava Flavored Tea', variations: ['mango tea', 'guava tea'] },
-    { name: 'Peach Lychee Flavored Tea', variations: ['peach tea', 'lychee tea'] },
-    { name: 'Pineapple Flavored Tea', variations: ['pineapple tea'] },
-    { name: 'Watermelon Mango Flavored Tea', variations: ['watermelon tea'] }
+    { 
+      name: 'Dr Pepper',
+      variations: ['doctor pepper', 'pepper']
+    },
+    { 
+      name: 'Coca Cola',
+      variations: ['coke', 'cola']
+    },
+    { 
+      name: 'Diet Coke',
+      variations: ['diet cola']
+    },
+    { 
+      name: 'Mango Guava Flavored Tea',
+      variations: ['mango tea', 'guava tea']
+    },
+    { 
+      name: 'Peach Lychee Flavored Refresher',
+      variations: ['peach refresher', 'lychee refresher']
+    },
+    { 
+      name: 'Pomegranate Pineapple Flavored Lemonade',
+      variations: ['pomegranate lemonade', 'pineapple lemonade']
+    },
+    { 
+      name: 'Watermelon Mango Flavored Refresher',
+      variations: ['watermelon refresher', 'mango refresher']
+    },
+    { 
+      name: 'Fanta Orange',
+      variations: ['orange soda', 'fanta']
+    },
+    { 
+      name: 'Minute Maid Lemonade',
+      variations: ['lemonade']
+    },
+    { 
+      name: 'Powerade Mountain Berry Blast',
+      variations: ['mountain berry', 'powerade berry']
+    },
+    { 
+      name: 'Sprite',
+      variations: ['lemon lime soda']
+    },
+    { 
+      name: 'Coca Cola Cherry',
+      variations: ['cherry coke']
+    },
+    { 
+      name: 'Fuze Raspberry Iced Tea',
+      variations: ['raspberry tea', 'fuze tea']
+    },
+    { 
+      name: 'Powerade Fruit Punch',
+      variations: ['fruit punch']
+    },
+    { 
+      name: 'Dasani',
+      variations: ['water', 'dasani water']
+    },
+    { 
+      name: 'Minute Maid Apple Juice',
+      variations: ['apple juice']
+    },
+    { 
+      name: 'Coke Mexico',
+      variations: ['mexican coke']
+    },
+    { 
+      name: 'Coke Zero',
+      variations: ['zero coke']
+    },
+    { 
+      name: 'Smartwater',
+      variations: ['smart water']
+    },
+    { 
+      name: 'Boba',
+      variations: ['bubble tea', 'boba tea']
+    }
+  ],
+  other: [
+    {
+      name: 'Strawberry Ice Cream',
+      variations: ['strawberry']
+    },
+    {
+      name: 'Chocolate Ice Cream',
+      variations: ['chocolate']
+    },
+    {
+      name: 'A La Carte Fortune Cookie',
+      variations: ['fortune cookie']
+    }
   ]
 } as const;
 
@@ -75,6 +230,7 @@ export function extractCommand(transcript: string): string {
     'bowl', 'plate', 'bigger plate', 'remove', 'delete', 'promo'
   ];
 
+  log.debug('Extracting command from:', transcript);
   const words = transcript.toLowerCase().split(' ');
   const commandStart = words.findIndex(word => {
     if (word === 'and') return false;
@@ -82,10 +238,13 @@ export function extractCommand(transcript: string): string {
            keywords.some(keyword => word.includes(keyword));
   });
   
-  if (commandStart === -1) return '';
+  if (commandStart === -1) {
+    log.debug('No command keywords found');
+    return '';
+  }
   
   const command = words.slice(commandStart).join(' ');
-  console.log('Extracted command:', command);
+  log.debug('Extracted command:', command);
   return command;
 }
 
@@ -102,6 +261,7 @@ export class VoiceCommandHandler {
     this.handlers = handlers;
     this.currentMeal = currentMeal;
     this.initializeCommandPatterns();
+    log.info('VoiceCommandHandler initialized with', menuItems.length, 'menu items');
   }
 
   private initializeCommandPatterns() {
@@ -110,7 +270,7 @@ export class VoiceCommandHandler {
         pattern: /^(create|start|make|begin|give me)(?:\s+a)?(?:\s+new)?\s+(bowl|plate|bigger plate)$/i,
         action: (matches) => {
           const size = matches[2] as "bowl" | "plate" | "bigger plate";
-          console.log('Starting new meal:', size);
+          log.debug('Starting new meal:', size);
           this.handlers.startNewMeal(size);
         },
         example: "create bowl" 
@@ -118,7 +278,7 @@ export class VoiceCommandHandler {
       {
         pattern: /^add\s+(?:some\s+|a\s+|an\s+)?(.+?)(?:\s+and\s+(?:some\s+|a\s+|an\s+)?(.+))?$/i,
         action: (matches) => {
-          console.log('Add command matches:', matches);
+          log.debug('Add command matches:', matches);
           const firstItem = matches[1].trim();
           this.handleAddItem(firstItem);
 
@@ -132,7 +292,7 @@ export class VoiceCommandHandler {
       {
         pattern: /^(complete|finish|done with|end)\s+(?:the\s+)?meal$/i,
         action: () => {
-          console.log('Completing meal');
+          log.debug('Completing meal');
           this.handlers.completeMeal();
         },
         example: "complete meal"
@@ -140,7 +300,7 @@ export class VoiceCommandHandler {
       {
         pattern: /^(cancel|stop|remove|delete)\s+(?:the\s+)?meal$/i,
         action: () => {
-          console.log('Canceling meal');
+          log.debug('Canceling meal');
           this.handlers.cancelMeal();
         },
         example: "cancel meal"
@@ -148,7 +308,7 @@ export class VoiceCommandHandler {
       {
         pattern: /^(checkout|check\s*out|pay|finish order|complete order)$/i,
         action: () => {
-          console.log('Initiating checkout');
+          log.debug('Initiating checkout');
           this.handlers.handleCheckout();
         },
         example: "checkout"
@@ -159,123 +319,133 @@ export class VoiceCommandHandler {
         example: "promo code PANDA20"
       }
     ];
+    log.info('Command patterns initialized');
   }
 
   private handleAddItem(itemName: string) {
-    console.log('Attempting to add item:', itemName);
+    log.debug('=== Attempting to add item ===');
+    log.debug('Item name:', itemName);
     const menuItem = this.findMenuItem(itemName);
     
     if (!menuItem) {
-      console.error('Menu item not found:', itemName);
+      log.error('Menu item not found:', itemName);
       throw new Error(`Sorry, I couldn't find "${itemName}" in the menu. Try saying the exact item name.`);
     }
 
-    console.log('Found menu item:', menuItem);
+    log.info('Found menu item:', menuItem.name);
     
     if (this.currentMeal) {
-      console.log('Adding to current meal:', menuItem.name);
+      log.debug('Adding to current meal:', menuItem.name);
       this.handlers.handleMealUpdate(menuItem);
     } else {
-      console.log('Adding as simple item:', menuItem.name);
+      log.debug('Adding as simple item:', menuItem.name);
       this.handlers.addSimpleItem(menuItem);
     }
   }
 
   private findMenuItem(itemName: string): MenuItem | undefined {
-    console.log('Searching for menu item:', itemName);
-    const normalizedSearchName = itemName.toLowerCase().trim();
+    log.debug('=== Starting item search ===');
+    log.debug('Looking for:', itemName);
     
-    // First try exact match
-    const exactMatch = this.menuItems.find(
-      item => item.name.toLowerCase() === normalizedSearchName
-    );
+    const normalizeString = (str: string) => 
+      str.toLowerCase()
+         .replace(/[^\w\s]/g, '') // Remove special characters
+         .replace(/\s+/g, ' ')    // Normalize spaces
+         .trim();
+
+    const normalizedSearchName = normalizeString(itemName);
+    
+    const exactMatch = this.menuItems.find(item => {
+      const isMatch = normalizeString(item.name) === normalizedSearchName;
+      log.debug('Checking exact match:', item.name, isMatch ? '✓' : '✗');
+      return isMatch;
+    });
+    
     if (exactMatch) {
-      console.log('Found exact match:', exactMatch.name);
+      log.info('Found exact match:', exactMatch.name);
       return exactMatch;
     }
 
-    // Handle common variations and partial matches
     for (const category of Object.values(COMMON_MENU_ITEMS)) {
-      for (const item of category) {
-        const variations = Array.isArray(item) ? [item] : 
-                         typeof item === 'string' ? [item] :
-                         [item.name, ...(item.variations || [])];
+      for (const menuItem of category) {
+        log.debug('Checking variations for:', menuItem.name);
         
-        for (const variation of variations) {
-          const variationText = typeof variation === 'string' ? variation : variation.name;
-          if (variationText.toLowerCase() === normalizedSearchName) {
-            const match = this.menuItems.find(
-              menuItem => menuItem.name.toLowerCase() === 
-                (typeof item === 'string' ? item : item.name).toLowerCase()
-            );
-            if (match) {
-              console.log('Found match through variation:', match.name);
-              return match;
+        const databaseItem = this.menuItems.find(
+          item => normalizeString(item.name) === normalizeString(menuItem.name)
+        );
+        
+        if (databaseItem) {
+          const allNames = [menuItem.name, ...menuItem.variations].map(normalizeString);
+          for (const name of allNames) {
+            const isMatch = name === normalizedSearchName;
+            log.debug('Checking variation:', name, isMatch ? '✓' : '✗');
+            if (isMatch) {
+              log.info('Found match through variation:', databaseItem.name);
+              return databaseItem;
             }
           }
         }
       }
     }
 
-    // Try partial matches as a last resort
-    const partialMatch = this.menuItems.find(item =>
-      item.name.toLowerCase().includes(normalizedSearchName) ||
-      normalizedSearchName.includes(item.name.toLowerCase())
-    );
+    log.debug('Trying partial matches');
+    const partialMatch = this.menuItems.find(item => {
+      const normalizedItem = normalizeString(item.name);
+      const isMatch = normalizedItem.includes(normalizedSearchName) ||
+                     normalizedSearchName.includes(normalizedItem);
+      log.debug('Checking partial match:', item.name, isMatch ? '✓' : '✗');
+      return isMatch;
+    });
 
     if (partialMatch) {
-      console.log('Found partial match:', partialMatch.name);
+      log.info('Found partial match:', partialMatch.name);
       return partialMatch;
     }
 
-    console.log('No menu item found for:', itemName);
+    log.error('No matches found for:', itemName);
     return undefined;
   }
 
   handleCommand(command: string) {
-    console.log('Received raw command:', command);
+    log.debug('Received raw command:', command);
     const normalizedCommand = command.toLowerCase().trim();
-    console.log('Normalized command:', normalizedCommand);
+    log.debug('Normalized command:', normalizedCommand);
     this.addToHistory(normalizedCommand);
 
-    // Try to match command against patterns
     for (const { pattern, action } of this.commandPatterns) {
       const matches = normalizedCommand.match(pattern);
-      console.log('Testing pattern:', pattern);
+      log.debug('Testing pattern:', pattern);
       if (matches) {
-        console.log('Matched pattern:', pattern);
-        console.log('Matches:', matches);
+        log.info('Matched pattern:', pattern, 'Matches:', matches);
         try {
           action(matches);
           return;
         } catch (error) {
-          console.error(`Error executing command "${command}":`, error);
+          log.error(`Error executing command "${command}":`, error);
           throw new Error(error instanceof Error ? error.message : 'Unrecognized command');
         }
       }
     }
 
-    // Handle compound commands with "and"
     if (normalizedCommand.includes(' and ')) {
       const items = normalizedCommand.split(' and ').map(item => item.trim());
-      console.log('Split items:', items);
+      log.debug('Split items:', items);
       
       if (items[0].startsWith('add')) {
         try {
           items.forEach(item => {
             const cleanItem = item.replace(/^add\s+/, '').trim();
-            console.log('Processing item:', cleanItem);
+            log.debug('Processing item:', cleanItem);
             this.handleAddItem(cleanItem);
           });
           return;
         } catch (error) {
-          console.error('Error processing multiple items:', error);
+          log.error('Error processing multiple items:', error);
           throw error;
         }
       }
     }
 
-    // Provide helpful feedback for unrecognized commands
     if (normalizedCommand.includes('add')) {
       throw new Error('Item not found. Try saying the complete item name, for example "add orange chicken"');
     }
@@ -288,6 +458,7 @@ export class VoiceCommandHandler {
     if (this.commandHistory.length > this.MAX_HISTORY) {
       this.commandHistory.pop();
     }
+    log.debug('Command added to history. Current history:', this.commandHistory);
   }
 
   getLastCommand(): string | undefined {

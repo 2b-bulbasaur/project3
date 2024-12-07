@@ -424,6 +424,7 @@ const CustomerPage = () => {
 
     router.push("/customer/checkout");
   };
+
   const handleVoiceCommand = useCallback((transcript: string) => {
     const command = extractCommand(transcript);
     if (!command) return;
@@ -436,10 +437,22 @@ const CustomerPage = () => {
         handleMealUpdate,
         completeMeal,
         cancelMeal,
-        handleCheckout,
+        handleCheckout: () => {
+          if (currentOrder.length === 0) {
+            setError("Please add items to your order before checking out");
+            return;
+          }
+
+          localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
+          localStorage.setItem("orderTotal", discountedTotal.toString());
+          localStorage.setItem("originalTotal", orderTotal.toString());
+          localStorage.setItem("promoCode", isPromoValid ? promoCode : "");
+
+          router.push("/customer/checkout");
+        },
         validatePromoCode
       },
-      currentMeal
+      currentMeal,
     );
   
     try {
@@ -451,7 +464,7 @@ const CustomerPage = () => {
       setTimeout(() => setCommandFeedback(null), 3000);
     } catch (error) {
       setCommandFeedback({
-        message: "Sorry, I didn't understand that command.",
+        message: error instanceof Error ? error.message : "Command failed",
         isError: true
       });
       setTimeout(() => setCommandFeedback(null), 3000);
@@ -459,12 +472,17 @@ const CustomerPage = () => {
   }, [
     menuItems,
     currentMeal,
+    currentOrder,
+    router,
     startNewMeal,
     addSimpleItem,
     handleMealUpdate,
     completeMeal,
     cancelMeal,
-    handleCheckout
+    discountedTotal,
+    orderTotal,
+    isPromoValid,
+    promoCode
   ]);
 
   if (loading)

@@ -11,7 +11,7 @@ type VoiceControlProps = {
   setIsListening: (listening: boolean) => void;
 };
 
-const DEBUG = true; // Enable detailed console logging
+const DEBUG = true; 
 
 const VoiceControl = ({ onCommand, isListening, setIsListening }: VoiceControlProps) => {
   const [speechSupported, setSpeechSupported] = useState(true);
@@ -35,7 +35,6 @@ const VoiceControl = ({ onCommand, isListening, setIsListening }: VoiceControlPr
     }
   };
 
-  // Available commands help text
   const availableCommands = [
     "create bowl",
     "create plate",
