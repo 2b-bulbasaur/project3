@@ -18,6 +18,11 @@ import type { OrderItem, MealInProgress } from "@/types/api.types";
 
 import GoogleTranslate from "@/components/Translation";
 
+
+import VoiceControl from "@/components/VoiceControl";
+import { VoiceCommandHandler, extractCommand } from '@/lib/VoiceCommands';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Mic, MicOff, AlertTriangle } from 'lucide-react';
 /**
  * CategorySection component renders a list of menu items categorized by type (e.g., appetizer, drink).
  *
@@ -91,6 +96,9 @@ const CustomerPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showMealBuilder, setShowMealBuilder] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [commandFeedback, setCommandFeedback] = useState<{message: string, isError: boolean} | null>(null);
+  
   const goToHome = () => {
     router.push("/");
   };
@@ -404,6 +412,7 @@ const CustomerPage = () => {
       return updatedOrder;
     });
   };
+  
 
   /**
    * Handles the checkout process. It ensures that the order has at least one item, 
@@ -425,6 +434,47 @@ const CustomerPage = () => {
 
     router.push("/customer/checkout");
   };
+  const handleVoiceCommand = useCallback((transcript: string) => {
+    const command = extractCommand(transcript);
+    if (!command) return;
+  
+    const commandHandler = new VoiceCommandHandler(
+      menuItems,
+      {
+        startNewMeal,
+        addSimpleItem,
+        handleMealUpdate,
+        completeMeal,
+        cancelMeal,
+        handleCheckout
+      },
+      currentMeal
+    );
+  
+    try {
+      commandHandler.handleCommand(command);
+      setCommandFeedback({
+        message: `Command executed: "${command}"`,
+        isError: false
+      });
+      setTimeout(() => setCommandFeedback(null), 3000);
+    } catch (error) {
+      setCommandFeedback({
+        message: "Sorry, I didn't understand that command.",
+        isError: true
+      });
+      setTimeout(() => setCommandFeedback(null), 3000);
+    }
+  }, [
+    menuItems,
+    currentMeal,
+    startNewMeal,
+    addSimpleItem,
+    handleMealUpdate,
+    completeMeal,
+    cancelMeal,
+    handleCheckout
+  ]);
 
   if (loading)
     return (
@@ -439,6 +489,7 @@ const CustomerPage = () => {
       </div>
     );
 
+
   return (
     
     <div className="h-screen flex" style={{ fontSize: `${textSize}px`, '--dynamic-button-text-size': `${textSize}px` } as React.CSSProperties}>
@@ -447,6 +498,11 @@ const CustomerPage = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="dynamic-text">Place Your Order</CardTitle>
             <div className="flex gap-2">
+            <VoiceControl
+            onCommand={handleVoiceCommand}
+            isListening={isListening}
+            setIsListening={setIsListening}
+          />
 
             <Button 
                 variant="outline" 
