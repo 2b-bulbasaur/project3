@@ -294,17 +294,7 @@ const CustomerPage = () => {
       );
 
       if (existingIndex >= 0) {
-        return prev.map((orderItem, index) =>
-          index === existingIndex && orderItem.item
-            ? {
-                ...orderItem,
-                item: {
-                  ...orderItem.item,
-                  quantity: (orderItem.item.quantity || 1) + 1,
-                },
-              }
-            : orderItem
-        );
+        return prev; 
       }
 
       const newOrderItem: OrderItem = {
@@ -446,7 +436,8 @@ const CustomerPage = () => {
         handleMealUpdate,
         completeMeal,
         cancelMeal,
-        handleCheckout
+        handleCheckout,
+        validatePromoCode
       },
       currentMeal
     );
