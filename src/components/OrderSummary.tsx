@@ -106,7 +106,7 @@ export const OrderSummary = ({
 
       <div className="border-t p-4 space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-lg font-medium">Total</span>
+          <span className="text-lg font-medium dynamic-text">Total</span>
           <span className="text-2xl font-bold">${formatPrice(total)}</span>
         </div>
         <Button 

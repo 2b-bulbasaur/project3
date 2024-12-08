@@ -43,12 +43,22 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { set } from "date-fns";
 
+/**
+ * @typedef {Object} TransactionWithSummary
+ * @extends Transaction
+ * @property {string} order_summary - Summary of the transaction order.
+ */
 interface TransactionWithSummary extends Transaction {
   order_summary: string;
 }
 
+/**
+ * ManagerDashboard Component
+ * Displays a dashboard for the manager, including transaction data, inventory alerts, and weather updates.
+ *
+ * @returns {JSX.Element} The rendered ManagerDashboard component.
+ */
 const ManagerDashboard = () => {
   const [transactions, setTransactions] = useState<TransactionWithSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +72,8 @@ const ManagerDashboard = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -79,6 +91,10 @@ const ManagerDashboard = () => {
   useEffect(() => {
     if (!hasMounted) return;
 
+    /**
+     * Fetch transaction data.
+     * Includes order summaries.
+     */
     const fetchTransactions = async () => {
       try {
         const response = await fetch("/api/transactions?summary=true");
@@ -96,6 +112,9 @@ const ManagerDashboard = () => {
       }
     };
     
+    /**
+     * Fetch reorder inventory alerts.
+     */
     const fetchReorderInventory = async () => {
       try {
         if (!showAlerts) {
@@ -119,8 +138,55 @@ const ManagerDashboard = () => {
 
     fetchTransactions();
     fetchReorderInventory();
-  }, [showAlerts, hasMounted]);
+  }, [showAlerts, hasMounted, showWeatherBoard]);
 
+  /**
+   * Handles auto-restocking of inventory
+   * @returns {Promise<void>}
+   */
+  const handleAutoRestock = async () => {
+    try {
+      const response = await fetch('/api/inventory/auto_restock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        const reorderResponse = await fetch("/api/inventory/reorder_alert");
+        if (!reorderResponse.ok) {
+          throw new Error("Failed to fetch updated inventory status");
+        }
+        
+        const data = await reorderResponse.json();
+        setReorderInventory(data.map((item: { name: string }) => item.name));
+        setReorderItems(data.length > 0);
+        
+        setError(null);
+        setSuccessMessage("Inventory has been successfully restocked!");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+        
+
+      } else {
+        throw new Error(result.error || 'Restock operation failed');
+      }
+      
+    } catch (error) {
+      console.error('Error restocking inventory:', error);
+      setError(error instanceof Error ? error.message : 'Failed to auto-restock inventory');
+      setReorderItems(true);
+    }
+  };
+
+  /**
+   * Toggles the inventory alert system.
+   * @param {boolean} checked - New state of the alert toggle.
+   */
   const handleAlertToggle = (checked: boolean) => {
     if (typeof window !== 'undefined') {
       setShowAlerts(checked);
@@ -132,6 +198,10 @@ const ManagerDashboard = () => {
     }
   };
 
+  /**
+   * Toggles the weather alert system.
+   * @param {boolean} checked - New state of the weather alert toggle.
+   */
   const handleWeatherAlertToggle = (checked: boolean) => {
     if (typeof window !== 'undefined') {
       setShowWeatherBoard(checked);
@@ -142,14 +212,24 @@ const ManagerDashboard = () => {
     }
   };
 
+  /**
+   * Switches the view to the cashier dashboard.
+   */
   const switchToCashierView = () => {
     router.push("/cashier");
   };
 
+  /**
+   * Logs the user out and redirects to the home page.
+   */
   const handleLogout = () => {
     router.push("/");
   };
 
+  /**
+   * weather dialog component
+   * @returns {JSX.Element} The WeatherDialog component.
+   */
   const WeatherDialog = () => {
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -160,6 +240,11 @@ const ManagerDashboard = () => {
       icon: '',
     });
   
+    /**
+     * Gets the business impact of the current weather.
+     * @param description 
+     * @returns {string} The business impact of the current weather.
+     */
     const getBusinessImpact = (description: string) => {
       const lowercaseDesc = description.toLowerCase();
       if (lowercaseDesc.includes('clear') || lowercaseDesc.includes('sunny')) {
@@ -175,9 +260,6 @@ const ManagerDashboard = () => {
     useEffect(() => {
       const fetchWeather = async (lat: number, lon: number) => {
         try {
-
-          
-
           // Get city name from coordinates
           const geoResponse = await axios.get(
             `https://api.openweathermap.org/geo/1.0/reverse`,
@@ -341,7 +423,7 @@ const ManagerDashboard = () => {
             </div>
             <div className="flex items-center space-x-6">
               <div className="flex flex-col space-y-2">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                   <Label htmlFor="show-alerts" className="text-sm">Show Inventory Alerts</Label>
                   <Switch
                     id="show-alerts"
@@ -351,9 +433,9 @@ const ManagerDashboard = () => {
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="show-alerts" className="text-sm">Show Weather Board</Label>
+                  <Label htmlFor="show-weather" className="text-sm">Show Weather Board</Label>
                   <Switch
-                    id="show-alerts"
+                    id="show-weather"
                     checked={showWeatherBoard}
                     disabled={!isInitialized}
                     onCheckedChange={handleWeatherAlertToggle}
@@ -382,6 +464,16 @@ const ManagerDashboard = () => {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {/* Success Alert */}
+      {successMessage && (
+        <Alert variant="default" className="mb-6 border-green-500 bg-green-50 text-green-700">
+          <AlertDescription>{successMessage}</AlertDescription>
+        </Alert>
+      )}
+
+
+      {/* Inventory Alert */}
 
       {/* Transactions Table */}
       <Card>
@@ -431,6 +523,7 @@ const ManagerDashboard = () => {
         </CardContent>
       </Card>
 
+      {/* Reorder Inventory Dialog */}
       {reorderItems && (
         <Dialog open={reorderItems} onOpenChange={setReorderItems}>
           <DialogContent className="max-w-md w-full p-6 bg-white rounded-lg">
@@ -446,20 +539,27 @@ const ManagerDashboard = () => {
                 <li key={item}>{item}</li>
               ))}
             </ul>
-
             <div className="flex justify-end space-x-4">
               <DialogClose asChild>
                 <Button variant="outline">Close</Button>
               </DialogClose>
+              <Button onClick={() => window.location.href = "/manager/manage-inventory"}>
+                Go to Inventory
+              </Button>
               <DialogClose asChild>
-                <Button onClick={() => window.location.href = "/manager/manage-inventory"}>
-                  Go to Inventory
+                <Button 
+                  onClick={handleAutoRestock}
+                  variant="secondary"
+                >
+                  Auto Restock All
                 </Button>
               </DialogClose>
             </div>
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Weather Dialog */}
       {!isLoading && showWeatherDialog && <WeatherDialog />}
     </div>
   );

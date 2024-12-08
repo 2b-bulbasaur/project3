@@ -6,6 +6,16 @@ interface ProductUsageResult {
     usage_count: number;
 }
 
+/**
+ * Handles the POST request to generate a product usage report based on the given date range.
+ * The function extracts two dates (input1, input2), parses them, and retrieves ingredient usage
+ * for each menu item sold between the specified dates.
+ * 
+ * @param {Request} request - The incoming request object containing the date range in JSON format.
+ * @returns {Promise<NextResponse>} - A JSON response with the product usage report or an error message.
+ * 
+ * @throws {Error} Throws an error if the date range is invalid or no product usage data is found.
+ */
 export async function POST(request: Request) {
     try {
         const { input1, input2 } = await request.json();

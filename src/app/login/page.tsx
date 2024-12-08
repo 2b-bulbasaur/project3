@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -10,6 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 
+/**
+ * LoginPage component handles the user login process for employees.
+ * It allows the user to enter their username and password, manage form submission, and navigate to different pages based on the role of the logged-in user.
+ * 
+ * @component
+ */
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,6 +23,16 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  /**
+   * Handles the form submission for user login.
+   * It prevents the default form submission, sends the login request to the server,
+   * and navigates to the appropriate dashboard based on the user's role.
+   *
+   * @async
+   * @function
+   * @param {React.FormEvent} e - The form submit event.
+   * @returns {Promise<void>} 
+   */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;

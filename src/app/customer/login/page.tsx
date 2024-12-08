@@ -9,23 +9,41 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import GoogleTranslate from '@/components/Translation';
 
+/**
+ * The login page component for Panda Express, allowing users to log in with Google, log out, 
+ * or continue as a guest. It manages session states and handles user login/logout actions.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered login page.
+ */
 const CustomerLoginPage = () => {
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  /**
+   * Handles the login action by triggering Google OAuth login through NextAuth.
+   * Sets the loading state to true while the login is in progress.
+   */
   const handleLogin = async () => {
     setIsLoading(true);
     await signIn('google'); // Trigger Google OAuth login
     setIsLoading(false);
   };
 
+  /**
+   * Handles the logout action by signing the user out using NextAuth.
+   * Sets the loading state to true while the logout is in progress.
+   */
   const handleLogout = async () => {
     setIsLoading(true);
     await signOut(); // Log the user out
     setIsLoading(false);
   };
 
+  /**
+   * Redirects the user directly to the customer page without logging in.
+   */
   const handleGuestAccess = () => {
     router.push('/customer'); // Redirect directly to the customer page
   };

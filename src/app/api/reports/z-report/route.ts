@@ -1,15 +1,35 @@
+/**
+ * @fileoverview Handles Z-Report generation for daily transaction summaries
+ * @module route
+ */
+
 import { NextResponse } from 'next/server';
 import { getTransactions } from '@/lib/transactions';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+/**
+ * Represents hourly transaction count data
+ * @typedef {Object} HourlyCount
+ * @property {string} hour - Hour in 24-hour format (HH:00)
+ * @property {number} count - Number of transactions in that hour
+ */
 type HourlyCount = {
   hour: string;
   count: number;
 };
 
+/**
+ * Path to the file storing Z-Report generation status
+ * @constant {string}
+ */
 const REPORT_FILE = path.join(process.cwd(), 'z-report-status.json');
 
+/**
+ * Retrieves the date when the last Z-Report was generated
+ * @async
+ * @returns {Promise<string|null>} The last generated date in ISO format, or null if error occurs
+ */
 async function getLastGeneratedDate(): Promise<string | null> {
   try {
     const data = await fs.readFile(REPORT_FILE, 'utf-8');
@@ -21,6 +41,12 @@ async function getLastGeneratedDate(): Promise<string | null> {
   }
 }
 
+/**
+ * Updates the last generated date for Z-Report
+ * @async
+ * @param {string} date - The date to set as last generated date in ISO format
+ * @returns {Promise<void>}
+ */
 async function setLastGeneratedDate(date: string): Promise<void> {
   await fs.writeFile(
     REPORT_FILE,
@@ -29,6 +55,18 @@ async function setLastGeneratedDate(date: string): Promise<void> {
   );
 }
 
+/**
+ * Handles POST request for Z-Report generation
+ * Business rules:
+ * - Can only generate after 9 PM
+ * - Can only generate once per day
+ * - Counts transactions between 9 AM and 9 PM
+ * 
+ * @async
+ * @returns {Promise<NextResponse>} Response object with either:
+ *   - Success: Hourly transaction counts
+ *   - Error 403: If report already generated or too early
+ */
 export async function POST() {
   try {
     const now = new Date();

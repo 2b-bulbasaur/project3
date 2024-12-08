@@ -17,6 +17,20 @@ interface MealBuilderProps {
   onCancel: () => void;
 }
 
+/**
+ * MealBuilder component that allows users to build their meal by selecting sides and entrees.
+ * The available options are displayed based on the size of the meal (e.g., bowl, plate, bigger plate).
+ *
+ * @param {Object} props - The props for the MealBuilder component.
+ * @param {SizeEnum} props.size - The size of the meal (e.g., 'bowl', 'plate', 'bigger plate').
+ * @param {MealInProgress} props.meal - The current state of the meal being built.
+ * @param {MenuItem[]} props.menuItems - A list of available menu items for the meal.
+ * @param {Function} props.onUpdateMeal - A callback to update the meal when a menu item is selected.
+ * @param {Function} props.onComplete - A callback to complete the meal selection.
+ * @param {Function} props.onCancel - A callback to cancel the meal selection process.
+ * 
+ * @returns {JSX.Element} The rendered MealBuilder component.
+ */
 export const MealBuilder = ({ 
   size, 
   meal, 
@@ -25,6 +39,11 @@ export const MealBuilder = ({
   onComplete,
   onCancel 
 }: MealBuilderProps) => {
+
+  /**
+   * Returns the meal requirements (sides and entrees) based on the meal size.
+   * @returns {Object} An object with the number of sides and entrees required for the selected meal size.
+   */
   const getMealRequirements = () => {
     switch (size) {
       case 'bowl':
@@ -38,6 +57,10 @@ export const MealBuilder = ({
     }
   };
 
+  /**
+   * Calculates the progress of the meal based on the selected sides and entrees.
+   * @returns {number} The percentage of meal completion.
+   */
   const getProgress = () => {
     const requirements = getMealRequirements();
     let filled = 0;
@@ -59,6 +82,10 @@ export const MealBuilder = ({
     return (filled / total) * 100;
   };
 
+   /**
+   * Returns an array of the required items (sides and entrees) that are missing.
+   * @returns {string[]} A list of missing items such as sides or entrees.
+   */
   const getRequiredItems = () => {
     const requirements = getMealRequirements();
     const remaining = [];
@@ -77,15 +104,29 @@ export const MealBuilder = ({
     return remaining;
   };
 
+  /**
+   * Formats the price to two decimal places.
+   * @param {number|string} price - The price to be formatted.
+   * @returns {string} The formatted price as a string with two decimal places.
+   */
   const formatPrice = (price: number | string) => {
     return Number(price).toFixed(2);
   };
 
+  /**
+ * Generates a description of the meal based on its size and the number of sides and entrees.
+ * @returns {string} A string describing the meal.
+ */
   const getMealDescription = () => {
     const requirements = getMealRequirements();
     return `${size} (${requirements.sides} side${requirements.sides > 1 ? 's' : ''}, ${requirements.entrees} entrée${requirements.entrees > 1 ? 's' : ''})`;
   };
 
+  /**
+   * Determines whether a side item is disabled based on the current meal state.
+   * @param {MenuItem} item - The side menu item to check.
+   * @returns {boolean} True if the item is disabled, false otherwise.
+   */
   const isSideDisabled = (item: MenuItem) => {
     const requirements = getMealRequirements();
     if (requirements.sides === 1) {
@@ -95,6 +136,11 @@ export const MealBuilder = ({
            meal.side1.id !== item.id && meal.side2.id !== item.id;
   };
 
+  /**
+   * Determines whether an entree item is disabled based on the current meal state and size.
+   * @param {MenuItem} item - The entree menu item to check.
+   * @returns {boolean} True if the item is disabled, false otherwise.
+   */
   const isEntreeDisabled = (item: MenuItem) => {
     if (size === 'bowl') {
       return meal.entree1 !== null && meal.entree1.id !== item.id;
@@ -111,12 +157,12 @@ export const MealBuilder = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">{getMealDescription()}</h2>
+        <h2 className="text-lg font-semibold dynamic-text">{getMealDescription()}</h2>
         <Button 
           variant="destructive" 
           size="sm"
           onClick={onCancel}
-          className="gap-2"
+          className="gap-2 dynamic-text"
         >
           <XCircle className="h-4 w-4" />
           Cancel Meal
@@ -127,7 +173,7 @@ export const MealBuilder = ({
         <Progress value={getProgress()} className="w-full" />
         {getRequiredItems().length > 0 && (
           <Alert>
-            <AlertDescription>
+            <AlertDescription className="dynamic-text">
               Please select your {getRequiredItems().join(', ')}
             </AlertDescription>
           </Alert>
@@ -148,11 +194,11 @@ export const MealBuilder = ({
                       variant={meal.side1?.id === item.id || meal.side2?.id === item.id 
                         ? "default" 
                         : "outline"}
-                      className="w-full justify-start h-auto py-2"
+                      className="w-full justify-start h-auto py-2 dynamic-text"
                       onClick={() => onUpdateMeal(item)}
                       disabled={isSideDisabled(item)}
                     >
-                      <div className="flex flex-col items-center w-full gap-2">
+                      <div className="flex flex-col items-center w-full gap-2 dynamic-text">
                         <Image
                           src={`/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.png`}
                           alt={item.name}
@@ -178,7 +224,7 @@ export const MealBuilder = ({
           <CardContent className="p-4">
             <h3 className="font-medium mb-2">Entrées</h3>
             <ScrollArea className="h-[550px]">
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-2 dynamic-text">
                 {menuItems
                   .filter(item => item.item_type === 'entree')
                   .map(item => (
@@ -191,7 +237,7 @@ export const MealBuilder = ({
                           ? "default" 
                           : "outline"
                       }
-                      className="w-full justify-start h-auto py-2"
+                      className="w-full justify-start h-auto py-2 dynamic-text"
                       onClick={() => onUpdateMeal(item)}
                       disabled={isEntreeDisabled(item)}
                     >

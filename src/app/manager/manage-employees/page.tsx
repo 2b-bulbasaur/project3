@@ -16,6 +16,10 @@ interface Employee {
   password: string;
 }
 
+/**
+ * Skeleton component for displaying a loading state for an employee.
+ * @returns {JSX.Element} The Employee Skeleton UI.
+ */
 const EmployeeSkeleton = () => (
   <div className="flex items-center justify-between p-3">
     <div className="space-y-2 flex-1">
@@ -29,6 +33,12 @@ const EmployeeSkeleton = () => (
   </div>
 );
 
+/**
+ * ManageEmployees component handles the employee management, including adding,
+ * updating, and deleting employees. It also handles the display of employee
+ * data and loading states.
+ * @returns {JSX.Element} The Manage Employees UI.
+ */
 const ManageEmployees: React.FC = () => {
   const router = useRouter();
 
@@ -43,11 +53,18 @@ const ManageEmployees: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  /**
+   * Displays a success message for a short duration.
+   * @param {string} message - The success message to display.
+   */
   const showSuccessMessage = (message: string) => {
     setSuccessMessage(message);
     setTimeout(() => setSuccessMessage(null), 3000); // Hide after 3 seconds
   };
 
+  /**
+   * Fetches the list of employees from the server and updates the state.
+   */
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
@@ -65,6 +82,10 @@ const ManageEmployees: React.FC = () => {
     }
   };
 
+  /**
+   * Handles adding a new employee.
+   * Validates the input and sends a POST request to the server.
+   */
   const handleAddEmployee = async () => {
     if (!name || !job || hours === '' || salary === '') {
       setError('All fields are required');
@@ -98,6 +119,10 @@ const ManageEmployees: React.FC = () => {
     }
   };
 
+  /**
+   * Handles updating an existing employee.
+   * Validates the input and sends a PUT request to the server.
+   */
   const handleUpdateEmployee = async () => {
     if (!selectedEmployee || !name || !job || hours === '' || salary === '') {
       setError('All fields are required');
@@ -138,6 +163,11 @@ const ManageEmployees: React.FC = () => {
     }
   };
 
+  /**
+   * Handles deleting an employee.
+   * Prompts the user for confirmation and sends a DELETE request to the server.
+   * @param {number} id - The unique identifier of the employee to delete.
+   */
   const handleDeleteEmployee = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this employee?')) {
       return;
@@ -166,6 +196,10 @@ const ManageEmployees: React.FC = () => {
     }
   };
 
+  /**
+   * Handles the click on the edit button to populate the form with the selected employee's details.
+   * @param {Employee} employee - The employee whose details to edit.
+   */
   const handleEditClick = (employee: Employee) => {
     setSelectedEmployee(employee);
     setName(employee.name);

@@ -1,3 +1,8 @@
+/**
+ * @file Menu Board Component - Displays a carousel of menu items with their nutrition facts.
+ * @module MenuBoard
+ */
+
 "use client";
 
 import Image from "next/image";
@@ -95,6 +100,26 @@ const nutritionData = {
     "Sodium (mg)": 930,
     "Total Carb (g)": 12,
     "Protein (g)": 19,
+    "Sugars (g)": 5,
+    "Dietary Fiber (g)": 2,
+  },
+  "Black Pepper Sirloin Steak": {
+    "Serving Size (oz)": "6.1 oz",
+    Calories: 250,
+    "Total Fat (g)": 14,
+    "Sodium (mg)": 930,
+    "Total Carb (g)": 12,
+    "Protein (g)": 19,
+    "Sugars (g)": 5,
+    "Dietary Fiber (g)": 2,
+  },
+  "Hot Ones Blazing Bourbon Chicken": {
+    "Serving Size (oz)": "5.6 oz",
+    Calories: 170,
+    "Total Fat (g)": 7,
+    "Sodium (mg)": 740,
+    "Total Carb (g)": 13,
+    "Protein (g)": 15,
     "Sugars (g)": 5,
     "Dietary Fiber (g)": 2,
   },
@@ -201,6 +226,14 @@ type NutritionData = {
   };
 };
 
+/**
+ * Displays the nutritional information for a specific menu item.
+ * 
+ * @param {Object} props - The props for this component.
+ * @param {NutritionData} props.nutritionData - The full nutrition data for all menu items.
+ * @param {string} props.name - The name of the selected menu item to display nutrition for.
+ * @returns {JSX.Element|null} - A JSX element with nutritional facts or null if no data exists.
+ */
 const NutritionInfo = ({
   nutritionData,
   name,
@@ -244,24 +277,21 @@ const menuItemsData: MenuBoardItem[] = [
   {
     name: "Black Pepper Chicken",
     image: "/images/black-pepper-chicken.png",
-    description:
-      "Marinated chicken, celery and onions in a bold black pepper sauce.",
+    description: "Marinated chicken, celery and onions in a bold black pepper sauce.",
     calories: "280",
     type: "entree",
   },
   {
     name: "Black Pepper Sirloin Steak",
     image: "/images/black-pepper-sirloin-steak.png",
-    description:
-      "Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
+    description:"Premium Angus steak wok-seared with baby broccoli, onions, and mushrooms in a savory black pepper sauce.",
     calories: "450",
     type: "entree",
   },
   {
     name: "Hot Ones Blazing Bourbon Chicken",
     image: "/images/hot-ones-blazing-bourbon-chicken.png",
-    description:
-      "Chicken breast pieces wok-fired in a signature bourbon sauce.",
+    description: "Chicken breast pieces wok-fired in a signature bourbon sauce.",
     calories: "460",
     type: "entree",
   },
@@ -275,8 +305,7 @@ const menuItemsData: MenuBoardItem[] = [
   {
     name: "Mushroom Chicken",
     image: "/images/mushroom-chicken.png",
-    description:
-      "Light and savory chicken with mushrooms, zucchini and carrots in a ginger soy sauce.",
+    description: "Light and savory chicken with mushrooms, zucchini and carrots in a ginger soy sauce.",
     calories: "220",
     type: "entree",
   },
@@ -330,6 +359,12 @@ const menuItemsData: MenuBoardItem[] = [
   },
 ];
 
+/**
+ * Displays the weather information for the current location.
+ * Uses the OpenWeather API to fetch weather based on geolocation.
+ * 
+ * @returns {JSX.Element} - The weather information with icon and temperature.
+ */
 const Weather = () => {
   const [weather, setWeather] = useState<string | null>(null);
   const [icon, setIcon] = useState<string | null>(null);
@@ -428,6 +463,18 @@ const sidesData: MenuBoardItem[] = [
   },
 ];
 
+/**
+ * Component to render a single menu item in a carousel.
+ * 
+ * @param {Object} props - The props for this component.
+ * @param {MenuBoardItem} props.item - The menu item data.
+ * @param {string | null} props.speaking - The currently speaking item name.
+ * @param {Function} props.onSpeak - Function to handle speaking the menu item's description.
+ * @param {Function} props.onItemClick - Function to handle the selection of the menu item.
+ * @param {boolean} props.isSelected - Boolean indicating if the item is selected.
+ * @param {NutritionData} props.nutritionData - Nutrition data for all items.
+ * @returns {JSX.Element} - A JSX element representing the menu item.
+ */
 const MenuItem = ({
   item,
   speaking,
@@ -518,6 +565,16 @@ const MenuItem = ({
   );
 };
 
+/**
+ * Displays a carousel of menu items with options for speaking the item descriptions
+ * and selecting a menu item. Supports dynamic updates to the selected item.
+ * 
+ * @param {Object} props - The properties for this component.
+ * @param {MenuBoardItem[]} props.items - The list of menu items to be displayed in the carousel.
+ * @param {NutritionData} props.nutritionData - The nutritional information for each menu item.
+ * 
+ * @returns {JSX.Element} - A JSX element representing the carousel of menu items.
+ */
 const MenuCarousel = ({
   items,
   nutritionData,
@@ -542,6 +599,11 @@ const MenuCarousel = ({
     setSpeaking(itemName);
   };
 
+  /**
+   * Toggles the selection of a menu item. If the item is already selected, it will be deselected.
+   * 
+   * @param {string} name - The name of the menu item to select or deselect.
+   */
   const handleItemClick = (name: string) => {
     setSelectedItem(selectedItem === name ? null : name);
   };

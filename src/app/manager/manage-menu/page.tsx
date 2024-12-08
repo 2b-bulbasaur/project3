@@ -8,16 +8,35 @@ import { ItemTypeEnum, MenuItem, InventoryItem } from '@/types/db.types';
 import { Trash2, Edit, Plus, X, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+/**
+ * Interface representing the selected ingredient in the menu item.
+ * @interface SelectedIngredient
+ * @extends {InventoryItem}
+ */
 interface SelectedIngredient extends InventoryItem {
   quantity?: number;
 }
 
+/**
+ * Interface representing a menu item with associated ingredients.
+ * @interface MenuItemWithIngredients
+ * @extends {MenuItem}
+ */
 interface MenuItemWithIngredients extends MenuItem {
   ingredients?: SelectedIngredient[];
 }
 
+/**
+ * Constants representing the different item types for a menu.
+ * @constant itemTypes
+ * @type {ItemTypeEnum[]}
+ */
 const itemTypes: ItemTypeEnum[] = ['entree', 'side', 'appetizer', 'drink', 'other'];
 
+/**
+ * Main component for managing the menu items and their ingredients.
+ * @component ManageMenu
+ */
 const ManageMenu: React.FC = () => {
   const router = useRouter();
 
@@ -43,6 +62,12 @@ const ManageMenu: React.FC = () => {
     reorder: false
   });
 
+  /**
+   * Fetches the list of menu items from the API.
+   * @async
+   * @function fetchMenuItems
+   * @returns {Promise<void>} 
+   */
   const fetchMenuItems = async () => {
     try {
       const response = await fetch('/api/menu');
@@ -56,6 +81,12 @@ const ManageMenu: React.FC = () => {
     }
   };
 
+  /**
+   * Fetches the list of ingredients from the API.
+   * @async
+   * @function fetchIngredients
+   * @returns {Promise<void>}
+   */
   const fetchIngredients = async () => {
     try {
       const response = await fetch('/api/inventory');
@@ -68,6 +99,12 @@ const ManageMenu: React.FC = () => {
     }
   };
 
+  /**
+   * Adds a new menu item to the menu.
+   * @async
+   * @function handleAddMenuItem
+   * @returns {Promise<void>}
+   */
   const handleAddMenuItem = async () => {
     if (!name || price === '') {
       setError('Name and price are required');
@@ -115,7 +152,12 @@ const ManageMenu: React.FC = () => {
     }
   };
 
-
+  /**
+   * Updates an existing menu item.
+   * @async
+   * @function handleUpdateMenuItem
+   * @returns {Promise<void>}
+   */
   const handleUpdateMenuItem = async () => {
     if (!selectedItem || !name || price === '') {
       setError('Name and price are required');
@@ -162,6 +204,14 @@ const ManageMenu: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  /**
+   * Deletes a menu item from the menu.
+   * @async
+   * @function handleDeleteMenuItem
+   * @param {number} id - The ID of the menu item to delete.
+   * @returns {Promise<void>}
+   */
   const handleDeleteMenuItem = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this menu item?')) return;
 
@@ -187,6 +237,12 @@ const ManageMenu: React.FC = () => {
     }
   };
 
+  /**
+   * Adds a new ingredient to the inventory.
+   * @async
+   * @function handleAddIngredient
+   * @returns {Promise<void>}
+   */
   const handleAddIngredient = async () => {
     if (!newIngredient.name || !newIngredient.amount || !newIngredient.unit) {
       setError('Name, amount, and unit are required for new ingredients');
@@ -218,6 +274,11 @@ const ManageMenu: React.FC = () => {
     }
   };
 
+  /**
+   * Sets up the selected item for editing.
+   * @function handleEditClick
+   * @param {MenuItemWithIngredients} item - The menu item to be edited.
+   */
   const handleEditClick = (item: MenuItemWithIngredients) => {
     setSelectedItem(item);
     setName(item.name);
@@ -228,6 +289,10 @@ const ManageMenu: React.FC = () => {
     setError(null);
   };
 
+  /**
+   * Resets the form to its initial state.
+   * @function resetForm
+   */
   const resetForm = () => {
     setSelectedItem(null);
     setName('');
@@ -243,6 +308,10 @@ const ManageMenu: React.FC = () => {
     fetchIngredients();
   }, []);
 
+  /**
+   * Skeleton component to display while menu items are loading.
+   * @component MenuItemSkeleton
+   */
   const MenuItemSkeleton = () => (
     <div className="flex items-center justify-between p-3">
       <div className="space-y-2 flex-1">

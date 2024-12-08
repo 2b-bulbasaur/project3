@@ -1,4 +1,8 @@
-// /app/api/inventory/route.ts
+/**
+ * @file Route handlers for inventory management API endpoints
+ * @module inventory/route
+ */
+
 import { NextResponse } from 'next/server';
 import {
   getAllInventory,
@@ -8,6 +12,12 @@ import {
   deleteInventory,
 } from '@/lib/inventory';
 
+/**
+ * Handles GET requests for inventory items
+ * @param {Request} request - The incoming HTTP request
+ * @returns {Promise<NextResponse>} JSON response with inventory data or error
+ * @throws {Error} When database operations fail
+ */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
@@ -35,6 +45,21 @@ export async function GET(request: Request) {
   }
 }
 
+/**
+ * Handles POST requests to create new inventory items
+ * @param {Request} request - The incoming HTTP request with inventory item data
+ * @returns {Promise<NextResponse>} JSON response with created item or error
+ * @throws {Error} When database operations fail
+ * 
+ * @example
+ * // Request body format
+ * {
+ *   "name": "Item Name",
+ *   "amount": 100,
+ *   "unit": "kg",
+ *   "reorder": 20
+ * }
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -71,6 +96,22 @@ export async function POST(request: Request) {
   }
 }
 
+/**
+ * Handles PUT requests to update existing inventory items
+ * @param {Request} request - The incoming HTTP request with updated item data
+ * @returns {Promise<NextResponse>} JSON response with updated item or error
+ * @throws {Error} When database operations fail
+ * 
+ * @example
+ * // Request body format
+ * {
+ *   "id": 1,
+ *   "name": "Updated Item Name",
+ *   "amount": 150,
+ *   "unit": "kg",
+ *   "reorder": 30
+ * }
+ */
 export async function PUT(request: Request) {
   try {
     const { id, name, amount, unit, reorder } = await request.json();

@@ -21,6 +21,15 @@ import { ShoppingCart, CreditCard, ArrowLeft, Check } from 'lucide-react';
 
 import type { OrderItem } from '@/types/api.types';
 
+/**
+ * CheckoutPage Component
+ * 
+ * This component allows users to review their order, input customer details, 
+ * and submit the order for processing. It handles form validation, promo code checks,
+ * and order submission, while also managing loading, success, and error states.
+ * 
+ * @component
+ */
 const CheckoutPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -45,6 +54,10 @@ const CheckoutPage = () => {
     phone: ''
   });
 
+   /**
+   * useEffect hook to retrieve order and customer data from local storage
+   * and initialize state variables when the component mounts.
+   */
   useEffect(() => {
     const order = localStorage.getItem('currentOrder');
     const total = localStorage.getItem('orderTotal');
@@ -69,6 +82,11 @@ const CheckoutPage = () => {
     }
   }, []);
 
+  /**
+   * Handles input changes for customer details form.
+   * 
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event.
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCustomerDetails(prev => ({
@@ -77,6 +95,12 @@ const CheckoutPage = () => {
     }));
   };
 
+  /**
+   * Validates customer details (name, email, phone).
+   * Displays error messages if validation fails.
+   * 
+   * @returns {boolean} - Returns true if validation is successful, false otherwise.
+   */
   const validate = () => {
     const newErrors: { name: string; email: string; phone: string } = { name: '', email: '', phone: '' };
     let isValid = true;
@@ -108,11 +132,16 @@ const CheckoutPage = () => {
     return isValid;
   };
 
-
+  /**
+   * Redirects the user back to the order page.
+   */
   const handleBackToOrder = () => {
     router.push('/customer');
   };
 
+  /**
+   * Handles user logout and redirects to the login page.
+   */
   const handleLogoutAndRedirect = async () => {
     try {
       await signOut({ redirect: false });
@@ -123,6 +152,11 @@ const CheckoutPage = () => {
     }
   };
 
+  /**
+   * Submits the order data, including customer details, order summary, 
+   * and promo code. Handles API request for order submission and checks 
+   * promo eligibility for the next order.
+   */
   const handleSubmitOrder = async () => {
     if (!customerDetails.name || !customerDetails.email || !customerDetails.phone) {
       setError("Please fill in all required fields");
@@ -208,31 +242,42 @@ const CheckoutPage = () => {
     }
   };
 
+  /**
+   * Formats the price value to a string with 2 decimal points.
+   * 
+   * @param {number} price - The price to format.
+   * @returns {string} - The formatted price string.
+   */
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
 
+  /**
+   * Renders the order summary in a table format.
+   * 
+   * @returns {JSX.Element} - The rendered table displaying the order summary.
+   */
   const renderOrderSummary = () => (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Item</TableHead>
-          <TableHead className="text-right">Quantity</TableHead>
-          <TableHead className="text-right">Price</TableHead>
+          <TableHead className="dynamic-text">Item</TableHead>
+          <TableHead className="text-right dynamic-text">Quantity</TableHead>
+          <TableHead className="text-right dynamic-text">Price</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {currentOrder.map((item, index) => (
           <TableRow key={index}>
-            <TableCell>
+            <TableCell className="dynamic-text">
               {item.type === 'meal' && item.meal
                 ? `${item.meal.size} meal`
                 : item.item?.name}
             </TableCell>
-            <TableCell className="text-right">
+            <TableCell className="text-right dynamic-text">
               {item.type === 'meal' 
                 ? '1'
                 : item.item?.quantity || 1}
             </TableCell>
-            <TableCell className="text-right">
+            <TableCell className="text-right dynamic-text">
               {item.type === 'meal' && item.meal
                 ? formatPrice(
                     item.meal.size === 'bowl' 
@@ -249,24 +294,24 @@ const CheckoutPage = () => {
         ))}
         
         <TableRow>
-          <TableCell colSpan={2} className="text-right font-medium">Total:</TableCell>
-          <TableCell className="text-right font-bold">{formatPrice(originalTotal)}</TableCell>
+          <TableCell colSpan={2} className="text-right font-medium dynamic-text">Total:</TableCell>
+          <TableCell className="text-right font-bold dynamic-text">{formatPrice(originalTotal)}</TableCell>
         </TableRow>
         {appliedPromo && (
           <>
           <TableRow>
-          <TableCell colSpan={2} className="text-right text-green-600">
+          <TableCell colSpan={2} className="text-right text-green-600 dynamic-text">
                 Promo Code ({appliedPromo}):
               </TableCell>
-              <TableCell className="text-right text-green-600">
+              <TableCell className="text-right text-green-600 dynamic-text">
               -${(originalTotal - finalTotal).toFixed(2)}
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell colSpan={2} className="text-right font-bold">
+              <TableCell colSpan={2} className="text-right font-bold dynamic-text">
                 Final Total:
               </TableCell>
-              <TableCell className="text-right font-bold">
+              <TableCell className="text-right font-bold dynamic-text">
                 {formatPrice(finalTotal)}
               </TableCell>
             </TableRow>
@@ -275,8 +320,8 @@ const CheckoutPage = () => {
 
 {!appliedPromo && (
           <TableRow>
-            <TableCell colSpan={2} className="text-right font-bold">Total:</TableCell>
-            <TableCell className="text-right font-bold">{formatPrice(finalTotal)}</TableCell>
+            <TableCell colSpan={2} className="text-right font-bold dynamic-text">Total:</TableCell>
+            <TableCell className="text-right font-bold dynamic-text">{formatPrice(finalTotal)}</TableCell>
           </TableRow>
         )}
       </TableBody>
@@ -285,12 +330,12 @@ const CheckoutPage = () => {
 
   if (success) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Card className="w-96">
-          <CardContent className="pt-6 text-center">
-            <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
-            <p className="text-muted-foreground">
+      <div className="flex items-center justify-center h-screen dynamic-text">
+        <Card className="w-96 dynamic-text">
+          <CardContent className="pt-6 text-center dynamic-text">
+            <Check className="w-12 h-12 text-green-500 mx-auto mb-4 dynamic-text" />
+            <h2 className="text-2xl font-bold mb-2 dynamic-text">Order Confirmed!</h2>
+            <p className="text-muted-foreground dynamic-text">
               Thank you for your order. Redirecting you to the home page...
             </p>
           </CardContent>
@@ -300,26 +345,26 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
+    <div className="container mx-auto py-8 max-w-4xl dynamic-text">
       <Button
         variant="ghost"
         onClick={handleBackToOrder}
         className="mb-6"
       >
-        <ArrowLeft className="w-4 h-4 mr-2" />
+        <ArrowLeft className="w-4 h-4 mr-2 dynamic-text" />
         Back to Order
       </Button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dynamic-text">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 dynamic-text">
+              <ShoppingCart className="h-5 w-5 dynamic-text" />
               Order Summary
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[400px]">
+            <ScrollArea className="h-[400px] dynamic-text">
               {renderOrderSummary()}
             </ScrollArea>
           </CardContent>
@@ -333,8 +378,8 @@ const CheckoutPage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="space-y-4 dynamic-text">
+              <div className="space-y-2 dynamic-text">
                 <Label htmlFor="name">Name *</Label>
                 <Input
                   id="name"
@@ -345,11 +390,11 @@ const CheckoutPage = () => {
                 />
 
                 {errors.name && (
-                  <span className="text-red-500 text-sm">Invalid Name</span>
+                  <span className="text-red-500 text-sm dynamic-text">Invalid Name</span>
                 )}
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-2 dynamic-text">
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
@@ -361,11 +406,11 @@ const CheckoutPage = () => {
                 />
 
                 {errors.email && (
-                  <span className="text-red-500 text-sm">Invalid Email Address</span>
+                  <span className="text-red-500 text-sm dynamic-text">Invalid Email Address</span>
                 )}
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-2 dynamic-text">
                 <Label htmlFor="phone">Phone *</Label>
                 <Input
                   id="phone"
@@ -382,7 +427,7 @@ const CheckoutPage = () => {
               </div>
 
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="dynamic-text">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
@@ -390,7 +435,7 @@ const CheckoutPage = () => {
           </CardContent>
           <CardFooter>
             <Button 
-              className="w-full"
+              className="w-full dynamic-text"
               onClick={handleSubmitOrder}
               disabled={loading}
             >

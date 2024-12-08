@@ -15,6 +15,10 @@ interface InventoryItem {
   reorder: boolean;
 }
 
+/**
+ * Skeleton loader component for an inventory item.
+ * Displays placeholder content while inventory data is loading.
+ */
 const InventoryItemSkeleton = () => (
   <div className="flex items-center justify-between p-3">
     <div className="space-y-2 flex-1">
@@ -28,6 +32,9 @@ const InventoryItemSkeleton = () => (
   </div>
 );
 
+/**
+ * Manages the inventory list and operations such as adding, updating, and deleting items.
+ */
 const ManageInventory: React.FC = () => {
   const router = useRouter();
 
@@ -40,6 +47,10 @@ const ManageInventory: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  /**
+   * Fetches the inventory data from the server and updates the component's state.
+   * The data is sorted alphabetically by the item name.
+   */
   const fetchInventory = async () => {
     try {
       const response = await fetch('/api/inventory');
@@ -58,6 +69,10 @@ const ManageInventory: React.FC = () => {
     }
   };
 
+  /**
+   * Handles adding a new item to the inventory.
+   * Submits the data to the server and refreshes the inventory list.
+   */
   const handleAddItem = async () => {
     if (!name || amount === '' || !unit) {
       setError('All fields are required');
@@ -95,6 +110,10 @@ const ManageInventory: React.FC = () => {
     }
   };
 
+  /**
+   * Handles updating an existing inventory item.
+   * Submits the updated data to the server and refreshes the inventory list.
+   */
   const handleUpdateItem = async () => {
     if (!selectedItem || !name || amount === '' || !unit) {
       setError('All fields are required');
@@ -133,6 +152,10 @@ const ManageInventory: React.FC = () => {
     }
   };
 
+  /**
+   * Handles deleting an inventory item.
+   * Prompts the user for confirmation before sending the delete request to the server.
+   */
   const handleDeleteItem = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this item?')) {
       return;
@@ -160,6 +183,9 @@ const ManageInventory: React.FC = () => {
     }
   };
 
+  /**
+   * Initializes the form for editing an existing inventory item.
+   */
   const handleEditClick = (item: InventoryItem) => {
     setSelectedItem(item);
     setName(item.name);
@@ -169,6 +195,9 @@ const ManageInventory: React.FC = () => {
     setError(null);
   };
 
+  /**
+   * Resets the form fields and error state.
+   */
   const resetForm = () => {
     setSelectedItem(null);
     setName('');
@@ -221,11 +250,24 @@ const ManageInventory: React.FC = () => {
               ) : (
                 <div className="divide-y divide-border rounded-md border">
                   {inventory.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 hover:bg-secondary/10">
+                    <div 
+                      key={item.id} 
+                      className={`flex items-center justify-between p-3 ${
+                        item.reorder 
+                          ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' 
+                          : 'hover:bg-secondary/10'
+                      }`}
+                    >
                       <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.amount} {item.unit} • {item.reorder ? 'Reorder needed' : 'Stock OK'}
+                        <div className={`font-medium ${item.reorder ? 'text-red-700' : ''}`}>
+                          {item.name}
+                        </div>
+                        <div className={`text-sm ${item.reorder ? 'text-red-600' : 'text-muted-foreground'}`}>
+                          {item.amount} {item.unit} • {item.reorder ? (
+                            <span className="font-medium">Reorder needed</span>
+                          ) : (
+                            'Stock OK'
+                          )}
                         </div>
                       </div>
                       <div className="flex gap-2">

@@ -30,6 +30,17 @@ interface TransactionData {
 
 type ChartDataType = ChartData<'line', number[], string>;
 
+/**
+ * TransactionChart component to render a line chart displaying transaction counts per hour.
+ *
+ * This component uses Chart.js (via react-chartjs-2) to visualize the number of transactions
+ * occurring each hour. The input `data` prop should contain an array of objects with `hour`
+ * and `count` properties.
+ *
+ * @param {Object} props - The component props.
+ * @param {TransactionData[]} props.data - Array of transaction data objects containing hour and count values.
+ * @returns {JSX.Element} A line chart displaying transaction counts by hour.
+ */
 const TransactionChart = ({ data }: { data: TransactionData[] }) => {
   const [chartData, setChartData] = useState<ChartDataType | null>(null);
 
