@@ -457,6 +457,7 @@ const CustomerPage = () => {
       commandHandler.handleCommand(command);
     } catch (error) {
       setError(error instanceof Error ? error.message : "Command failed");
+      setTimeout(() => setError(""), 3000);
     }
   }, [
     menuItems,
