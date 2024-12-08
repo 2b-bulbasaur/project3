@@ -1,184 +1,230 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Mic, MicOff, AlertTriangle, Info } from 'lucide-react';
+//components/VoiceControl.tsx
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Mic, MicOff, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { extractCommand } from '@/lib/VoiceCommands';
+import type { 
+  FeedbackMessage, 
+  SpeechRecognition, 
+  SpeechRecognitionEvent, 
+  SpeechRecognitionErrorEvent 
+} from '@/types/voice.types';
 
-type VoiceControlProps = {
+interface VoiceControlProps {
   onCommand: (command: string) => void;
   isListening: boolean;
   setIsListening: (listening: boolean) => void;
-};
+}
 
-const DEBUG = true; 
-
-const VoiceControl = ({ onCommand, isListening, setIsListening }: VoiceControlProps) => {
+const VoiceControl: React.FC<VoiceControlProps> = ({ 
+  onCommand, 
+  isListening, 
+  setIsListening 
+}) => {
   const [speechSupported, setSpeechSupported] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [recognition, setRecognition] = useState<any>(null);
-  const [debugInfo, setDebugInfo] = useState<{
-    rawTranscript: string;
-    extractedCommand: string;
-    status: string;
-  }>({ rawTranscript: '', extractedCommand: '', status: 'Ready' });
+  const [hasMicPermission, setHasMicPermission] = useState<boolean | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [feedback, setFeedback] = useState<FeedbackMessage | null>(null);
+  const [debugInfo, setDebugInfo] = useState({
+    rawTranscript: '',
+    extractedCommand: '',
+    status: 'Ready'
+  });
 
-  const logDebug = (...args: any[]) => {
-    if (DEBUG) {
-      console.log('%c[Voice Control]', 'color: #4CAF50; font-weight: bold;', ...args);
+  const showFeedback = useCallback((message: FeedbackMessage) => {
+    console.log('Feedback:', message);
+    setFeedback(message);
+    if (message.duration) {
+      setTimeout(() => setFeedback(null), message.duration);
     }
-  };
+  }, []);
 
-  const logError = (...args: any[]) => {
-    if (DEBUG) {
-      console.error('%c[Voice Control Error]', 'color: #f44336; font-weight: bold;', ...args);
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      setDebugInfo(prev => ({ ...prev, status: 'Stopped' }));
     }
-  };
+  }, [setIsListening]);
 
-  const availableCommands = [
-    "create bowl",
-    "create plate",
-    "create bigger plate",
-    "add orange chicken",
-    "add chow mein",
-    "add super greens",
-    "complete meal",
-    "checkout"
-  ];
+  const checkMicrophonePermission = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop()); // Clean up the stream
+      setHasMicPermission(true);
+      setError(null);
+      return true;
+    } catch (err) {
+      console.error('Microphone permission error:', err);
+      setHasMicPermission(false);
+      setError("Please allow microphone access to use voice commands");
+      return false;
+    }
+  }, []);
 
-  useEffect(() => {
-    logDebug('Initializing voice control...');
-    
+  const initializeRecognition = useCallback(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      logError('Speech recognition not supported in this browser');
       setSpeechSupported(false);
       setError("Your browser doesn't support voice commands. Please use Chrome for the best experience.");
-      return;
+      return false;
     }
 
-    // Initialize recognition instance
-    // @ts-ignore - Speech Recognition API types
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognitionInstance = new SpeechRecognition();
-    recognitionInstance.continuous = true;
-    recognitionInstance.interimResults = false;
-    recognitionInstance.lang = 'en-US';
-    
-    logDebug('Speech recognition instance created with settings:', {
-      continuous: recognitionInstance.continuous,
-      interimResults: recognitionInstance.interimResults,
-      lang: recognitionInstance.lang
-    });
+    try {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
 
-    recognitionInstance.onstart = () => {
-      logDebug('Recognition started');
+      recognitionRef.current = recognition;
+      return true;
+    } catch (err) {
+      console.error('Error initializing speech recognition:', err);
+      setSpeechSupported(false);
+      setError("Failed to initialize speech recognition");
+      return false;
+    }
+  }, []);
+
+  const startListening = useCallback(async () => {
+    if (!speechSupported) return;
+
+    // Check/request microphone permission
+    const hasPermission = await checkMicrophonePermission();
+    if (!hasPermission) return;
+
+    // Initialize recognition if needed
+    if (!recognitionRef.current && !initializeRecognition()) return;
+
+    const recognition = recognitionRef.current!;
+
+    recognition.onstart = () => {
       setIsListening(true);
       setError(null);
       setDebugInfo(prev => ({ ...prev, status: 'Listening...' }));
+      showFeedback({
+        message: 'Voice recognition started',
+        type: 'success',
+        duration: 2000
+      });
     };
 
-    recognitionInstance.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const last = event.results.length - 1;
-      const transcript = event.results[last][0].transcript.toLowerCase().trim();
-      logDebug('Raw transcript received:', transcript);
-      logDebug('Confidence level:', event.results[last][0].confidence);
+      const transcript = event.results[last][0].transcript;
+      console.log('Transcript received:', transcript);
 
       const command = extractCommand(transcript);
-      logDebug('Extracted command:', command);
-      
+      console.log('Extracted command:', command);
+
       setDebugInfo({
         rawTranscript: transcript,
-        extractedCommand: command,
-        status: 'Processing command...'
+        extractedCommand: command || '',
+        status: command ? 'Processing command...' : 'No command found'
       });
 
       if (command) {
-        logDebug('Executing command:', command);
-        onCommand(command);
-      } else {
-        logDebug('No valid command found in transcript');
+        setIsProcessing(true);
+        try {
+          onCommand(command);
+          showFeedback({
+            message: `Command executed: ${command}`,
+            type: 'success',
+            duration: 2000
+          });
+        } catch (err) {
+          showFeedback({
+            message: err instanceof Error ? err.message : 'Command failed',
+            type: 'error',
+            duration: 3000
+          });
+        } finally {
+          setIsProcessing(false);
+        }
       }
     };
 
-    recognitionInstance.onerror = (event: any) => {
-      logError('Recognition error:', event.error);
-      console.error('Speech recognition error:', {
-        error: event.error,
-        message: event.message,
-        timeStamp: event.timeStamp
-      });
-      setError(`Error: ${event.error}`);
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      console.error('Recognition error:', event);
+      if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+        setHasMicPermission(false);
+        setError("Microphone access denied. Please allow microphone access and try again.");
+      } else {
+        setError(`Recognition error: ${event.error}`);
+      }
       setIsListening(false);
-      setDebugInfo(prev => ({ ...prev, status: `Error: ${event.error}` }));
+      stopListening();
     };
 
-    recognitionInstance.onend = () => {
-      logDebug('Recognition ended. isListening:', isListening);
+    recognition.onend = () => {
       if (isListening) {
-        logDebug('Restarting recognition...');
-        recognitionInstance.start();
-        setDebugInfo(prev => ({ ...prev, status: 'Restarting...' }));
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error('Failed to restart recognition:', e);
+          stopListening();
+        }
       } else {
         setIsListening(false);
-        setDebugInfo(prev => ({ ...prev, status: 'Stopped' }));
       }
     };
 
-    setRecognition(recognitionInstance);
-
-    return () => {
-      logDebug('Cleaning up recognition instance');
-      if (recognitionInstance) {
-        recognitionInstance.stop();
-      }
-    };
-  }, [isListening, onCommand, setIsListening]);
-
-  const startListening = useCallback(() => {
-    if (!speechSupported || !recognition) {
-      logError('Cannot start - speech not supported or recognition not initialized');
-      return;
-    }
     try {
-      logDebug('Starting recognition...');
       recognition.start();
-      setDebugInfo(prev => ({ ...prev, status: 'Starting...' }));
     } catch (err) {
-      logError('Failed to start recognition:', err);
-      setError(String(err));
-    }
-  }, [speechSupported, recognition]);
-
-  const stopListening = useCallback(() => {
-    if (!recognition) {
-      logError('Cannot stop - recognition not initialized');
-      return;
-    }
-    try {
-      logDebug('Stopping recognition...');
-      recognition.stop();
+      console.error('Failed to start recognition:', err);
+      setError('Failed to start voice recognition. Please try again.');
       setIsListening(false);
-      setDebugInfo(prev => ({ ...prev, status: 'Stopping...' }));
-    } catch (err) {
-      logError('Failed to stop recognition:', err);
-      setError(String(err));
     }
-  }, [recognition, setIsListening]);
+  }, [
+    speechSupported,
+    checkMicrophonePermission,
+    initializeRecognition,
+    isListening,
+    onCommand,
+    showFeedback,
+    stopListening,
+    setIsListening
+  ]);
 
-  // Log component re-renders
   useEffect(() => {
-    logDebug('VoiceControl component state updated:', {
-      isListening,
-      error,
-      debugInfo
-    });
-  }, [isListening, error, debugInfo]);
+    const init = async () => {
+      await checkMicrophonePermission();
+      initializeRecognition();
+    };
+    init();
+  }, [checkMicrophonePermission, initializeRecognition]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   if (!speechSupported) {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>Voice control is not supported in your browser</AlertDescription>
+        <AlertDescription>Voice control is not supported in your browser. Please use Chrome.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (hasMicPermission === false) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          Microphone access is required. Please allow microphone access in your browser settings and refresh the page.
+        </AlertDescription>
       </Alert>
     );
   }
@@ -190,11 +236,12 @@ const VoiceControl = ({ onCommand, isListening, setIsListening }: VoiceControlPr
           variant={isListening ? "destructive" : "default"}
           onClick={isListening ? stopListening : startListening}
           className="gap-2"
+          disabled={isProcessing || !hasMicPermission}
         >
           {isListening ? (
             <>
               <MicOff className="h-4 w-4" />
-              Stop Voice
+              {isProcessing ? 'Processing...' : 'Stop Voice'}
             </>
           ) : (
             <>
@@ -209,34 +256,31 @@ const VoiceControl = ({ onCommand, isListening, setIsListening }: VoiceControlPr
         </span>
       </div>
 
-      {isListening && (
-        <Card className="p-4">
-          <div className="space-y-2">
-            <div className="text-sm">
-              <strong>Raw Transcript:</strong> {debugInfo.rawTranscript}
-            </div>
-            <div className="text-sm">
-              <strong>Extracted Command:</strong> {debugInfo.extractedCommand}
-            </div>
-            <div className="mt-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <Info className="h-4 w-4" />
-                Available Commands:
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                {availableCommands.map((cmd, i) => (
-                  <div key={i} className="bg-secondary rounded px-2 py-1">{cmd}</div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
+      {feedback && (
+        <Alert variant={feedback.type === 'error' ? 'destructive' : 'default'}>
+          <AlertDescription>{feedback.message}</AlertDescription>
+        </Alert>
       )}
 
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {isListening && debugInfo.rawTranscript && (
+        <Card className="p-4">
+          <div className="space-y-2">
+            <div className="text-sm">
+              <strong>Heard:</strong> {debugInfo.rawTranscript}
+            </div>
+            {debugInfo.extractedCommand && (
+              <div className="text-sm">
+                <strong>Command:</strong> {debugInfo.extractedCommand}
+              </div>
+            )}
+          </div>
+        </Card>
       )}
     </div>
   );

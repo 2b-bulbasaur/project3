@@ -96,7 +96,6 @@ const CustomerPage = () => {
   const [error, setError] = useState("");
   const [showMealBuilder, setShowMealBuilder] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [commandFeedback, setCommandFeedback] = useState<{message: string, isError: boolean} | null>(null);
   
   const goToHome = () => {
     router.push("/");
@@ -196,7 +195,7 @@ const CustomerPage = () => {
   /**
    * Validates the promo code entered by the user.
    */
-  const validatePromoCode = () => {
+  const validatePromoCode = useCallback(() => {
     if (promoCode.trim().toUpperCase() === "PANDA20") {
       setIsPromoValid(true);
       setDiscountedTotal(orderTotal * 0.8);
@@ -204,7 +203,7 @@ const CustomerPage = () => {
       setIsPromoValid(false);
       setDiscountedTotal(orderTotal);
     }
-  };
+  }, [promoCode, orderTotal]);
 
   /**
  * Updates the promo code input field value.
@@ -218,7 +217,7 @@ const CustomerPage = () => {
    * Starts a new meal creation process with the selected size.
    * @param {SizeEnum} size - The size of the meal being created (e.g., "bowl", "plate").
    */
-  const startNewMeal = (size: SizeEnum) => {
+  const startNewMeal = useCallback((size: SizeEnum) => {
     setCurrentMeal({
       size,
       side1: null,
@@ -228,34 +227,34 @@ const CustomerPage = () => {
       entree3: null,
     });
     setShowMealBuilder(true);
-  };
+  }, []);
 
   /**
    * Handles meal updates based on the selected item (side, entree).
    * @param {MenuItem} item - The menu item selected to update the meal.
    */
-  const handleMealUpdate = (item: MenuItem) => {
+  const handleMealUpdate = useCallback((item: MenuItem) => {
     if (!currentMeal) return;
-
+  
     setCurrentMeal((prev) => {
       if (!prev) return prev;
-
+  
       if (item.item_type === "side") {
         if (prev.size === "bowl" || prev.size === "plate") {
           if (prev.side1?.id === item.id) return { ...prev, side1: null };
           if (prev.side2?.id === item.id) return { ...prev, side2: null };
-
+  
           return { ...prev, side1: item, side2: null };
         } else {
           if (prev.side1?.id === item.id) return { ...prev, side1: null };
           if (prev.side2?.id === item.id) return { ...prev, side2: null };
-
+  
           if (!prev.side1) return { ...prev, side1: item };
           if (!prev.side2) return { ...prev, side2: item };
         }
         return prev;
       }
-
+  
       if (item.item_type === "entree") {
         if (prev.size === "bowl") {
           if (prev.entree1?.id === item.id) return { ...prev, entree1: null };
@@ -264,46 +263,46 @@ const CustomerPage = () => {
         } else if (prev.size === "plate") {
           if (prev.entree1?.id === item.id) return { ...prev, entree1: null };
           if (prev.entree2?.id === item.id) return { ...prev, entree2: null };
-
+  
           if (!prev.entree1) return { ...prev, entree1: item };
           if (!prev.entree2) return { ...prev, entree2: item };
         } else {
           if (prev.entree1?.id === item.id) return { ...prev, entree1: null };
           if (prev.entree2?.id === item.id) return { ...prev, entree2: null };
           if (prev.entree3?.id === item.id) return { ...prev, entree3: null };
-
+  
           if (!prev.entree1) return { ...prev, entree1: item };
           if (!prev.entree2) return { ...prev, entree2: item };
           if (!prev.entree3) return { ...prev, entree3: item };
         }
         return prev;
       }
-
+  
       return prev;
     });
-  };
+  }, [currentMeal]);
 
-  const addSimpleItem = (item: MenuItem) => {
+  const addSimpleItem = useCallback((item: MenuItem) => {
     if (item.item_type !== "appetizer" && item.item_type !== "drink") return;
-
+  
     setCurrentOrder((prev) => {
       const existingIndex = prev.findIndex(
         (orderItem) =>
           orderItem.type !== "meal" && orderItem.item?.id === item.id
       );
-
+  
       if (existingIndex >= 0) {
-        return prev; 
+        return prev;
       }
-
+  
       const newOrderItem: OrderItem = {
         type: item.item_type as "appetizer" | "drink",
         item: { ...item, quantity: 1 },
       };
-
+  
       return [...prev, newOrderItem];
     });
-  };
+  }, []);
 
   /**
  * Handles the item click event. If the meal builder is active, it updates the current meal;
@@ -322,10 +321,10 @@ const CustomerPage = () => {
   /**
  * Cancels the current meal creation process by resetting the meal state and hiding the meal builder.
  */
-  const cancelMeal = () => {
+  const cancelMeal = useCallback(() => {
     setCurrentMeal(null);
     setShowMealBuilder(false);
-  };
+  }, []);
 
   /**
    * Cancels the current order by clearing all the order details, resetting the meal state, 
@@ -351,7 +350,7 @@ const CustomerPage = () => {
    * Completes the current meal by adding it to the order and saving the updated order to localStorage.
    * Afterward, it resets the current meal and hides the meal builder.
    */
-  const completeMeal = () => {
+  const completeMeal = useCallback(() => {
     if (!currentMeal) return;
     const newMealItem: OrderItem = { type: "meal", meal: currentMeal };
     const updatedOrder = [...currentOrder, newMealItem];
@@ -359,7 +358,7 @@ const CustomerPage = () => {
     localStorage.setItem("currentOrder", JSON.stringify(updatedOrder));
     setCurrentMeal(null);
     setShowMealBuilder(false);
-  };
+  }, [currentMeal, currentOrder]);
 
   /**
    * Removes an item from the current order based on its index and updates the localStorage with the new order.
@@ -437,49 +436,27 @@ const CustomerPage = () => {
         completeMeal,
         cancelMeal,
         handleCheckout: () => {
-          console.log('Checkout Handler Invoked'); // Add this log
-
           if (currentOrder.length === 0) {
-            setCommandFeedback({
-              message: "Please add items to your order before checking out",
-              isError: true
-            });
-            setTimeout(() => setCommandFeedback(null), 3000);
+            setError("Please add items to your order before checking out");
             return;
-  
           }
-
+  
           localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
           localStorage.setItem("orderTotal", discountedTotal.toString());
           localStorage.setItem("originalTotal", orderTotal.toString());
           localStorage.setItem("promoCode", isPromoValid ? promoCode : "");
-
+  
           router.push("/customer/checkout");
-
-          setCommandFeedback({
-            message: "Command executed: Redirecting to heckout",
-            isError: false
-          });
-
         },
         validatePromoCode
       },
-      currentMeal,
+      currentMeal
     );
   
     try {
       commandHandler.handleCommand(command);
-      setCommandFeedback({
-        message: `Command executed: "${command}"`,
-        isError: false
-      });
-      setTimeout(() => setCommandFeedback(null), 3000);
     } catch (error) {
-      setCommandFeedback({
-        message: error instanceof Error ? error.message : "Command failed",
-        isError: true
-      });
-      setTimeout(() => setCommandFeedback(null), 3000);
+      setError(error instanceof Error ? error.message : "Command failed");
     }
   }, [
     menuItems,
@@ -494,7 +471,9 @@ const CustomerPage = () => {
     discountedTotal,
     orderTotal,
     isPromoValid,
-    promoCode
+    promoCode,
+    validatePromoCode,
+    setError
   ]);
 
   if (loading)

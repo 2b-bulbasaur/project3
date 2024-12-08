@@ -50,6 +50,7 @@
     "@shadcn/ui": "^0.0.4",
     "@types/axios": "^0.9.36",
     "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.13",
     "@types/next-auth": "^3.13.0",
     "@types/node": "^20",
     "@types/pg": "^8.11.10",
