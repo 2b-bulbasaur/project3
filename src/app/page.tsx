@@ -21,11 +21,12 @@ export default function SetupPage() {
   const deviceOptions: DeviceOption[] = [
     {
       title: "Customer Kiosk",
-      description: "Set up this device as a self-service customer ordering kiosk",
+      description:
+        "Set up this device as a self-service customer ordering kiosk",
       route: "/customer/login",
       icon: (
         <svg
-          className="w-24 h-24 text-orange-500"
+          className="w-20 h-20 text-orange-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -46,7 +47,7 @@ export default function SetupPage() {
       route: "/login",
       icon: (
         <svg
-          className="w-24 h-24 text-orange-500"
+          className="w-20 h-20 text-orange-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -67,7 +68,7 @@ export default function SetupPage() {
       route: "/menu-board",
       icon: (
         <svg
-          className="w-24 h-24 text-orange-500"
+          className="w-20 h-20 text-orange-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -78,6 +79,28 @@ export default function SetupPage() {
             strokeLinejoin="round"
             strokeWidth={2}
             d="M4 6h16M4 10h16M4 14h16M4 18h16"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: "Static Menu Board",
+      description:
+        "Display a non-interactive menu board for multi-display setups",
+      route: "/static-menu",
+      icon: (
+        <svg
+          className="w-20 h-20 text-orange-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"
           />
         </svg>
       ),
@@ -127,7 +150,7 @@ export default function SetupPage() {
           Device Setup
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-7xl mx-auto">
           {deviceOptions.map((option) => (
             <Card
               key={option.title}
@@ -135,20 +158,27 @@ export default function SetupPage() {
               onClick={() => router.push(option.route)}
             >
               <CardHeader className="text-center">
-                <h3 className="text-2xl font-bold text-white">{option.title}</h3>
+                <h3 className="text-xl font-bold text-white">{option.title}</h3>
               </CardHeader>
               <CardContent className="text-center">
-                <div className="h-32 flex items-center justify-center">
+                <div className="h-28 flex items-center justify-center">
                   {option.icon}
                 </div>
-                <p className="text-gray-300 mt-4">{option.description}</p>
+                <p className="text-gray-300 mt-4 text-sm">
+                  {option.description}
+                </p>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // stops card click when clicking the button
-                    speak(`${option.title}. ${option.description}`, option.title);
+                    e.stopPropagation();
+                    speak(
+                      `${option.title}. ${option.description}`,
+                      option.title
+                    );
                   }}
                   className="absolute top-4 right-4 p-2 hover:bg-zinc-800 rounded-full transition-colors"
-                  aria-label={speaking === option.title ? "Stop speaking" : "Read aloud"}
+                  aria-label={
+                    speaking === option.title ? "Stop speaking" : "Read aloud"
+                  }
                 >
                   {speaking === option.title ? (
                     <VolumeX className="w-5 h-5 text-amber-500" />
