@@ -7,6 +7,11 @@ Welcome to the documentation for our Point of Sale (POS) System.
 This system provides an integrated solution for managing restaurant operations through multiple specialized interfaces.
 This documentation covers the technical details of our components, API routes, and application pages.
 
+## Getting Started
+- [Installation Guide](./getting-started/installation.md)
+- [Development Setup](./getting-started/development.md)
+- [Deployment Guide](./getting-started/deployment.md)
+
 ## Components
 
 ### UI Components
@@ -31,8 +36,3 @@ This documentation covers the technical details of our components, API routes, a
 - [Inventory](./api/inventory.md)
 - [Menu](./api/menu.md)
 - [Reports](./api/reports.md)
-
-## Getting Started
-- [Installation Guide](./getting-started/installation.md)
-- [Development Setup](./getting-started/development.md)
-- [Deployment Guide](./getting-started/deployment.md)
