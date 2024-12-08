@@ -21,8 +21,7 @@ import GoogleTranslate from "@/components/Translation";
 
 import VoiceControl from "@/components/VoiceControl";
 import { VoiceCommandHandler, extractCommand } from '@/lib/VoiceCommands';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Mic, MicOff, AlertTriangle } from 'lucide-react';
+
 /**
  * CategorySection component renders a list of menu items categorized by type (e.g., appetizer, drink).
  *
@@ -438,9 +437,16 @@ const CustomerPage = () => {
         completeMeal,
         cancelMeal,
         handleCheckout: () => {
+          console.log('Checkout Handler Invoked'); // Add this log
+
           if (currentOrder.length === 0) {
-            setError("Please add items to your order before checking out");
+            setCommandFeedback({
+              message: "Please add items to your order before checking out",
+              isError: true
+            });
+            setTimeout(() => setCommandFeedback(null), 3000);
             return;
+  
           }
 
           localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
@@ -449,6 +455,12 @@ const CustomerPage = () => {
           localStorage.setItem("promoCode", isPromoValid ? promoCode : "");
 
           router.push("/customer/checkout");
+
+          setCommandFeedback({
+            message: "Command executed: Redirecting to heckout",
+            isError: false
+          });
+
         },
         validatePromoCode
       },

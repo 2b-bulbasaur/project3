@@ -1,3 +1,5 @@
+import { useRouter } from 'next/router';
+
 import { MenuItem } from '@/types/db.types';
 import { MealInProgress } from '@/types/api.types';
 
@@ -225,27 +227,43 @@ const COMMON_MENU_ITEMS = {
 } as const;
 
 export function extractCommand(transcript: string): string {
+  const normalizedTranscript = transcript.toLowerCase().trim();
+
   const keywords = [
-    'create', 'start', 'add', 'complete', 'finish', 'cancel', 'checkout', 
+    'create', 'start', 'add', 'complete', 'finish', 'cancel', 'checkout', 'check out',
     'bowl', 'plate', 'bigger plate', 'remove', 'delete', 'promo'
   ];
 
-  log.debug('Extracting command from:', transcript);
-  const words = transcript.toLowerCase().split(' ');
+  const words = normalizedTranscript.split(' ');
   const commandStart = words.findIndex(word => {
     if (word === 'and') return false;
     return keywords.includes(word) || 
            keywords.some(keyword => word.includes(keyword));
   });
-  
-  if (commandStart === -1) {
-    log.debug('No command keywords found');
-    return '';
+
+  if (commandStart !== -1) {
+    const command = words.slice(commandStart).join(' ');
+    log.debug('Extracted command:', command);
+    return command;
   }
-  
-  const command = words.slice(commandStart).join(' ');
-  log.debug('Extracted command:', command);
-  return command;
+
+  for (let i = words.length - 1; i >= 0; i--) {
+    if (keywords.includes(words[i])) {
+      const command = words.slice(i).join(' ');
+      log.debug('Extracted command:', command);
+      return command;
+    }
+  }
+
+  for (const keyword of keywords) {
+    if (normalizedTranscript.includes(keyword)) {
+      log.debug("Matched Command:", keyword);
+      return keyword === "check out" ? "checkout" : keyword;
+    }
+  }
+
+  log.debug('No command keywords found');
+  return '';
 }
 
 export class VoiceCommandHandler {
