@@ -23,14 +23,14 @@ const COMMON_MENU_ITEMS = {
       name: 'Chow Mein',
       aliases: ['chow mein', 'noodles', 'lo mein']
     },
-    // Add other sides here
+   
   ],
   entrees: [
     {
       name: 'Orange Chicken',
       aliases: ['orange chicken', 'orange']
     },
-    // Add other entrees here
+
   ]
 };
 
@@ -38,18 +38,15 @@ export function extractCommand(transcript: string): string {
   console.log('Extracting command from:', transcript);
   const normalizedTranscript = transcript.toLowerCase().trim();
 
-  // Basic commands
   if (normalizedTranscript.match(/^(create|make|start)\s+(bowl|plate|bigger plate)$/i)) {
     return normalizedTranscript;
   }
 
-  // For add commands, keep the original phrasing
   if (normalizedTranscript.startsWith('add ')) {
     return normalizedTranscript;
   }
 
-  // Other commands
-  if (normalizedTranscript.match(/^(complete|finish|done|checkout|cancel)\s+.*$/i)) {
+  if (normalizedTranscript.match(/^(complete|finish|done|cancel|checkout|check\s*out)(?:\s+.*)?$/i)) {
     return normalizedTranscript;
   }
 
@@ -82,7 +79,6 @@ export class VoiceCommandHandler {
     console.log('Finding menu item:', itemName);
     const normalizedName = itemName.toLowerCase().trim();
     
-    // First try exact match
     const exactMatch = this.menuItems.find(item => 
       item.name.toLowerCase() === normalizedName
     );
@@ -91,16 +87,13 @@ export class VoiceCommandHandler {
       return exactMatch;
     }
 
-    // Check common item names and aliases
     let itemAlias = '';
-    // Check sides
     for (const side of COMMON_MENU_ITEMS.sides) {
       if (side.aliases.some(alias => normalizedName.includes(alias))) {
         itemAlias = side.name;
         break;
       }
     }
-    // Check entrees if no side match
     if (!itemAlias) {
       for (const entree of COMMON_MENU_ITEMS.entrees) {
         if (entree.aliases.some(alias => normalizedName.includes(alias))) {
@@ -120,7 +113,6 @@ export class VoiceCommandHandler {
       }
     }
 
-    // Try partial match as last resort
     const partialMatch = this.menuItems.find(item => {
       const itemNameLower = item.name.toLowerCase();
       return itemNameLower.includes(normalizedName) || normalizedName.includes(itemNameLower);
@@ -149,7 +141,6 @@ export class VoiceCommandHandler {
     }
 
     try {
-      // Create meal patterns
       const createMealMatch = normalizedCommand.match(/^(?:create|start|make)\s+(bowl|plate|bigger plate)$/i);
       if (createMealMatch) {
         const size = createMealMatch[1] as "bowl" | "plate" | "bigger plate";
@@ -158,7 +149,6 @@ export class VoiceCommandHandler {
         return;
       }
 
-      // Add item pattern
       const addItemMatch = normalizedCommand.match(/^add\s+(.+)$/i);
       if (addItemMatch) {
         const itemName = addItemMatch[1];
@@ -179,21 +169,18 @@ export class VoiceCommandHandler {
         return;
       }
 
-      // Complete meal pattern
       if (normalizedCommand.match(/^(?:complete|finish|done)\s+(?:the\s+)?meal$/i)) {
         console.log('Completing meal');
         this.handlers.completeMeal();
         return;
       }
 
-      // Cancel meal pattern
       if (normalizedCommand.match(/^(?:cancel|stop)\s+(?:the\s+)?meal$/i)) {
         console.log('Canceling meal');
         this.handlers.cancelMeal();
         return;
       }
 
-      // Checkout pattern
       if (normalizedCommand.match(/^(?:checkout|check\s*out)$/i)) {
         console.log('Processing checkout');
         this.handlers.handleCheckout();
